@@ -1,0 +1,218 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:include schemaLocation="parameterxml.xsd" />
+  <xs:include schemaLocation="QueryExpression.xsd" />
+  <xs:simpleType name="EntityTypes">
+    <xs:restriction base="xs:NMTOKEN">
+      <xs:enumeration value="Entity" />
+      <xs:enumeration value="Intersect" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="FilterTypes">
+    <xs:restriction base="xs:NMTOKEN">
+      <xs:enumeration value="string" />
+      <xs:enumeration value="guid" />
+      <xs:enumeration value="int" />
+      <xs:enumeration value="bool" />
+      <xs:enumeration value="datetime" />
+      <xs:enumeration value="null" />
+      <xs:enumeration value="not-null" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="SortTypes">
+    <xs:restriction base="xs:NMTOKEN">
+      <xs:enumeration value="Asc" />
+      <xs:enumeration value="Desc" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="DeleteTypes">
+    <xs:restriction base="xs:NMTOKEN">
+      <xs:enumeration value="None"/>
+      <xs:enumeration value="Existing"/>
+      <xs:enumeration value="All"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="SaveTypes">
+    <xs:restriction base="xs:NMTOKEN">
+      <xs:enumeration value="CreateUpdate"/>
+      <xs:enumeration value="CreateOnly"/>
+      <xs:enumeration value="UpdateOnly"/>
+      <xs:enumeration value="Never"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="SolutionTypes">
+    <xs:restriction base="xs:NMTOKEN">
+      <xs:enumeration value="Managed"/>
+      <xs:enumeration value="Unmanaged"/>
+      <xs:enumeration value="Both"/>
+      <xs:enumeration value="None"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="SolutionVersionComparers">
+    <xs:restriction base="xs:NMTOKEN">
+      <xs:enumeration value="any"/>
+      <xs:enumeration value="eq-this"/>
+      <xs:enumeration value="ge-this"/>
+      <xs:enumeration value="eq"/>
+      <xs:enumeration value="ge"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:element name="ShuffleDefinition">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="Blocks" type="Blocks"/>
+      </xs:sequence>
+      <xs:attribute name="Timeout" type="xs:int" use="optional" />
+      <xs:attribute name="StopOnError" type="xs:boolean" use="optional" default="false" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:complexType name="Blocks">
+    <xs:sequence minOccurs="1">
+      <xs:choice minOccurs="1" maxOccurs="unbounded">
+        <xs:element name="SolutionBlock" type="SolutionBlock" minOccurs="1" maxOccurs="unbounded"/>
+        <xs:element name="DataBlock" type="DataBlock" minOccurs="1" maxOccurs="unbounded"/>
+      </xs:choice>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="SolutionBlock">
+    <xs:sequence minOccurs="1">
+      <xs:element minOccurs="0" maxOccurs="1" name="Export" type="SolutionBlockExport" />
+      <xs:element minOccurs="0" maxOccurs="1" name="Import" type="SolutionBlockImport" />
+    </xs:sequence>
+    <xs:attribute name="Name" type="xs:string" use="required" />
+    <xs:attribute name="Path" type="xs:string" use="optional" />
+    <xs:attribute name="File" type="xs:string" use="optional" />
+  </xs:complexType>
+
+  <xs:complexType name="SolutionBlockExport">
+    <xs:sequence>
+      <xs:element name="Settings" minOccurs="0" maxOccurs="1">
+        <xs:complexType>
+          <xs:attribute name="AutoNumbering" type="xs:boolean" use="optional" default="false" />
+          <xs:attribute name="Calendar" type="xs:boolean" use="optional" default="false" />
+          <xs:attribute name="Customization" type="xs:boolean" use="optional" default="false" />
+          <xs:attribute name="EmailTracking" type="xs:boolean" use="optional" default="false" />
+          <xs:attribute name="General" type="xs:boolean" use="optional" default="false" />
+          <xs:attribute name="Marketing" type="xs:boolean" use="optional" default="false" />
+          <xs:attribute name="OutlookSync" type="xs:boolean" use="optional" default="false" />
+          <xs:attribute name="RelationshipRoles" type="xs:boolean" use="optional" default="false" />
+          <xs:attribute name="IsvConfig" type="xs:boolean" use="optional" default="false" />
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="Type" type="SolutionTypes" use="required" />
+    <xs:attribute name="SetVersion" type="xs:string" use="optional" />
+    <xs:attribute name="PublishBeforeExport" type="xs:boolean" use="optional" default="false" />
+    <xs:attribute name="TargetVersion" type="xs:string" use="optional" />
+  </xs:complexType>
+
+  <xs:complexType name="SolutionBlockImport">
+    <xs:sequence>
+      <xs:element name="PreRequisites" minOccurs="0" maxOccurs="1">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element maxOccurs="unbounded" name="Solution">
+              <xs:complexType>
+                <xs:attribute name="Name" type="xs:string" use="required" />
+                <xs:attribute name="Comparer" type="SolutionVersionComparers" use="required" />
+                <xs:attribute name="Version" type="xs:string" use="optional" />
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="PostSuccessfulImportBlocks" type="Blocks" minOccurs="0"></xs:element>
+    </xs:sequence>
+    <xs:attribute name="OverwriteSameVersion" type="xs:boolean" use="optional" default="true" />
+    <xs:attribute name="OverwriteNewerVersion" type="xs:boolean" use="optional" default="false" />
+    <xs:attribute name="Type" type="SolutionTypes" use="required" />
+    <xs:attribute name="ActivateServersideCode" type="xs:boolean" use="required" />
+    <xs:attribute name="OverwriteCustomizations" type="xs:boolean" use="required" />
+    <xs:attribute name="PublishAll" type="xs:boolean" use="required" />
+  </xs:complexType>
+
+  <xs:complexType name="DataBlock">
+    <xs:sequence minOccurs="1">
+      <xs:element minOccurs="0" maxOccurs="1" name="Export" type="DataBlockExport" />
+      <xs:element minOccurs="0" maxOccurs="1" name="Import" type="DataBlockImport" />
+      <xs:element name="Relation" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:attribute name="Block" type="xs:string" use="required" />
+          <xs:attribute name="Attribute" type="xs:string" use="required" />
+          <xs:attribute name="PK-Attribute" type="xs:string" use="optional" />
+          <xs:attribute name="IncludeNull" type="xs:boolean" use="optional" default="false" />
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="Name" type="xs:string" use="required" />
+    <xs:attribute name="Entity" type="xs:string" use="required" />
+    <xs:attribute name="Type" type="EntityTypes" use="optional" />
+    <xs:attribute name="IntersectName" type="xs:string" use="optional" />
+  </xs:complexType>
+
+  <xs:complexType name="DataBlockExport">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="Filter">
+        <xs:complexType>
+          <xs:attribute name="Attribute" type="xs:string" use="required" />
+          <xs:attribute name="Operator" type="ConditionOperator" use="required" />
+          <xs:attribute name="Type" type="FilterTypes" use="optional" />
+          <xs:attribute name="Value" type="xs:string" use="optional" />
+        </xs:complexType>
+      </xs:element>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="Sort">
+        <xs:complexType>
+          <xs:attribute name="Attribute" type="xs:string" use="required" />
+          <xs:attribute name="Type" type="SortTypes" use="optional" default="Asc" />
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="Attributes">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element maxOccurs="unbounded" name="Attribute">
+              <xs:complexType>
+                <xs:attribute name="Name" type="xs:string" use="required" />
+                <xs:attribute name="IncludeNull" type="xs:boolean" default="false" use="optional" />
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="ActiveOnly" type="xs:boolean" use="optional" default="false" />
+  </xs:complexType>
+
+  <xs:complexType name="DataBlockImport">
+    <xs:sequence>
+      <xs:element name="Match" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element maxOccurs="unbounded" name="Attribute">
+              <xs:complexType>
+                <xs:attribute name="Name" type="xs:string" use="required" />
+                <xs:attribute name="Display" type="xs:string" use="optional" />
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+          <xs:attribute name="PreRetrieveAll" type="xs:boolean" default="false" use="optional" />
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="CreateWithId" type="xs:boolean" use="optional" default="false" />
+    <xs:attribute name="Save" type="SaveTypes" use="optional" default="CreateUpdate" />
+    <xs:attribute name="Delete" type="DeleteTypes" use="optional" default="None" />
+    <xs:attribute name="UpdateInactive" type="xs:boolean" use="optional" default="false" />
+    <xs:attribute name="Overwrite" type="xs:boolean" use="optional">
+      <xs:annotation>
+        <xs:appinfo>ShuffleDefinition.Blocks.DataBlock.Import.Overwrite</xs:appinfo>
+        <xs:documentation>DEPRECATED. Use Save attribute instead.</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <!--<xs:attribute name="ExecuteMultiple" type="xs:boolean" use="optional" default="false" />-->
+  </xs:complexType>
+
+
+</xs:schema>

@@ -1,0 +1,60 @@
+{
+  "id": "87589590-e070-48ad-b709-a7758db9db8b",
+  "name": "UpdateAssembly",
+  "friendlyName": "DevUtils - Update Assembly",
+  "description": "Updates an assembly in target CRM organization.",
+  "author": "Innofactor Sweden",
+  "helpMarkDown": "",
+  "category": "Build",
+  "visibility": [
+    "Build",
+    "Release"
+  ],
+  "demands": [],
+  "version": {
+    "Major": "8",
+    "Minor": "2",
+    "Patch": "9"
+  },
+  "minimumAgentVersion": "1.95.0",
+  "groups": [
+    {
+      "name": "advanced",
+      "displayName": "Advanced",
+      "isExpanded": false
+    }
+  ],
+  "instanceNameFormat": "Update Assembly",
+  "inputs": [
+    {
+      "name": "crmConnectionString",
+      "type": "string",
+      "label": "CRM Connection String",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "For more information on format: https://msdn.microsoft.com/en-gb/library/mt608573.aspx"
+    },
+    {
+      "name": "assembly",
+      "type": "filePath",
+      "label": "Assembly",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "Assembly file to update in target CRM. _Assembly must be registered._"
+    },
+    {
+      "name": "updateManaged",
+      "type": "boolean",
+      "label": "Update Managed",
+      "defaultValue": "false",
+      "required": false,
+      "helpMarkDown": "Check this to allow update of assemblies that are managed in target CRM environment.",
+      "groupName": "advanced"
+    }
+  ],
+  "execution": {
+    "PowerShell3": {
+      "target": "UpdateAssembly.ps1"
+    }
+  }
+}

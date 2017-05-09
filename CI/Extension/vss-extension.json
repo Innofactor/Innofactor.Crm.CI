@@ -1,0 +1,101 @@
+{
+  "manifestVersion": 1,
+  "id": "cinteros-devutils-ci-build-tasks",
+  "name": "Cinteros DevUtils Build Tools",
+  "version": "8.2.56",
+  "publisher": "InnofactorSE",
+  "targets": [
+    {
+      "id": "Microsoft.VisualStudio.Services"
+    }
+  ],
+  "description": "Tasks automating Build & Deployment using Cinteros Shuffle and other internal tools",
+  "categories": [
+    "Build and release"
+  ],
+  "icons": {
+    "default": "icon_128x128.png"
+  },
+  "files": [
+    {
+      "path": "ApplyVersionToAssemblies"
+    },
+    {
+      "path": "ShuffleExport"
+    },
+    {
+      "path": "ShuffleImport"
+    },
+    {
+      "path": "UpdateAssembly"
+    },
+    {
+      "path": "UpdateWebResources"
+    },
+    {
+      "path": "MinifyJS"
+    }
+  ],
+  "contributions": [
+    {
+      "id": "ApplyVersionToAssemblies",
+      "type": "ms.vss-distributed-task.task",
+      "targets": [
+        "ms.vss-distributed-task.tasks"
+      ],
+      "properties": {
+        "name": "ApplyVersionToAssemblies"
+      }
+    },
+    {
+      "id": "ShuffleExport",
+      "type": "ms.vss-distributed-task.task",
+      "targets": [
+        "ms.vss-distributed-task.tasks"
+      ],
+      "properties": {
+        "name": "ShuffleExport"
+      }
+    },
+    {
+      "id": "ShuffleImport",
+      "type": "ms.vss-distributed-task.task",
+      "targets": [
+        "ms.vss-distributed-task.tasks"
+      ],
+      "properties": {
+        "name": "ShuffleImport"
+      }
+    },
+    {
+      "id": "UpdateAssembly",
+      "type": "ms.vss-distributed-task.task",
+      "targets": [
+        "ms.vss-distributed-task.tasks"
+      ],
+      "properties": {
+        "name": "UpdateAssembly"
+      }
+    },
+    {
+      "id": "UpdateWebResources",
+      "type": "ms.vss-distributed-task.task",
+      "targets": [
+        "ms.vss-distributed-task.tasks"
+      ],
+      "properties": {
+        "name": "UpdateWebResources"
+      }
+    },
+    {
+      "id": "MinifyJS",
+      "type": "ms.vss-distributed-task.task",
+      "targets": [
+        "ms.vss-distributed-task.tasks"
+      ],
+      "properties": {
+        "name": "MinifyJS"
+      }
+    }
+  ]
+}

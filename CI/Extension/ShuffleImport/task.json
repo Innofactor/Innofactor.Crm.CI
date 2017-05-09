@@ -1,0 +1,52 @@
+{
+  "id": "a4334ae5-0d38-4dc9-b30d-881fd2988c56",
+  "name": "ShuffleImport",
+  "friendlyName": "DevUtils - Shuffle Import",
+  "description": "Import data and solutions using Cinteros Shuffle.",
+  "author": "Innofactor Sweden",
+  "helpMarkDown": "",
+  "category": "Deploy",
+  "visibility": [
+    "Build",
+    "Release"
+  ],
+  "demands": [],
+  "version": {
+    "Major": "8",
+    "Minor": "2",
+    "Patch": "18"
+  },
+  "minimumAgentVersion": "1.95.0",
+  "instanceNameFormat": "ShuffleImport",
+  "inputs": [
+    {
+      "name": "crmConnectionString",
+      "type": "string",
+      "label": "CRM Connection String",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "For more information on format: https://msdn.microsoft.com/en-gb/library/mt608573.aspx"
+    },
+    {
+      "name": "definitionFile",
+      "type": "filePath",
+      "label": "Shuffle Definition",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "Shuffle Definition file specifying the import."
+    },
+    {
+      "name": "dataFile",
+      "type": "filePath",
+      "label": "Shuffle Data File",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "Shuffle Data file to import. Default is _DefinitionFile_.data.xml"
+    }
+  ],
+  "execution": {
+    "PowerShell3": {
+      "target": "ShuffleImport.ps1"
+    }
+  }
+}

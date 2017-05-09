@@ -1,0 +1,76 @@
+{
+  "id": "ebd685fe-1b2d-4b7f-aaad-002ecec338b7",
+  "name": "UpdateWebResources",
+  "friendlyName": "DevUtils - Update Web Resources",
+  "description": "Update web resources from local folder structure to target CRM organization.",
+  "author": "Innofactor Sweden",
+  "helpMarkDown": "",
+  "category": "Build",
+  "visibility": [
+    "Build",
+    "Release"
+  ],
+  "demands": [],
+  "version": {
+    "Major": "8",
+    "Minor": "2",
+    "Patch": "17"
+  },
+  "minimumAgentVersion": "1.95.0",
+  "groups": [
+    {
+      "name": "advanced",
+      "displayName": "Advanced",
+      "isExpanded": false
+    }
+  ],
+  "instanceNameFormat": "Update Web Resources",
+  "inputs": [
+    {
+      "name": "crmConnectionString",
+      "type": "string",
+      "label": "CRM Connection String",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "For more information on format: https://msdn.microsoft.com/en-gb/library/mt608573.aspx"
+    },
+    {
+      "name": "prefix",
+      "type": "string",
+      "label": "Prefix for web resource files",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "The prefix must match the prefix of the existing web resource files."
+    },
+    {
+      "name": "pattern",
+      "type": "filePath",
+      "label": "Pattern file",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "File containing pattern of files to include and exclude in the update. _WebResources must be registered._"
+    },
+    {
+      "name": "rootPath",
+      "type": "filePath",
+      "label": "Root folder",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "Local root folder corresponding to root web resource path on CRM server."
+    },
+    {
+      "name": "updateManaged",
+      "type": "boolean",
+      "label": "Update Managed",
+      "defaultValue": "false",
+      "required": false,
+      "helpMarkDown": "Check this to allow update of webresources that are managed in target CRM environment.",
+      "groupName": "advanced"
+    }
+  ],
+  "execution": {
+    "PowerShell3": {
+      "target": "UpdateWebResources.ps1"
+    }
+  }
+}

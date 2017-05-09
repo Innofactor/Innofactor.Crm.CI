@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>Cinteros.DevUtils.Shuffle.8</id>
+    <title>Cinteros DevUtils for CRM 2016 Shuffle</title>
+    <authors>Cinteros</authors>
+    <owners>Cinteros</owners>
+    <version>1.0.0.0</version>
+    <iconUrl>http://rappen.net/Cinteros/cinteros.ico</iconUrl>
+    <projectUrl>https://cinteros.visualstudio.com/Cinteros%20Utils/_git/DevUtils?path=%2FCrm.Utils.Shuffle&amp;version=GBmaster&amp;_a=history</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Shuffle Utilities for Cinteros CRM 2016 projects.</description>
+    <copyright>Cinteros AB</copyright>
+    <language>en-US</language>
+    <dependencies>
+      <dependency id="Cinteros.DevUtils.8" version="8.0.0.0"/>
+    </dependencies>
+  </metadata>
+</package>

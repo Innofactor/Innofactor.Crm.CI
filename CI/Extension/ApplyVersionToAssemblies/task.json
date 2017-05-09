@@ -1,0 +1,26 @@
+{
+  "id": "4d6fe5ed-c8e8-4782-ac11-97e27b7a72c5",
+  "name": "ApplyVersionToAssemblies",
+  "friendlyName": "DevUtils - Apply Build Version to assemblies",
+  "description": "This task will extract the four part version number from generated the build number and update all AssemblyInfo files in the solution with this version.",
+  "author": "Innofactor Sweden",
+  "helpMarkDown": "This task will extract the *four part version number* from generated the {build number} and update all AssemblyInfo files in the solution with this version.",
+  "category": "Build",
+  "visibility": [
+    "Build",
+    "Release"
+  ],
+  "demands": [],
+  "version": {
+    "Major": "8",
+    "Minor": "2",
+    "Patch": "4"
+  },
+  "minimumAgentVersion": "1.95.0",
+  "instanceNameFormat": "Apply Build Version to assemblies",
+  "execution": {
+    "PowerShell3": {
+      "target": "ApplyVersionToAssemblies.ps1"
+    }
+  }
+}

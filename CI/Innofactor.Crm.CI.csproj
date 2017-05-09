@@ -1,0 +1,172 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{2CE10812-D7D7-40F2-94E4-63A3E7E345AC}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Cinteros.Crm.Utils.CI</RootNamespace>
+    <AssemblyName>Cinteros.Crm.Utils.CI</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Release\Cinteros.Crm.Utils.CI.xml</DocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Cinteros.Crm.Utils.Common, Version=8.1.1705.3, Culture=neutral, PublicKeyToken=0b6cd78ab2e51f2b, processorArchitecture=MSIL">
+      <HintPath>..\packages\Cinteros.DevUtils.8.8.1.1705.03\lib\net452\Cinteros.Crm.Utils.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Cinteros.Crm.Utils.Misc, Version=8.1.1705.3, Culture=neutral, PublicKeyToken=0b6cd78ab2e51f2b, processorArchitecture=MSIL">
+      <HintPath>..\packages\Cinteros.DevUtils.8.8.1.1705.03\lib\net452\Cinteros.Crm.Utils.Misc.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Crm.Sdk.Proxy, Version=8.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.CrmSdk.CoreAssemblies.8.2.0.2\lib\net452\Microsoft.Crm.Sdk.Proxy.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.IdentityModel, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.IdentityModel.6.1.7600.16394\lib\net35\Microsoft.IdentityModel.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.IdentityModel.Clients.ActiveDirectory, Version=2.22.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.IdentityModel.Clients.ActiveDirectory.2.22.302111727\lib\net45\Microsoft.IdentityModel.Clients.ActiveDirectory.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.IdentityModel.Clients.ActiveDirectory.WindowsForms, Version=2.22.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.IdentityModel.Clients.ActiveDirectory.2.22.302111727\lib\net45\Microsoft.IdentityModel.Clients.ActiveDirectory.WindowsForms.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Xrm.Sdk, Version=8.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.CrmSdk.CoreAssemblies.8.2.0.2\lib\net452\Microsoft.Xrm.Sdk.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Xrm.Sdk.Deployment">
+      <HintPath>..\packages\Microsoft.CrmSdk.Deployment.8.2.0.2\lib\net452\Microsoft.Xrm.Sdk.Deployment.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Xrm.Tooling.Connector, Version=2.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.CrmSdk.XrmTooling.CoreAssembly.8.2.0.2\lib\net452\Microsoft.Xrm.Tooling.Connector.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Activities" />
+    <Reference Include="System.Activities.Presentation" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.DirectoryServices" />
+    <Reference Include="System.DirectoryServices.AccountManagement" />
+    <Reference Include="System.IdentityModel" />
+    <Reference Include="System.Management.Automation, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.PowerShell.5.ReferenceAssemblies.1.0.0\lib\net4\System.Management.Automation.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.ServiceModel.Web" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.Workflow.Activities" />
+    <Reference Include="System.Workflow.ComponentModel" />
+    <Reference Include="System.Workflow.Runtime" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Plugins\UpdateCrmAssemblyCmdlet.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Shuffle\ExportCrmShuffleCmdlet.cs" />
+    <Compile Include="Shuffle\ImportCrmShuffleCmdlet.cs" />
+    <Compile Include="WebResources\SolutionComponentType.cs" />
+    <Compile Include="WebResources\UpdateCrmWebResoucesCmdlet.cs" />
+    <Compile Include="WebResources\WebResourceManager.cs" />
+    <Compile Include="XrmCommandBase.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Shuffle\Innofactor.Crm.Shuffle.csproj">
+      <Project>{c381e1b6-63d1-4f5f-9d9b-b275f3cc6687}</Project>
+      <Name>Innofactor.Crm.Shuffle</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Extension\ApplyVersionToAssemblies\icon.png" />
+    <Content Include="Extension\icon_128x128.png" />
+    <Content Include="Extension\MinifyJS\gulpfile.js" />
+    <None Include="Extension\WebResourcePatternSample.txt" />
+    <Content Include="Extension\ApplyVersionToAssemblies\ApplyVersionToAssemblies.ps1" />
+    <Content Include="Extension\MinifyJS\icon.png" />
+    <Content Include="Extension\ShuffleExport\icon.png" />
+    <Content Include="Extension\ShuffleExport\ShuffleExport.ps1" />
+    <Content Include="Extension\ShuffleImport\icon.png" />
+    <Content Include="Extension\ShuffleImport\ShuffleImport.ps1" />
+    <Content Include="Extension\UpdateAssembly\icon.png" />
+    <Content Include="Extension\UpdateWebResources\icon.png" />
+    <Content Include="Extension\VstsTaskSdk\Minimatch.dll" />
+    <Content Include="Extension\VstsTaskSdk\Strings\resources.resjson\de-de\resources.resjson" />
+    <Content Include="Extension\VstsTaskSdk\Strings\resources.resjson\en-US\resources.resjson" />
+    <Content Include="Extension\VstsTaskSdk\Strings\resources.resjson\es-es\resources.resjson" />
+    <Content Include="Extension\VstsTaskSdk\Strings\resources.resjson\fr-fr\resources.resjson" />
+    <Content Include="Extension\VstsTaskSdk\Strings\resources.resjson\it-IT\resources.resjson" />
+    <Content Include="Extension\VstsTaskSdk\Strings\resources.resjson\ja-jp\resources.resjson" />
+    <Content Include="Extension\VstsTaskSdk\Strings\resources.resjson\ko-KR\resources.resjson" />
+    <Content Include="Extension\VstsTaskSdk\Strings\resources.resjson\ru-RU\resources.resjson" />
+    <Content Include="Extension\VstsTaskSdk\Strings\resources.resjson\zh-CN\resources.resjson" />
+    <Content Include="Extension\VstsTaskSdk\Strings\resources.resjson\zh-TW\resources.resjson" />
+    <None Include="Extension\ApplyVersionToAssemblies\task.json" />
+    <None Include="Extension\CopyLibToTasks.cmd" />
+    <Content Include="Extension\MinifyJS\MinifyJS.ps1" />
+    <None Include="Extension\MinifyJS\task.json" />
+    <None Include="Extension\PackExtension.cmd" />
+    <None Include="Extension\ShuffleExport\task.json" />
+    <None Include="Extension\ShuffleImport\task.json" />
+    <None Include="Extension\UpdateAssembly\task.json" />
+    <None Include="Extension\UpdateWebResources\task.json" />
+    <None Include="Extension\vss-extension.json" />
+    <None Include="Extension\VstsTaskSdk\FindFunctions.ps1" />
+    <None Include="Extension\VstsTaskSdk\InputFunctions.ps1" />
+    <None Include="Extension\VstsTaskSdk\LegacyFindFunctions.ps1" />
+    <None Include="Extension\VstsTaskSdk\lib.json" />
+    <None Include="Extension\VstsTaskSdk\LocalizationFunctions.ps1" />
+    <None Include="Extension\VstsTaskSdk\LoggingCommandFunctions.ps1" />
+    <None Include="Extension\VstsTaskSdk\LongPathFunctions.ps1" />
+    <None Include="Extension\VstsTaskSdk\OutFunctions.ps1" />
+    <None Include="Extension\VstsTaskSdk\ServerOMFunctions.ps1" />
+    <None Include="Extension\VstsTaskSdk\ToolFunctions.ps1" />
+    <None Include="Extension\VstsTaskSdk\TraceFunctions.ps1" />
+    <None Include="Extension\VstsTaskSdk\VstsTaskSdk.psd1" />
+    <None Include="Extension\VstsTaskSdk\VstsTaskSdk.psm1" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
+    <Content Include="Extension\UpdateWebResources\UpdateWebResources.ps1" />
+    <Content Include="Extension\UpdateAssembly\UpdateAssembly.ps1" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>"$(ProjectDir)Extension\CopyLibToTasks.cmd" "$(TargetDir)" "$(ProjectDir)"</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

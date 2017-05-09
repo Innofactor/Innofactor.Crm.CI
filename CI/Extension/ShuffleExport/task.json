@@ -1,0 +1,61 @@
+{
+  "id": "c0da7e50-d3a6-417e-9c8b-11da841352fc",
+  "name": "ShuffleExport",
+  "friendlyName": "DevUtils - Shuffle Export",
+  "description": "Export data and solutions using Cinteros Shuffle.",
+  "author": "Innofactor Sweden",
+  "helpMarkDown": "",
+  "category": "Build",
+  "visibility": [
+    "Build",
+    "Release"
+  ],
+  "demands": [],
+  "version": {
+    "Major": "8",
+    "Minor": "2",
+    "Patch": "24"
+  },
+  "minimumAgentVersion": "1.95.0",
+  "instanceNameFormat": "ShuffleExport",
+  "inputs": [
+    {
+      "name": "crmConnectionString",
+      "type": "string",
+      "label": "CRM Connection String",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "For more information on format: https://msdn.microsoft.com/en-gb/library/mt608573.aspx"
+    },
+    {
+      "name": "definitionFile",
+      "type": "filePath",
+      "label": "Shuffle Definition",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "Shuffle Definition file specifying the export."
+    },
+    {
+      "name": "dataFile",
+      "type": "filePath",
+      "label": "Shuffle Data File",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "Shuffle export target data file. Default is _DefinitionFile_.data.xml"
+    },
+    {
+      "name": "setVersion",
+      "type": "boolean",
+      "label": "Set Version",
+      "defaultValue": "true",
+      "required": false,
+      "helpMarkDown": "Check this to set version of solutions exported to current semantic build version."
+    }
+  ],
+  "execution": {
+    "PowerShell3": {
+      "target": "ShuffleExport.ps1",
+      "argumentFormat": "$(crmConnectionString)"
+    }
+  }
+}

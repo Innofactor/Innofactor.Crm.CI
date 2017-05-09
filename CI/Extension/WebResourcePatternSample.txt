@@ -1,0 +1,4 @@
+﻿scripts\*.js
+!**\*.maxi.js
+images\*.*
+!scripts\test.js
