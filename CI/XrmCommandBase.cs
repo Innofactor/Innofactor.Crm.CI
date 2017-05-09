@@ -1,4 +1,8 @@
-﻿using Cinteros.Crm.Utils.Common;
+﻿// Heavily inspired by Wael Hamze xrm-ci-framework
+// https://github.com/WaelHamze/xrm-ci-framework/blob/master/CRM365/Xrm.Framework.CI/Xrm.Framework.CI.PowerShell.Cmdlets/XrmCommandBase.cs
+
+
+using Cinteros.Crm.Utils.Common;
 using Microsoft.Xrm.Tooling.Connector;
 using System.Management.Automation;
 
