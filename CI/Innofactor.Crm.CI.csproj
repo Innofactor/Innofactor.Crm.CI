@@ -110,6 +110,8 @@
     <Content Include="Extension\icon_128x128.png" />
     <Content Include="Extension\Images\Assembly.png" />
     <Content Include="Extension\Images\Export.png" />
+    <Content Include="Extension\Images\InnofactorIcon128.png" />
+    <Content Include="Extension\Images\InnofactorIcon512.png" />
     <Content Include="Extension\Images\Minify.png" />
     <Content Include="Extension\Images\Tasks.png" />
     <Content Include="Extension\Images\WebResources.png" />

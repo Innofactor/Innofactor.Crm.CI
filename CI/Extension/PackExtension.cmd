@@ -10,14 +10,16 @@ if [%publish%]==[y] (set publish=Y)
 
 if [%publish%]==[Y] (
   set /P pat=Enter PAT: 
-  set /P share=Enter shares: 
 )
 if NOT EXIST VSIX (md VSIX)
 
 if [%publish%]==[Y] (
-  call tfx extension publish --manifest-globs vss-extension.json --output-path VSIX %rev% --share-with %share% --token %pat%
+  call tfx extension publish --manifest-globs vss-extension.json --output-path VSIX %rev% --token %pat%
 ) else (
   call tfx extension create --manifest-globs vss-extension.json %rev% --output-path VSIX
 )
 
 pause
+
+rem   set /P share=Enter shares: 
+rem   call tfx extension publish --manifest-globs vss-extension.json --output-path VSIX %rev% --share-with %share% --token %pat%

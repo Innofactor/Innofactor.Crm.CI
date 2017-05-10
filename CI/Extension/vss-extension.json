@@ -2,16 +2,20 @@
   "manifestVersion": 1,
   "id": "cinteros-devutils-ci-build-tasks",
   "name": "DevOps for Microsoft Dynamics 365",
-  "version": "8.2.74",
+  "version": "8.2.78",
   "publisher": "InnofactorSE",
   "targets": [
     {
       "id": "Microsoft.VisualStudio.Services"
     }
   ],
-  "description": "Tasks to facilitate a complete DevOps approach to Microsoft Dynamics 365 projects using Innofactor Shuffle and related tools.",
+  "description": "Build and Release tasks to facilitate a complete DevOps approach to Microsoft Dynamics 365 projects using Innofactor Shuffle and related tools.",
   "categories": [
     "Build and release"
+  ],
+  "galleryFlags": [
+    "Preview",
+    "Public"
   ],
   "tags": [
     "Dynamics 365",
@@ -21,7 +25,8 @@
     "CRM 365"
   ],
   "icons": {
-    "default": "icon_128x128.png"
+    "default": "Images/InnofactorIcon128.png",
+    "large": "Images/InnofactorIcon512.png"
   },
   "screenshots": [
     {
@@ -60,7 +65,15 @@
     "type": "git",
     "uri": "https://github.com/Innofactor/Innofactor.Crm.CI"
   },
+  "branding": {
+    "color": "rgb(0, 93, 164)",
+    "theme": "dark"
+  },
   "files": [
+    {
+      "path": "Images",
+      "addressable": true
+    },
     {
       "path": "ApplyVersionToAssemblies"
     },
