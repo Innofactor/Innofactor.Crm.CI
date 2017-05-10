@@ -158,5 +158,55 @@ namespace Cinteros.Crm.Utils.Shuffle
             CintDynEntity cdSolution = cSolutions[0];
             return cdSolution;
         }
+
+        /// <summary>Get the current versions for all solutions defined in the definition file</summary>
+        /// <remarks>Results will be placed in the public dictionary <c ref="ExistingSolutionVersions">ExistingSolutionVersions</c></remarks>
+        private void GetCurrentVersions()
+        {
+            log.StartSection("GetCurrentVersions");
+            ExistingSolutionVersions = new Dictionary<string, Version>();
+            XmlNode xRoot = CintXML.FindChild(definition, "ShuffleDefinition");
+            XmlNode xBlocks = CintXML.FindChild(xRoot, "Blocks");
+            if (xBlocks != null)
+            {
+                var solutions = GetExistingSolutions();
+                foreach (XmlNode xBlock in xBlocks.ChildNodes)
+                {
+                    if (xBlock.NodeType == XmlNodeType.Element)
+                    {
+                        switch (xBlock.Name)
+                        {
+                            case "DataBlock":
+                                break;
+                            case "SolutionBlock":
+                                var xmlNode = CintXML.FindChild(xBlock, "Export");
+                                if (xmlNode != null)
+                                {
+                                    var name = CintXML.GetAttribute(xBlock, "Name");
+                                    log.Log("Getting version for: {0}", name);
+                                    foreach (var solution in solutions)
+                                    {
+                                        if (name.Equals(solution.Property("uniquename", ""), StringComparison.OrdinalIgnoreCase))
+                                        {
+                                            ExistingSolutionVersions.Add(name, new Version(solution.Property("version", "1.0.0.0")));
+                                            log.Log("Version found: {0}", ExistingSolutionVersions[name]);
+                                        }
+                                    }
+                                }
+                                break;
+                        }
+                    }
+                }
+            }
+            log.EndSection();
+        }
+
+        private Version IncrementVersion(Version version)
+        {
+            var verparts = version;
+            var newversion = verparts.Major.ToString() + "." + verparts.Minor.ToString() + "." + DateTime.Today.ToString("yyMM") + "." + (verparts.Revision + 1).ToString();
+            log.Log("Increasing {0} to {1}", version, newversion);
+            return new Version(newversion);
+        }
     }
 }
