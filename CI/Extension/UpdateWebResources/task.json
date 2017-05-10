@@ -1,7 +1,7 @@
 {
   "id": "ebd685fe-1b2d-4b7f-aaad-002ecec338b7",
   "name": "UpdateWebResources",
-  "friendlyName": "DevUtils - Update Web Resources",
+  "friendlyName": "Innofactor DevOps: Update Web Resources",
   "description": "Update web resources from local folder structure to target CRM organization.",
   "author": "Innofactor Sweden",
   "helpMarkDown": "",
@@ -14,7 +14,7 @@
   "version": {
     "Major": "8",
     "Minor": "2",
-    "Patch": "17"
+    "Patch": "23"
   },
   "minimumAgentVersion": "1.95.0",
   "groups": [

@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Cinteros.Crm.Utils.Shuffle</RootNamespace>
-    <AssemblyName>Cinteros.Crm.Utils.Shuffle</AssemblyName>
+    <AssemblyName>Innofactor.Crm.Shuffle</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SccProjectName>SAK</SccProjectName>
@@ -21,22 +21,22 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug8\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;Crm8</DefineConstants>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
-    <DocumentationFile>bin\Debug8\Cinteros.Crm.Utils.Shuffle.xml</DocumentationFile>
+    <DocumentationFile>bin\Debug\Innofactor.Crm.Shuffle.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE;Crm8</DefineConstants>
+    <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
-    <DocumentationFile>bin\Release\Cinteros.Crm.Utils.Shuffle.xml</DocumentationFile>
+    <DocumentationFile>bin\Release\Innofactor.Crm.Shuffle.xml</DocumentationFile>
     <CodeAnalysisRuleSet>..\..\..\Cinteros.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup>
@@ -93,7 +93,7 @@
     <Compile Include="Types.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Crm.Utils.Shuffle.nuspec" />
+    <None Include="Innofactor.Crm.Shuffle.nuspec" />
     <None Include="Cinteros.CRM.snk" />
     <EmbeddedResource Include="Resources\QueryExpression.xsd">
       <SubType>Designer</SubType>

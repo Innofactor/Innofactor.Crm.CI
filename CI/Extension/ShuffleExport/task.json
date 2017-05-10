@@ -1,8 +1,8 @@
 {
   "id": "c0da7e50-d3a6-417e-9c8b-11da841352fc",
   "name": "ShuffleExport",
-  "friendlyName": "DevUtils - Shuffle Export",
-  "description": "Export data and solutions using Cinteros Shuffle.",
+  "friendlyName": "Innofactor DevOps: Shuffle Export",
+  "description": "Export data and solutions using Innofactor Shuffle.",
   "author": "Innofactor Sweden",
   "helpMarkDown": "",
   "category": "Build",
@@ -14,7 +14,7 @@
   "version": {
     "Major": "8",
     "Minor": "2",
-    "Patch": "24"
+    "Patch": "26"
   },
   "minimumAgentVersion": "1.95.0",
   "instanceNameFormat": "ShuffleExport",

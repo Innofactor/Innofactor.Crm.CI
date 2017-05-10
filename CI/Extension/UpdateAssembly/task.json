@@ -1,7 +1,7 @@
 {
   "id": "87589590-e070-48ad-b709-a7758db9db8b",
   "name": "UpdateAssembly",
-  "friendlyName": "DevUtils - Update Assembly",
+  "friendlyName": "Innofactor DevOps: Update Assembly",
   "description": "Updates an assembly in target CRM organization.",
   "author": "Innofactor Sweden",
   "helpMarkDown": "",
@@ -14,7 +14,7 @@
   "version": {
     "Major": "8",
     "Minor": "2",
-    "Patch": "9"
+    "Patch": "11"
   },
   "minimumAgentVersion": "1.95.0",
   "groups": [

@@ -1,8 +1,8 @@
 {
   "id": "a4334ae5-0d38-4dc9-b30d-881fd2988c56",
   "name": "ShuffleImport",
-  "friendlyName": "DevUtils - Shuffle Import",
-  "description": "Import data and solutions using Cinteros Shuffle.",
+  "friendlyName": "Innofactor DevOps: Shuffle Import",
+  "description": "Import data and solutions using Innofactor Shuffle.",
   "author": "Innofactor Sweden",
   "helpMarkDown": "",
   "category": "Deploy",
@@ -14,7 +14,7 @@
   "version": {
     "Major": "8",
     "Minor": "2",
-    "Patch": "18"
+    "Patch": "22"
   },
   "minimumAgentVersion": "1.95.0",
   "instanceNameFormat": "ShuffleImport",

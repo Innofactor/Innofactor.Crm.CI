@@ -41,7 +41,7 @@ else {
 }
 
 #Load DevUtils.CI
-$DevUtilsCI = $scriptPath + "\ps_modules\DevUtils.CI\Cinteros.Crm.Utils.CI.dll"
+$DevUtilsCI = $scriptPath + "\ps_modules\DevUtils.CI\Innofactor.Crm.CI.dll"
 Write-Verbose "Importing DevUtils.CI: $DevUtilsCI" 
 Import-Module $DevUtilsCI
 Write-Verbose "Imported DevUtils.CI"

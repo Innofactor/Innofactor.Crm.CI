@@ -2,7 +2,7 @@
   "manifestVersion": 1,
   "id": "cinteros-devutils-ci-build-tasks",
   "name": "Cinteros DevUtils Build Tools",
-  "version": "8.2.56",
+  "version": "8.2.68",
   "publisher": "InnofactorSE",
   "targets": [
     {
