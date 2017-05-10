@@ -38,12 +38,10 @@ namespace Cinteros.Crm.Utils.CI.Cmdlets
 
         protected override void ProcessRecord()
         {
-            var svc = Container.Service as CrmServiceProxy;
-            var log = Container.Logger as CRMLogger;
             try
             {
                 WriteDebug("Exporting");
-                var doc = Shuffler.QuickExport(Definition, Type, ';', ShuffleListener, svc, log, Folder, true);
+                var doc = Shuffler.QuickExport(Definition, Type, ';', ShuffleListener, Container, Folder, true);
                 WriteObject(doc);
             }
             catch (Exception ex)

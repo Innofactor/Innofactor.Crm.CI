@@ -1,4 +1,5 @@
 ﻿using Cinteros.Crm.Utils.Common;
+using Cinteros.Crm.Utils.Common.Interfaces;
 using Cinteros.Crm.Utils.Misc;
 using Cinteros.Crm.Utils.Shuffle.Types;
 using System;
@@ -242,7 +243,7 @@ namespace Cinteros.Crm.Utils.Shuffle
         /// <param name="def"></param>
         /// <param name="log"></param>
         /// <returns></returns>
-        public static string ValidateDefinitionXml(XmlDocument def, CRMLogger log)
+        public static string ValidateDefinitionXml(XmlDocument def, ILoggable log)
         {
             var result = "";
             try

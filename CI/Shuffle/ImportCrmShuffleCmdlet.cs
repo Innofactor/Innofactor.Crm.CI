@@ -41,8 +41,6 @@ namespace Cinteros.Crm.Utils.CI.Cmdlets
 
         protected override void ProcessRecord()
         {
-            var svc = Container.Service as CrmServiceProxy;
-            var log = Container.Logger as CRMLogger;
             var Data = DataXml;
             if (Data == null && DataCsv != null)
             {
@@ -59,7 +57,7 @@ namespace Cinteros.Crm.Utils.CI.Cmdlets
             try
             {
                 WriteDebug("Importing");
-                var result = Shuffler.QuickImport(Definition, Data, ShuffleListener, svc, log, Folder, true);
+                var result = Shuffler.QuickImport(Definition, Data, ShuffleListener, Container, Folder, true);
                 var output = new ShuffleImportResult
                 {
                     Created = result.Item1,
