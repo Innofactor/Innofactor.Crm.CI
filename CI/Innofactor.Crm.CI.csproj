@@ -108,7 +108,13 @@
   <ItemGroup>
     <Content Include="Extension\ApplyVersionToAssemblies\icon.png" />
     <Content Include="Extension\icon_128x128.png" />
+    <Content Include="Extension\Images\Assembly.png" />
+    <Content Include="Extension\Images\Export.png" />
+    <Content Include="Extension\Images\Minify.png" />
+    <Content Include="Extension\Images\Tasks.png" />
+    <Content Include="Extension\Images\WebResources.png" />
     <Content Include="Extension\MinifyJS\gulpfile.js" />
+    <None Include="Extension\overview.md" />
     <None Include="Extension\WebResourcePatternSample.txt" />
     <Content Include="Extension\ApplyVersionToAssemblies\ApplyVersionToAssemblies.ps1" />
     <Content Include="Extension\MinifyJS\icon.png" />
@@ -158,6 +164,7 @@
     <Content Include="Extension\UpdateWebResources\UpdateWebResources.ps1" />
     <Content Include="Extension\UpdateAssembly\UpdateAssembly.ps1" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>"$(ProjectDir)Extension\CopyLibToTasks.cmd" "$(TargetDir)" "$(ProjectDir)"</PostBuildEvent>
