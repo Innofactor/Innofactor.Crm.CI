@@ -86,6 +86,8 @@
     <Compile Include="ShuffleEventArgs.cs" />
     <Compile Include="ShuffleHelper.cs" />
     <Compile Include="Shuffler.cs" />
+    <Compile Include="ShuffleSolutionExport.cs" />
+    <Compile Include="ShuffleSolutionImport.cs" />
     <Compile Include="Types.cs" />
   </ItemGroup>
   <ItemGroup>
