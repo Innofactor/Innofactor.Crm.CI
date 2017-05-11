@@ -8,18 +8,49 @@ if [%updaterev%]==[Y] (set rev=--rev-version)
 set /P publish=Publish? [Y/N]: 
 if [%publish%]==[y] (set publish=Y)
 
-if [%publish%]==[Y] (
-  set /P pat=Enter PAT: 
+if NOT [%publish%]==[Y] (
+  goto tfx
 )
+
+set token=
+if EXIST pat.txt (
+  set /P token=<pat.txt
+)
+if [%token%]==[] (
+  set /P token=Enter PAT: 
+)
+
+:tfx
+
 if NOT EXIST VSIX (md VSIX)
 
 if [%publish%]==[Y] (
-  call tfx extension publish --manifest-globs vss-extension.json --output-path VSIX %rev% --token %pat%
+  call tfx extension publish --manifest-globs vss-extension.json --output-path VSIX %rev% --token %token%
 ) else (
   call tfx extension create --manifest-globs vss-extension.json %rev% --output-path VSIX
 )
 
-pause
+rem Offer to save PAT in local file to be used next time
 
-rem   set /P share=Enter shares: 
-rem   call tfx extension publish --manifest-globs vss-extension.json --output-path VSIX %rev% --share-with %share% --token %pat%
+if EXIST pat.txt (
+  goto end
+)
+if [%token%]==[] (
+  goto end
+)
+echo.
+set /P save=Save PAT to local file for use next time? [Y/N]: 
+if [%save%]==[y] (
+  set save=Y
+)
+if [%save%]==[Y] (
+  echo %token%>pat.txt
+  echo.
+  echo Saved token to file pat.txt
+  echo Be sure NOT to commit this file unintentionally!
+  echo.
+)
+
+:end
+
+pause
