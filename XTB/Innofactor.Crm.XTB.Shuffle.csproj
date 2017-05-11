@@ -1,0 +1,329 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{13AE5564-5C72-4A70-8AC5-00D227E8200A}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Innofactor.Crm.XTB.Shuffle</RootNamespace>
+    <AssemblyName>Innofactor.Crm.XTB.Shuffle</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Cinteros.Crm.Utils.Common, Version=8.1.1705.3, Culture=neutral, PublicKeyToken=0b6cd78ab2e51f2b, processorArchitecture=MSIL">
+      <HintPath>..\packages\Cinteros.DevUtils.8.8.1.1705.03\lib\net452\Cinteros.Crm.Utils.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Cinteros.Crm.Utils.Misc, Version=8.1.1705.3, Culture=neutral, PublicKeyToken=0b6cd78ab2e51f2b, processorArchitecture=MSIL">
+      <HintPath>..\packages\Cinteros.DevUtils.8.8.1.1705.03\lib\net452\Cinteros.Crm.Utils.Misc.dll</HintPath>
+    </Reference>
+    <Reference Include="McTools.Xrm.Connection, Version=1.2017.5.14, Culture=neutral, PublicKeyToken=96037217801d9658, processorArchitecture=MSIL">
+      <HintPath>..\packages\MscrmTools.Xrm.Connection.1.2017.5.14\lib\net452\McTools.Xrm.Connection.dll</HintPath>
+    </Reference>
+    <Reference Include="McTools.Xrm.Connection.WinForms, Version=1.2017.4.13, Culture=neutral, PublicKeyToken=f1559f79cf894e27, processorArchitecture=MSIL">
+      <HintPath>..\packages\MscrmTools.Xrm.Connection.1.2017.5.14\lib\net452\McTools.Xrm.Connection.WinForms.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Crm.Sdk.Proxy, Version=8.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.CrmSdk.CoreAssemblies.8.2.0.2\lib\net452\Microsoft.Crm.Sdk.Proxy.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.IdentityModel, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.IdentityModel.6.1.7600.16394\lib\net35\Microsoft.IdentityModel.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.IdentityModel.Clients.ActiveDirectory, Version=2.24.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.IdentityModel.Clients.ActiveDirectory.2.24.304111323\lib\net45\Microsoft.IdentityModel.Clients.ActiveDirectory.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.IdentityModel.Clients.ActiveDirectory.WindowsForms, Version=2.24.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.IdentityModel.Clients.ActiveDirectory.2.24.304111323\lib\net45\Microsoft.IdentityModel.Clients.ActiveDirectory.WindowsForms.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Web.XmlTransform, Version=2.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Web.Xdt.2.1.1\lib\net40\Microsoft.Web.XmlTransform.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Xrm.Sdk, Version=8.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.CrmSdk.CoreAssemblies.8.2.0.2\lib\net452\Microsoft.Xrm.Sdk.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Xrm.Sdk.Deployment, Version=8.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.CrmSdk.Deployment.8.2.0.2\lib\net452\Microsoft.Xrm.Sdk.Deployment.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Xrm.Sdk.Workflow, Version=8.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.CrmSdk.Workflow.8.2.0.2\lib\net452\Microsoft.Xrm.Sdk.Workflow.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Xrm.Tooling.Connector, Version=2.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.CrmSdk.XrmTooling.CoreAssembly.8.2.0.5\lib\net452\Microsoft.Xrm.Tooling.Connector.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NuGet.Core, Version=2.14.0.832, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\NuGet.Core.2.14.0\lib\net40-Client\NuGet.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="PresentationFramework" />
+    <Reference Include="System" />
+    <Reference Include="System.Activities" />
+    <Reference Include="System.Activities.Presentation" />
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.DirectoryServices" />
+    <Reference Include="System.DirectoryServices.AccountManagement" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.IdentityModel" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.ServiceModel.Web" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Workflow.Activities" />
+    <Reference Include="System.Workflow.ComponentModel" />
+    <Reference Include="System.Workflow.Runtime" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+    <Reference Include="XrmToolBox, Version=1.2017.3.14, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\XrmToolBoxPackage.1.2017.3.14\lib\net452\XrmToolBox.exe</HintPath>
+    </Reference>
+    <Reference Include="XrmToolBox.Extensibility, Version=1.2017.2.7, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\XrmToolBoxPackage.1.2017.3.14\lib\net452\XrmToolBox.Extensibility.dll</HintPath>
+    </Reference>
+    <Reference Include="XrmToolBox.PluginsStore, Version=1.2017.1.4, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\XrmToolBoxPackage.1.2017.3.14\lib\net452\XrmToolBox.PluginsStore.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Const.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Settings.cs" />
+    <Compile Include="Builder\AppCode\SaveEventArgs.cs" />
+    <Compile Include="Builder\Clipboard.cs" />
+    <Compile Include="Builder\Controls\DataBlockControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Builder\Controls\DataBlockControl.Designer.cs">
+      <DependentUpon>DataBlockControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Builder\Controls\DataBlockExportControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Builder\Controls\DataBlockExportControl.Designer.cs">
+      <DependentUpon>DataBlockExportControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Builder\Controls\DataBlockImportControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Builder\Controls\DataBlockImportControl.Designer.cs">
+      <DependentUpon>DataBlockImportControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Builder\Controls\ExportAttributeControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Builder\Controls\ExportAttributeControl.Designer.cs">
+      <DependentUpon>ExportAttributeControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Builder\Controls\FilterControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Builder\Controls\FilterControl.Designer.cs">
+      <DependentUpon>FilterControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Builder\Controls\IDefinitionSavable.cs" />
+    <Compile Include="Builder\Controls\ImportAttributeControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Builder\Controls\ImportAttributeControl.Designer.cs">
+      <DependentUpon>ImportAttributeControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Builder\Controls\ImportMatchControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Builder\Controls\ImportMatchControl.Designer.cs">
+      <DependentUpon>ImportMatchControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Builder\Controls\PreReqSolutionControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Builder\Controls\PreReqSolutionControl.Designer.cs">
+      <DependentUpon>PreReqSolutionControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Builder\Controls\RelationControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Builder\Controls\RelationControl.Designer.cs">
+      <DependentUpon>RelationControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Builder\Controls\SettingsControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Builder\Controls\SettingsControl.Designer.cs">
+      <DependentUpon>SettingsControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Builder\Controls\ShuffleDefinitionControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Builder\Controls\ShuffleDefinitionControl.Designer.cs">
+      <DependentUpon>ShuffleDefinitionControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Builder\Controls\SolutionBlockControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Builder\Controls\SolutionBlockControl.Designer.cs">
+      <DependentUpon>SolutionBlockControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Builder\Controls\SolutionBlockExportControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Builder\Controls\SolutionBlockExportControl.Designer.cs">
+      <DependentUpon>SolutionBlockExportControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Builder\Controls\SolutionBlockImportControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Builder\Controls\SolutionBlockImportControl.Designer.cs">
+      <DependentUpon>SolutionBlockImportControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Builder\Controls\SortControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Builder\Controls\SortControl.Designer.cs">
+      <DependentUpon>SortControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Builder\Forms\XmlContentDisplayDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Builder\Forms\XmlContentDisplayDialog.Designer.cs">
+      <DependentUpon>XmlContentDisplayDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Builder\PluginDescription.cs" />
+    <Compile Include="Builder\ShuffleBuilder.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Builder\ShuffleBuilder.Designer.cs">
+      <DependentUpon>ShuffleBuilder.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Builder\TreeNodeHelper.cs" />
+    <Compile Include="Runner\PluginDescription.cs" />
+    <Compile Include="Runner\ShuffleRunner.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Runner\ShuffleRunner.Designer.cs">
+      <DependentUpon>ShuffleRunner.cs</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="packages.config" />
+    <None Include="XrmToolBox.exe.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Builder\Controls\DataBlockControl.resx">
+      <DependentUpon>DataBlockControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Builder\Controls\DataBlockExportControl.resx">
+      <DependentUpon>DataBlockExportControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Builder\Controls\DataBlockImportControl.resx">
+      <DependentUpon>DataBlockImportControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Builder\Controls\ExportAttributeControl.resx">
+      <DependentUpon>ExportAttributeControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Builder\Controls\FilterControl.resx">
+      <DependentUpon>FilterControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Builder\Controls\ImportAttributeControl.resx">
+      <DependentUpon>ImportAttributeControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Builder\Controls\ImportMatchControl.resx">
+      <DependentUpon>ImportMatchControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Builder\Controls\PreReqSolutionControl.resx">
+      <DependentUpon>PreReqSolutionControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Builder\Controls\RelationControl.resx">
+      <DependentUpon>RelationControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Builder\Controls\SettingsControl.resx">
+      <DependentUpon>SettingsControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Builder\Controls\ShuffleDefinitionControl.resx">
+      <DependentUpon>ShuffleDefinitionControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Builder\Controls\SolutionBlockControl.resx">
+      <DependentUpon>SolutionBlockControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Builder\Controls\SolutionBlockExportControl.resx">
+      <DependentUpon>SolutionBlockExportControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Builder\Controls\SolutionBlockImportControl.resx">
+      <DependentUpon>SolutionBlockImportControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Builder\Controls\SortControl.resx">
+      <DependentUpon>SortControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Builder\Forms\XmlContentDisplayDialog.resx">
+      <DependentUpon>XmlContentDisplayDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Builder\ShuffleBuilder.resx">
+      <DependentUpon>ShuffleBuilder.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Runner\ShuffleRunner.resx">
+      <DependentUpon>ShuffleRunner.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Shuffle\Innofactor.Crm.Shuffle.csproj">
+      <Project>{c381e1b6-63d1-4f5f-9d9b-b275f3cc6687}</Project>
+      <Name>Innofactor.Crm.Shuffle</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>IF NOT EXIST Plugins mkdir Plugins
+move /Y Cinteros.*.dll Plugins
+move /Y Cinteros.*.pdb Plugins
+move /Y Innofactor.*.dll Plugins
+move /Y Innofactor.*.pdb Plugins
+move /Y Ionic*.dll Plugins
+
+</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
