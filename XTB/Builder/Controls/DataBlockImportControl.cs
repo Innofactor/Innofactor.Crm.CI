@@ -44,6 +44,7 @@ namespace Innofactor.Crm.Shuffle.Builder.Controls
             cmbSave.SelectedIndex = cmbSave.FindStringExact(collec.ContainsKey("Save") ? collec["Save"] : "");
             cmbDelete.SelectedIndex = cmbDelete.FindStringExact(collec.ContainsKey("Delete") ? collec["Delete"] : "");
             chkUpdateInactive.Checked = bool.Parse(collec.ContainsKey("UpdateInactive") ? collec["UpdateInactive"] : "false");
+            chkUpdateIdentical.Checked = bool.Parse(collec.ContainsKey("UpdateIdentical") ? collec["UpdateIdentical"] : "false");
             var overwrite = collec.ContainsKey("Overwrite") ? collec["Overwrite"] : "";
             if (!string.IsNullOrWhiteSpace(overwrite))
             {
@@ -71,6 +72,7 @@ namespace Innofactor.Crm.Shuffle.Builder.Controls
                 collection.Add("Delete", cmbDelete.Text);
             }
             collection.Add("UpdateInactive", chkUpdateInactive.Checked ? "true" : "false");
+            collection.Add("UpdateIdentical", chkUpdateIdentical.Checked ? "true" : "false");
             controlsCheckSum = ControlsChecksum();
             SendSaveMessage(collection);
         }

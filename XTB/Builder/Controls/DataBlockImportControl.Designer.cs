@@ -39,6 +39,8 @@ namespace Innofactor.Crm.Shuffle.Builder.Controls
             this.label5 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
             this.txtOverwrite = new System.Windows.Forms.TextBox();
+            this.label7 = new System.Windows.Forms.Label();
+            this.chkUpdateIdentical = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // chkCreateWithId
@@ -154,12 +156,32 @@ namespace Innofactor.Crm.Shuffle.Builder.Controls
             this.txtOverwrite.Location = new System.Drawing.Point(213, 168);
             this.txtOverwrite.Name = "txtOverwrite";
             this.txtOverwrite.Size = new System.Drawing.Size(234, 20);
-            this.txtOverwrite.TabIndex = 14;
+            this.txtOverwrite.TabIndex = 20;
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(4, 115);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(84, 13);
+            this.label7.TabIndex = 16;
+            this.label7.Text = "Update identical";
+            // 
+            // chkUpdateIdentical
+            // 
+            this.chkUpdateIdentical.AutoSize = true;
+            this.chkUpdateIdentical.Location = new System.Drawing.Point(213, 115);
+            this.chkUpdateIdentical.Name = "chkUpdateIdentical";
+            this.chkUpdateIdentical.Size = new System.Drawing.Size(15, 14);
+            this.chkUpdateIdentical.TabIndex = 15;
+            this.chkUpdateIdentical.UseVisualStyleBackColor = true;
             // 
             // DataBlockImportControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.label7);
+            this.Controls.Add(this.chkUpdateIdentical);
             this.Controls.Add(this.txtOverwrite);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.label5);
@@ -192,5 +214,7 @@ namespace Innofactor.Crm.Shuffle.Builder.Controls
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.TextBox txtOverwrite;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.CheckBox chkUpdateIdentical;
     }
 }
