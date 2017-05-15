@@ -14,7 +14,7 @@
   "version": {
     "Major": "8",
     "Minor": "2",
-    "Patch": "22"
+    "Patch": "23"
   },
   "minimumAgentVersion": "1.95.0",
   "instanceNameFormat": "ShuffleImport",
