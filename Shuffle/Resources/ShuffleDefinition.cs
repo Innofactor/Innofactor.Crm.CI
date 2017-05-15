@@ -81,6 +81,11 @@ namespace Cinteros.Crm.Utils.Shuffle.Types {
         
         /// <remarks/>
         [System.Xml.Serialization.XmlAttributeAttribute()]
+        [System.ComponentModel.DefaultValueAttribute(false)]
+        public bool UpdateIdentical;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
         public bool Overwrite;
         
         /// <remarks/>
@@ -92,6 +97,7 @@ namespace Cinteros.Crm.Utils.Shuffle.Types {
             this.Save = SaveTypes.CreateUpdate;
             this.Delete = DeleteTypes.None;
             this.UpdateInactive = false;
+            this.UpdateIdentical = false;
         }
     }
     

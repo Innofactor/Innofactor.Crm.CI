@@ -36,11 +36,12 @@ namespace Cinteros.Crm.Utils.Shuffle
                     XmlNode xImport = CintXML.FindChild(xBlock, "Import");
                     if (xImport != null)
                     {
-                        bool includeid = CintXML.GetBoolAttribute(xImport, "CreateWithId", false);
-                        string save = CintXML.GetAttribute(xImport, "Save");
-                        string delete = CintXML.GetAttribute(xImport, "Delete");
-                        bool updateinactive = CintXML.GetBoolAttribute(xImport, "UpdateInactive", false);
-                        string deprecatedoverwrite = CintXML.GetAttribute(xImport, "Overwrite");
+                        var includeid = CintXML.GetBoolAttribute(xImport, "CreateWithId", false);
+                        var save = CintXML.GetAttribute(xImport, "Save");
+                        var delete = CintXML.GetAttribute(xImport, "Delete");
+                        var updateinactive = CintXML.GetBoolAttribute(xImport, "UpdateInactive", false);
+                        var updateidentical = CintXML.GetBoolAttribute(xImport, "UpdateIdentical", false);
+                        var deprecatedoverwrite = CintXML.GetAttribute(xImport, "Overwrite");
                         if (!string.IsNullOrWhiteSpace(deprecatedoverwrite))
                         {
                             SendLine("DEPRECATED use of attribute Overwrite!");
@@ -57,6 +58,7 @@ namespace Cinteros.Crm.Utils.Shuffle
                         }
                         XmlNode xMatch = CintXML.FindChild(xImport, "Match");
                         var matchattributes = GetMatchAttributes(xMatch);
+                        var updateattributes = !updateidentical ? GetUpdateAttributes(cEntities) : new List<string>();
                         var preretrieveall = xMatch != null ? CintXML.GetBoolAttribute(xMatch, "PreRetrieveAll", false) : false;
 
                         SendLine();
@@ -126,7 +128,7 @@ namespace Cinteros.Crm.Utils.Shuffle
                                             {
                                                 cdEntity.Id = Guid.Empty;
                                             }
-                                            if (SaveEntity(cdEntity, null, updateinactive, i, unique))
+                                            if (SaveEntity(cdEntity, null, updateinactive, updateidentical, i, unique))
                                             {
                                                 created++;
                                                 newid = cdEntity.Id;
@@ -136,7 +138,7 @@ namespace Cinteros.Crm.Utils.Shuffle
                                     }
                                     else
                                     {
-                                        CintDynEntityCollection matches = GetMatchingRecords(cdEntity, matchattributes, preretrieveall, ref cAllRecordsToMatch);
+                                        var matches = GetMatchingRecords(cdEntity, matchattributes, updateattributes, preretrieveall, ref cAllRecordsToMatch);
                                         if (delete == "All" || (matches.Count == 1 && delete == "Existing"))
                                         {
                                             foreach (CintDynEntity cdMatch in matches)
@@ -174,7 +176,7 @@ namespace Cinteros.Crm.Utils.Shuffle
                                                 {
                                                     cdEntity.Id = Guid.Empty;
                                                 }
-                                                if (SaveEntity(cdEntity, null, updateinactive, i, unique))
+                                                if (SaveEntity(cdEntity, null, updateinactive, updateidentical, i, unique))
                                                 {
                                                     created++;
                                                     newid = cdEntity.Id;
@@ -188,7 +190,7 @@ namespace Cinteros.Crm.Utils.Shuffle
                                             newid = match.Id;
                                             if (save == "CreateUpdate" || save == "UpdateOnly")
                                             {
-                                                if (SaveEntity(cdEntity, match, updateinactive, i, unique))
+                                                if (SaveEntity(cdEntity, match, updateinactive, updateidentical, i, unique))
                                                 {
                                                     updated++;
                                                     references.Add(cdEntity.Entity.ToEntityReference());
@@ -280,30 +282,36 @@ namespace Cinteros.Crm.Utils.Shuffle
             return new Tuple<int, int, int, int, int, EntityReferenceCollection>(created, updated, skipped, deleted, failed, references);
         }
 
-        private CintDynEntityCollection GetMatchingRecords(CintDynEntity cdEntity, List<string> matchattributes, bool preretrieveall, ref CintDynEntityCollection cAllRecordsToMatch)
+        private CintDynEntityCollection GetMatchingRecords(CintDynEntity cdEntity, List<string> matchattributes, List<string> updateattributes, bool preretrieveall, ref CintDynEntityCollection cAllRecordsToMatch)
         {
             log.StartSection(MethodBase.GetCurrentMethod().Name);
             CintDynEntityCollection matches = null;
+            var allattributes = new List<string>();
+            allattributes.Add(cdEntity.PrimaryIdAttribute);
+            if (cdEntity.Contains("ownerid"))
+            {
+                allattributes.Add("ownerid");
+            }
+            if (cdEntity.Contains("statecode") || cdEntity.Contains("statuscode"))
+            {
+                allattributes.Add("statecode");
+                allattributes.Add("statuscode");
+            }
+            allattributes = allattributes.Union(matchattributes.Union(updateattributes)).ToList();
             if (preretrieveall)
             {
                 if (cAllRecordsToMatch == null)
                 {
-                    cAllRecordsToMatch = GetAllRecordsForMatching(matchattributes, cdEntity);
+                    cAllRecordsToMatch = GetAllRecordsForMatching(allattributes, cdEntity);
                 }
                 matches = GetMatchingRecordsFromPreRetrieved(matchattributes, cdEntity, cAllRecordsToMatch);
             }
             else
             {
                 QueryExpression qMatch = new QueryExpression(cdEntity.Name);
-                qMatch.ColumnSet = new ColumnSet(cdEntity.PrimaryIdAttribute);
-                if (cdEntity.Contains("ownerid"))
-                {
-                    qMatch.ColumnSet.AddColumn("ownerid");
-                }
-                if (cdEntity.Contains("statecode") || cdEntity.Contains("statuscode"))
-                {
-                    qMatch.ColumnSet.AddColumns("statecode", "statuscode");
-                }
+                // We need to be able to see if any attributes have changed, so lets make sure matching records have all the attributes that will be updated
+                qMatch.ColumnSet = new ColumnSet(allattributes.ToArray());
+
                 foreach (var matchattr in matchattributes)
                 {
                     object value = null;
@@ -333,20 +341,11 @@ namespace Cinteros.Crm.Utils.Shuffle
             return matches;
         }
 
-        private CintDynEntityCollection GetAllRecordsForMatching(List<string> matchattributes, CintDynEntity cdEntity)
+        private CintDynEntityCollection GetAllRecordsForMatching(List<string> allattributes, CintDynEntity cdEntity)
         {
             log.StartSection(MethodBase.GetCurrentMethod().Name);
             QueryExpression qMatch = new QueryExpression(cdEntity.Name);
-            qMatch.ColumnSet = new ColumnSet(cdEntity.PrimaryIdAttribute);
-            if (cdEntity.Contains("ownerid"))
-            {
-                qMatch.ColumnSet.AddColumn("ownerid");
-            }
-            if (cdEntity.Contains("statecode") || cdEntity.Contains("statuscode"))
-            {
-                qMatch.ColumnSet.AddColumns("statecode", "statuscode");
-            }
-            qMatch.ColumnSet.AddColumns(matchattributes.ToArray());
+            qMatch.ColumnSet = new ColumnSet(allattributes.ToArray());
 #if DEBUG
             log.Log("Retrieving all records for {0}:\n{1}", cdEntity.Name, CintQryExp.ConvertToFetchXml(qMatch, crmsvc));
 #endif
@@ -363,26 +362,7 @@ namespace Cinteros.Crm.Utils.Shuffle
             var result = new CintDynEntityCollection();
             foreach (var cdRecord in cAllRecordsToMatch)
             {
-                var match = true;
-                foreach (var attr in matchattributes)
-                {
-                    var srcvalue = "";
-                    if (attr == cdEntity.PrimaryIdAttribute)
-                    {
-                        srcvalue = cdEntity.Id.ToString();
-                    }
-                    else
-                    {
-                        srcvalue = cdEntity.PropertyAsBaseType(attr, "<null>", false, false, true).ToString();
-                    }
-                    var trgvalue = cdRecord.PropertyAsBaseType(attr, "<null>", false, false, true).ToString();
-                    if (srcvalue != trgvalue)
-                    {
-                        match = false;
-                        break;
-                    }
-                }
-                if (match)
+                if (EntityAttributesEqual(matchattributes, cdEntity, cdRecord))
                 {
                     result.Add(cdRecord);
                     log.Log("Found match: {0} {1}", cdRecord.Id, cdRecord);
@@ -391,6 +371,30 @@ namespace Cinteros.Crm.Utils.Shuffle
             log.Log("Returned matches: {0}", result.Count);
             log.EndSection();
             return result;
+        }
+
+        private static bool EntityAttributesEqual(List<string> matchattributes, CintDynEntity entity1, CintDynEntity entity2)
+        {
+            var match = true;
+            foreach (var attr in matchattributes)
+            {
+                var srcvalue = "";
+                if (attr == entity1.PrimaryIdAttribute)
+                {
+                    srcvalue = entity1.Id.ToString();
+                }
+                else
+                {
+                    srcvalue = entity1.PropertyAsBaseType(attr, "<null>", false, false, true).ToString();
+                }
+                var trgvalue = entity2.PropertyAsBaseType(attr, "<null>", false, false, true).ToString();
+                if (srcvalue != trgvalue)
+                {
+                    match = false;
+                    break;
+                }
+            }
+            return match;
         }
 
         private List<string> GetMatchAttributes(XmlNode xMatch)
@@ -406,6 +410,22 @@ namespace Cinteros.Crm.Utils.Shuffle
                         throw new ArgumentOutOfRangeException("Match Attribute name not set");
                     }
                     result.Add(matchattr);
+                }
+            }
+            return result;
+        }
+
+        private List<string> GetUpdateAttributes(CintDynEntityCollection entities)
+        {
+            var result = new List<string>();
+            foreach (var entity in entities)
+            {
+                foreach (var attribute in entity.Attributes.Keys)
+                {
+                    if (!result.Contains(attribute))
+                    {
+                        result.Add(attribute);
+                    }
                 }
             }
             return result;
@@ -453,7 +473,7 @@ namespace Cinteros.Crm.Utils.Shuffle
             return string.Join(", ", unique);
         }
 
-        private bool SaveEntity(CintDynEntity cdNewEntity, CintDynEntity cdMatchEntity, bool updateInactiveRecord, int pos, string identifier)
+        private bool SaveEntity(CintDynEntity cdNewEntity, CintDynEntity cdMatchEntity, bool updateInactiveRecord, bool updateIdentical, int pos, string identifier)
         {
             log.StartSection("SaveEntity " + pos.ToString("000 ") + identifier);
             bool recordSaved = false;
@@ -497,9 +517,21 @@ namespace Cinteros.Crm.Utils.Shuffle
 
                 if (nowActive)
                 {
-                    cdNewEntity.Update();
-                    recordSaved = true;
-                    SendLine("{0:000} Updated: {1}", pos, identifier);
+                    var updateattributes = cdNewEntity.Attributes.Keys.ToList();
+                    if (updateattributes.Contains(cdNewEntity.PrimaryIdAttribute))
+                    {
+                        updateattributes.Remove(cdNewEntity.PrimaryIdAttribute);
+                    }
+                    if (updateIdentical || !EntityAttributesEqual(updateattributes, cdNewEntity, cdMatchEntity))
+                    {
+                        cdNewEntity.Update();
+                        recordSaved = true;
+                        SendLine("{0:000} Updated: {1}", pos, identifier);
+                    }
+                    else
+                    {
+                        SendLine("{0:000} Skipped: {1} (Identical)", pos, identifier);
+                    }
                 }
                 else
                 {

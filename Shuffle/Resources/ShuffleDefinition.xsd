@@ -205,6 +205,7 @@
     <xs:attribute name="Save" type="SaveTypes" use="optional" default="CreateUpdate" />
     <xs:attribute name="Delete" type="DeleteTypes" use="optional" default="None" />
     <xs:attribute name="UpdateInactive" type="xs:boolean" use="optional" default="false" />
+    <xs:attribute name="UpdateIdentical" type="xs:boolean" use="optional" default="false" />
     <xs:attribute name="Overwrite" type="xs:boolean" use="optional">
       <xs:annotation>
         <xs:appinfo>ShuffleDefinition.Blocks.DataBlock.Import.Overwrite</xs:appinfo>
