@@ -2,9 +2,9 @@
   "id": "4d6fe5ed-c8e8-4782-ac11-97e27b7a72c5",
   "name": "ApplyVersionToAssemblies",
   "friendlyName": "Innofactor DevOps: Apply Build Version to assemblies",
-  "description": "This task will extract the four part version number from the generated build number and update all AssemblyInfo.cs files in the solution with this version.",
+  "description": "This task will extract the four part version number from the generated build number or given file and update all AssemblyInfo.cs files in the solution with this version.",
   "author": "Innofactor Sweden",
-  "helpMarkDown": "This task will extract the *four part version number* from the generated {build number} and update all AssemblyInfo.cs files in the solution with this version.",
+  "helpMarkDown": "This task will extract the *four part version number* from the generated {build number} or {given file} and update all AssemblyInfo.cs files in the solution with this version.",
   "category": "Build",
   "visibility": [
     "Build",
@@ -14,9 +14,32 @@
   "version": {
     "Major": "8",
     "Minor": "2",
-    "Patch": "7"
+    "Patch": "8"
   },
   "minimumAgentVersion": "1.95.0",
+  "inputs": [
+    {
+      "name": "versionType",
+      "type": "radio",
+      "label": "Type",
+      "required": true,
+      "defaultValue": "build",
+      "options": {
+        "build": "Search for version in generated build number",
+        "file": "Append revision to version saved in a file"
+      },
+      "helpMarkDown": "Select location where version pattern will be searched."
+    },
+    {
+      "name": "versionFile",
+      "type": "filePath",
+      "label": "File",
+      "defaultValue": "",
+      "visibleRule": "versionType = file",
+      "required": "versionType = file",
+      "helpMarkDown": "Text file with version information. Revision number will be appended to it."
+    }
+  ],
   "instanceNameFormat": "Apply Build Version to assemblies",
   "execution": {
     "PowerShell3": {
