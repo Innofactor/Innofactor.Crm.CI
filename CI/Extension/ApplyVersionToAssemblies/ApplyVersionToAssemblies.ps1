@@ -53,10 +53,10 @@ Write-Host "BUILD_BUILDNUMBER: $Env:BUILD_BUILDNUMBER"
 $VersionRegex = "\d+\.\d+\.\d+\.\d+"
 
 # Getting input from UI
-$versionType = Get-VstsInput -Name versionType -Require
-$versionFile = Get-VstsInput -Name versionFile
+$VersionType = Get-VstsInput -Name versionType -Require
+$VersionFile = Get-VstsInput -Name versionFile
 
-$fileExists = Test-Path $versionFile
+$FileExists = Test-Path $VersionFile
 
 # File with resulting version
 $versionResult = Join-Path $Env:BUILD_SOURCESDIRECTORY "version.txt"
@@ -64,9 +64,9 @@ $versionResult = Join-Path $Env:BUILD_SOURCESDIRECTORY "version.txt"
 $NewVersion = ""
 
 # Checking if version should be taken from file and if that file does exist 
-if ($versionType -eq "file" -and $fileExists)
+if ($VersionType -eq "file" -and $FileExists)
 {
-    $Base = Get-Content $versionFile
+    $Base = Get-Content $VersionFile
     Write-Host "Base from file $VersionFile is $Base"
     
     $RevisionRegex = "\d+"
