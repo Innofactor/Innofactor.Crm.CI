@@ -48,6 +48,10 @@ if (-not $Env:BUILD_BUILDNUMBER)
 
 Write-Host "BUILD_BUILDNUMBER: $Env:BUILD_BUILDNUMBER"
 
+# Regular expression pattern to find the version in the build number 
+# and then apply it to the assemblies
+$VersionRegex = "\d+\.\d+\.\d+\.\d+"
+
 # Getting input from UI
 $versionType = Get-VstsInput -Name versionType -Require
 $versionFile = Get-VstsInput -Name versionFile
@@ -76,10 +80,6 @@ if ($versionType -eq "file" -and $fileExists)
 }
 else
 {
-# Regular expression pattern to find the version in the build number 
-# and then apply it to the assemblies
-    $VersionRegex = "\d+\.\d+\.\d+\.\d+"
-
 # Get and validate the version data
     $VersionData = [regex]::matches($Env:BUILD_BUILDNUMBER,$VersionRegex)
 
