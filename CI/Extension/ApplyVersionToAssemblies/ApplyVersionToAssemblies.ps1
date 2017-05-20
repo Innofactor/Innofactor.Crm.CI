@@ -11,23 +11,68 @@
 # This script would then apply version 2013.07.19.1 to your assemblies.
 
 # Enable -Verbose option
-[CmdletBinding()]
+# [CmdletBinding()]
+
+# If this script is not running on a build server, remind user to 
+# set environment variables so that this script can be debugged
+if(-not ($Env:BUILD_SOURCESDIRECTORY -and $Env:BUILD_BUILDNUMBER))
+{
+    Write-Error "You must set the following environment variables"
+    Write-Error "to test this script interactively."
+    Write-Host '$Env:BUILD_SOURCESDIRECTORY - For example, enter something like:'
+    Write-Host '$Env:BUILD_SOURCESDIRECTORY = "C:\code\FabrikamTFVC\HelloWorld"'
+    Write-Host '$Env:BUILD_BUILDNUMBER - For example, enter something like:'
+    Write-Host '$Env:BUILD_BUILDNUMBER = "Build HelloWorld_0000.00.00.0"'
+    exit 1
+}
+
+# Make sure path to source code directory is available
+if (-not $Env:BUILD_SOURCESDIRECTORY)
+{
+    Write-Error ("BUILD_SOURCESDIRECTORY environment variable is missing.")
+    exit 1
+}
+elseif (-not (Test-Path $Env:BUILD_SOURCESDIRECTORY))
+{
+    Write-Error "BUILD_SOURCESDIRECTORY does not exist: $Env:BUILD_SOURCESDIRECTORY"
+    exit 1
+}
+Write-Verbose "BUILD_SOURCESDIRECTORY: $Env:BUILD_SOURCESDIRECTORY"
+
+# Make sure there is a build number
+if (-not $Env:BUILD_BUILDNUMBER)
+{
+    Write-Error ("BUILD_BUILDNUMBER environment variable is missing.")
+    exit 1
+}
+
+Write-Host "BUILD_BUILDNUMBER: $Env:BUILD_BUILDNUMBER"
 
 # Getting input from UI
 $versionType = Get-VstsInput -Name versionType -Require
 $versionFile = Get-VstsInput -Name versionFile
 
+$fileExists = Test-Path $versionFile
+
 # File with resulting version
-$versionResult = Join-Path $env:BUILD_SOURCESDIRECTORY "version.txt"
+$versionResult = Join-Path $Env:BUILD_SOURCESDIRECTORY "version.txt"
 
 $NewVersion = ""
 
 # Checking if version should be taken from file and if that file does exist 
-if ($versionType -eq "file" -and Test-Path $versionFile)
+if ($versionType -eq "file" -and $fileExists)
 {
     $Base = Get-Content $versionFile
-    Write-Host "Base from file $VersionFile $Base"
-    $NewVersion = "$Base.$(Rev:.rrr)"
+    Write-Host "Base from file $VersionFile is $Base"
+    
+    $RevisionRegex = "\d+"
+    $RevisionData = [regex]::matches($Env:BUILD_BUILDNUMBER,$RevisionRegex)
+    
+    $Revision = $RevisionData[$RevisionData.Count-1]
+    
+    Write-Host "Revision from $Env:BUILD_BUILDNUMBER is $Revision"
+
+    $NewVersion = "$Base.$Revision"
 }
 else
 {
@@ -35,42 +80,9 @@ else
 # and then apply it to the assemblies
     $VersionRegex = "\d+\.\d+\.\d+\.\d+"
 
-# If this script is not running on a build server, remind user to 
-# set environment variables so that this script can be debugged
-    if(-not ($Env:BUILD_SOURCESDIRECTORY -and $Env:BUILD_BUILDNUMBER))
-    {
-        Write-Error "You must set the following environment variables"
-        Write-Error "to test this script interactively."
-        Write-Host '$Env:BUILD_SOURCESDIRECTORY - For example, enter something like:'
-        Write-Host '$Env:BUILD_SOURCESDIRECTORY = "C:\code\FabrikamTFVC\HelloWorld"'
-        Write-Host '$Env:BUILD_BUILDNUMBER - For example, enter something like:'
-        Write-Host '$Env:BUILD_BUILDNUMBER = "Build HelloWorld_0000.00.00.0"'
-        exit 1
-    }
-
-# Make sure path to source code directory is available
-    if (-not $Env:BUILD_SOURCESDIRECTORY)
-    {
-        Write-Error ("BUILD_SOURCESDIRECTORY environment variable is missing.")
-        exit 1
-    }
-    elseif (-not (Test-Path $Env:BUILD_SOURCESDIRECTORY))
-    {
-        Write-Error "BUILD_SOURCESDIRECTORY does not exist: $Env:BUILD_SOURCESDIRECTORY"
-        exit 1
-    }
-    Write-Verbose "BUILD_SOURCESDIRECTORY: $Env:BUILD_SOURCESDIRECTORY"
-
-# Make sure there is a build number
-    if (-not $Env:BUILD_BUILDNUMBER)
-    {
-        Write-Error ("BUILD_BUILDNUMBER environment variable is missing.")
-        exit 1
-    }
-    Write-Host "BUILD_BUILDNUMBER: $Env:BUILD_BUILDNUMBER"
-
 # Get and validate the version data
     $VersionData = [regex]::matches($Env:BUILD_BUILDNUMBER,$VersionRegex)
+
     switch($VersionData.Count)
     {
        0        
