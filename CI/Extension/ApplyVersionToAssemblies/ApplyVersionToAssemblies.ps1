@@ -59,7 +59,7 @@ $VersionFile = Get-VstsInput -Name versionFile
 $FileExists = Test-Path $VersionFile
 
 # File with resulting version
-$versionResult = Join-Path $Env:BUILD_SOURCESDIRECTORY "version.txt"
+$VersionResult = Join-Path $Env:BUILD_SOURCESDIRECTORY "__gen__version.txt"
 
 $NewVersion = ""
 
@@ -105,8 +105,8 @@ Write-Host "Version: $NewVersion"
 # Write version number to file, to be able to pick up in later scripts
 # If working folder is the same, it can be read using:
 # $version = Get-Content .\version.txt
-Write-Host "Saving version in file $versionResult"
-Set-Content -Path $versionResult -Value $NewVersion -Force
+Write-Host "Saving version in file $VersionResult"
+Set-Content -Path $VersionResult -Value $NewVersion -Force
 
 # Apply the version to the assembly property files
 $files = gci $Env:BUILD_SOURCESDIRECTORY -recurse -include "*Properties*","My Project","*Version*" | 
