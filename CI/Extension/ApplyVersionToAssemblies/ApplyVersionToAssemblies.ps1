@@ -61,7 +61,7 @@ $FileExists = Test-Path $VersionFile
 # File with resulting version
 $VersionResult = Join-Path $Env:BUILD_SOURCESDIRECTORY "__gen__version.txt"
 
-$NewVersion = ""
+$GenVersion = ""
 
 # Checking if version should be taken from file and if that file does exist 
 if ($VersionType -eq "file" -and $FileExists)
@@ -76,7 +76,7 @@ if ($VersionType -eq "file" -and $FileExists)
     
     Write-Host "Revision from $Env:BUILD_BUILDNUMBER is $Revision"
 
-    $NewVersion = "$Base.$Revision"
+    $GenVersion = "$Base.$Revision"
 }
 else
 {
@@ -97,16 +97,28 @@ else
              Write-Warning "Will assume first instance is version."
           }
     }
-    $NewVersion = $VersionData[0]
+    $GenVersion = $VersionData[0]
 }
 
-Write-Host "Version: $NewVersion"
+Write-Host "Version: $GenVersion"
 
 # Write version number to file, to be able to pick up in later scripts
 # If working folder is the same, it can be read using:
 # $version = Get-Content .\version.txt
 Write-Host "Saving version in file $VersionResult"
-Set-Content -Path $VersionResult -Value $NewVersion -Force
+Set-Content -Path $VersionResult -Value $GenVersion -Force
+
+$PrefixVersions = Get-VstsInput -Name prefixVersions
+$PrefixWord = Get-VstsInput -Name prefixWord
+$PrefixBranch = Get-VstsInput -Name prefixBranch
+
+if ($PrefixVersions -and ($Env:BUILD_SOURCEBRANCHNAME -eq $PrefixBranch))
+{
+    $SemVersion = $GenVersion -replace "(.*)\.(.*)", "`$1-$PrefixWord`$2"
+
+    Write-Host "Pushing $SemVersion to environment variable"
+    Write-Host "##vso[task.setvariable variable=SemanticVersion;]$SemVersion"
+}
 
 # Apply the version to the assembly property files
 $files = gci $Env:BUILD_SOURCESDIRECTORY -recurse -include "*Properties*","My Project","*Version*" | 
@@ -114,12 +126,12 @@ $files = gci $Env:BUILD_SOURCESDIRECTORY -recurse -include "*Properties*","My Pr
     foreach { gci -Path $_.FullName -Recurse -include *Info.cs }
 if($files)
 {
-    Write-Host "Will apply $NewVersion to $($files.count) files."
+    Write-Host "Will apply $GenVersion to $($files.count) files."
 
     foreach ($file in $files) {
         $filecontent = Get-Content($file)
         attrib $file -r
-        $filecontent -replace $VersionRegex, $NewVersion | Out-File $file
+        $filecontent -replace $VersionRegex, $GenVersion | Out-File $file
         Write-Host "$file - version applied"
     }
 }
