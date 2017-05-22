@@ -17,6 +17,18 @@
     "Patch": "9"
   },
   "minimumAgentVersion": "1.95.0",
+  "groups": [
+    {
+      "name": "optionsGeneral",
+      "displayName": "General Options",
+      "isExpanded": true
+    },
+    {
+      "name": "optionsAdvanced",
+      "displayName": "Advanced Options",
+      "isExpanded": false
+    }
+  ],
   "inputs": [
     {
       "name": "versionType",
