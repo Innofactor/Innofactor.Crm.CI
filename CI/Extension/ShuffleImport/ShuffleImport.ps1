@@ -30,7 +30,7 @@ Write-Verbose "Imported DevUtils.CI"
 
 if (Test-Path $DataFile) {
 	Write-Host "Loading data file"
-	[xml]$Data = Get-Content $DataFile
+	[xml]$Data = Get-Content $DataFile -Encoding UTF8
 }
 else {
 	Write-Verbose "Data file does not exist"
