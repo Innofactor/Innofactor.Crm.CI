@@ -14,21 +14,9 @@
   "version": {
     "Major": "8",
     "Minor": "3",
-    "Patch": "11"
+    "Patch": "13"
   },
   "minimumAgentVersion": "1.95.0",
-  "groups": [
-    {
-      "name": "optionsGeneral",
-      "displayName": "General Options",
-      "isExpanded": true
-    },
-    {
-      "name": "optionsAdvanced",
-      "displayName": "Advanced Options",
-      "isExpanded": false
-    }
-  ],
   "inputs": [
     {
       "name": "versionType",
@@ -40,8 +28,7 @@
         "build": "Search for full version in generated build number",
         "file": "Search for revision in build number and append it to pattern from file"
       },
-      "helpMarkDown": "Select location where version pattern will be searched.",
-      "groupName": "optionsGeneral"
+      "helpMarkDown": "Select location where version pattern will be searched."
     },
     {
       "name": "versionFile",
@@ -50,8 +37,7 @@
       "defaultValue": "",
       "visibleRule": "versionType = file",
       "required": false,
-      "helpMarkDown": "Text file with version information. Revision number will be appended to it.",
-      "groupName": "optionsGeneral"
+      "helpMarkDown": "Text file with version information. Revision number will be appended to it."
     }
   ],
   "instanceNameFormat": "Apply Build Version to assemblies",
