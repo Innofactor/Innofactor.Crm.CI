@@ -58,7 +58,7 @@ $VersionType = Get-VstsInput -Name versionType -Require
 $VersionFile = Get-VstsInput -Name versionFile
 
 # File with resulting version
-$VersionResult = Join-Path $Env:BUILD_BINARIESDIRECTORY "version.txt"
+$VersionResult = Join-Path $Env:AGENT_BUILDDIRECTORY "version.txt"
 
 $NewVersion = ""
 
