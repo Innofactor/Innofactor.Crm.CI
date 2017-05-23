@@ -23,8 +23,8 @@ Write-Verbose "Connection String: $ConnectionString"
 
 if ($SetVersion -and (Get-Content $DefinitionFile | Select-String "{ShuffleVar:version}" -Quiet)) {
 	Write-Verbose "Definition contains version placeholder"
-	$versionFile = "__version.txt"
-	if ($env:BUILD_SOURCESDIRECTORY) {
+	$versionFile = "version.txt"
+	if ($env:BUILD_BINARIESDIRECTORY) {
 		$versionFile = Join-Path $env:BUILD_SOURCESDIRECTORY $versionFile
 	}
 	Write-Verbose "Version File: $versionFile"

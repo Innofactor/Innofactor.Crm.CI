@@ -14,7 +14,7 @@
   "version": {
     "Major": "8",
     "Minor": "3",
-    "Patch": "10"
+    "Patch": "11"
   },
   "minimumAgentVersion": "1.95.0",
   "groups": [
@@ -52,35 +52,6 @@
       "required": false,
       "helpMarkDown": "Text file with version information. Revision number will be appended to it.",
       "groupName": "optionsGeneral"
-    },
-    {
-      "name": "prefixVersions",
-      "type": "boolean",
-      "label": "Prefix versions",
-      "required": false,
-      "defaultValue": "false",
-      "helpMarkDown": "Use semantic prefix, like *-pre*, *-beta*, *-unstable*.",
-      "groupName": "optionsAdvanced"
-    },
-    {
-      "name": "prefixWord",
-      "type": "string",
-      "label": "Prefix with word",
-      "visibleRule": "prefixVersions = true",
-      "required": false,
-      "defaultValue": "beta",
-      "helpMarkDown": "Type short semantic prefix without dash, just *pre*, *beta*, *unstable*.",
-      "groupName": "optionsAdvanced"
-    },
-    {
-      "name": "prefixBranch",
-      "type": "string",
-      "label": "Prefix from branch",
-      "visibleRule": "prefixVersions = true",
-      "required": false,
-      "defaultValue": "master",
-      "helpMarkDown": "Name of the branch builds from which would be prefixed.",
-      "groupName": "optionsAdvanced"
     }
   ],
   "instanceNameFormat": "Apply Build Version to assemblies",

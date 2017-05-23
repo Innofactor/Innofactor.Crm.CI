@@ -2,7 +2,7 @@
   "manifestVersion": 1,
   "id": "cinteros-devutils-ci-build-tasks",
   "name": "DevOps for Microsoft Dynamics 365",
-  "version": "8.3.14",
+  "version": "8.3.15",
   "publisher": "InnofactorSE",
   "targets": [
     {
