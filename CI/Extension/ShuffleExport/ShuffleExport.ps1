@@ -25,7 +25,7 @@ if ($SetVersion -and (Get-Content $DefinitionFile | Select-String "{ShuffleVar:v
 	Write-Verbose "Definition contains version placeholder"
 	$versionFile = "version.txt"
 	if ($env:BUILD_BINARIESDIRECTORY) {
-		$versionFile = Join-Path $env:BUILD_SOURCESDIRECTORY $versionFile
+		$versionFile = Join-Path $env:BUILD_BINARIESDIRECTORY $versionFile
 	}
 	Write-Verbose "Version File: $versionFile"
 	$version = Get-Content $versionFile

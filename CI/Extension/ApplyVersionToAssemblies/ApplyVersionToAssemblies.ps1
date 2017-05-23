@@ -11,7 +11,8 @@
 # This script would then apply version 2013.07.19.1 to your assemblies.
 
 # Enable -Verbose option
-# [CmdletBinding()]
+[CmdletBinding()]
+param()
 
 # If this script is not running on a build server, remind user to 
 # set environment variables so that this script can be debugged
@@ -81,7 +82,7 @@ if ($VersionType -eq "file")
     else
     {
         Write-Error "File $VersionFile was not found, please check your build settings!"
-        return
+        exit 1
     }
 }
 else
