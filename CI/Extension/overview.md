@@ -1,6 +1,16 @@
 ﻿# Innofactor DevOps tools for Microsoft Dynamics 365
 
-Article series describing purpose and usage:
+## Slides
+
+From [CRM Saturday](http://crmsaturday.com) in Madrid 2017-06-03 describing the process:
+
+[An Alternative Approach to DevOps for Microsoft Dynamics 365](https://www.slideshare.net/JonasRapp/crm-saturday-devops-with-jonas-rapp)
+
+
+
+## Articles
+
+A blog series describing purpose and usage:
 
 **Part I** – [Background and how our DevOps tools evolved before we knew about it](http://jonasrapp.innofactor.se/2017/04/DevOps-I.html)
 
@@ -10,7 +20,6 @@ Article series describing purpose and usage:
 
 
 
-_Detailed information coming soon_
 
 # Screenshots
 
