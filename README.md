@@ -1,5 +1,7 @@
 # Innofactor.Crm.CI
 
+[![Join the chat at https://gitter.im/Innofactor/Innofactor.Crm.CI](https://badges.gitter.im/Innofactor/Innofactor.Crm.CI.svg)](https://gitter.im/Innofactor/Innofactor.Crm.CI?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 ### Articles
 http://jonasrapp.innofactor.se/2017/04/DevOps-I.html <br/>
 These describe the outline of the tools in this repository.
