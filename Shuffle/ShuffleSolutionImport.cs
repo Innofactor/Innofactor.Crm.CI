@@ -370,7 +370,16 @@ namespace Cinteros.Crm.Utils.Shuffle
                             }
                             else
                             {
-                                SendLine("See log file for technical details.");
+                                var message = cdAsyncOperation.Property("message", "<none>");
+                                message = ExtractErrorMessage(message);
+                                if (!string.IsNullOrWhiteSpace(message) && !message.Equals(friendlymessage, StringComparison.InvariantCultureIgnoreCase))
+                                {
+                                    SendLine("Detailed message: \n{0}", message);
+                                }
+                                else
+                                {
+                                    SendLine("See log file for technical details.");
+                                }
                             }
                             ex = new Exception(string.Format("Solution Import Failed: {0} - {1}",
                                 cdAsyncOperation.PropertyAsString("statecode", "?", false, false),
@@ -417,6 +426,36 @@ namespace Cinteros.Crm.Utils.Shuffle
             SendStatus(-1, -1, 100, 0);
             log.EndSection();
             return result;
+        }
+
+        private static string ExtractErrorMessage(string message)
+        {
+            const string fault = "(Fault Detail is equal to Microsoft.Xrm.Sdk.OrganizationServiceFault).: ";
+            const string unhandled = "Unhandled Exception: ";
+            while (message.Contains(fault))
+            {
+                message = message.Substring(message.IndexOf(fault) + fault.Length);
+            }
+            message = message.Replace("&lt;", "<").Replace("&gt;", ">");
+            while (message.Contains("<InnerFault>") && message.Contains("</InnerFault>"))
+            {
+                message = message.Substring(message.IndexOf("<InnerFault>") + 9);
+                message = message.Substring(0, message.LastIndexOf("</InnerFault>"));
+            }
+            if (message.Contains("<Message>") && message.Contains("</Message>"))
+            {
+                message = message.Substring(message.IndexOf("<Message>") + 9);
+                message = message.Substring(0, message.LastIndexOf("</Message>"));
+            }
+            else if (message.StartsWith(unhandled))
+            {
+                message = message.Substring(message.IndexOf(unhandled) + unhandled.Length);
+                if (message.Contains(":"))
+                {
+                    message = message.Split(':')[0];
+                }
+            }
+            return message;
         }
 
         private bool DoImportSolutionSync(ImportSolutionRequest impSolReq, ref Exception ex)
