@@ -108,14 +108,14 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
-    <Reference Include="XrmToolBox, Version=1.2017.3.14, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\XrmToolBoxPackage.1.2017.3.14\lib\net452\XrmToolBox.exe</HintPath>
+    <Reference Include="XrmToolBox, Version=1.2017.7.18, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\XrmToolBoxPackage.1.2017.7.18\lib\net452\XrmToolBox.exe</HintPath>
     </Reference>
-    <Reference Include="XrmToolBox.Extensibility, Version=1.2017.2.7, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\XrmToolBoxPackage.1.2017.3.14\lib\net452\XrmToolBox.Extensibility.dll</HintPath>
+    <Reference Include="XrmToolBox.Extensibility, Version=1.2017.7.10, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\XrmToolBoxPackage.1.2017.7.18\lib\net452\XrmToolBox.Extensibility.dll</HintPath>
     </Reference>
-    <Reference Include="XrmToolBox.PluginsStore, Version=1.2017.1.4, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\XrmToolBoxPackage.1.2017.3.14\lib\net452\XrmToolBox.PluginsStore.dll</HintPath>
+    <Reference Include="XrmToolBox.PluginsStore, Version=1.2017.6.6, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\XrmToolBoxPackage.1.2017.7.18\lib\net452\XrmToolBox.PluginsStore.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -238,7 +238,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="XrmToolBox.exe.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
