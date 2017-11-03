@@ -310,6 +310,7 @@
             this.Controls.Add(this.btnFile);
             this.Name = "ShuffleRunner";
             this.Size = new System.Drawing.Size(432, 423);
+            this.TabIcon = ((System.Drawing.Image)(resources.GetObject("$this.TabIcon")));
             this.toolStripMain.ResumeLayout(false);
             this.toolStripMain.PerformLayout();
             this.ResumeLayout(false);

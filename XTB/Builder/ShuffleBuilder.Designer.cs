@@ -456,7 +456,7 @@
             this.toolStripButtonValidate.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButtonValidate.Image")));
             this.toolStripButtonValidate.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripButtonValidate.Name = "toolStripButtonValidate";
-            this.toolStripButtonValidate.Size = new System.Drawing.Size(69, 22);
+            this.toolStripButtonValidate.Size = new System.Drawing.Size(68, 22);
             this.toolStripButtonValidate.Text = "Validate";
             this.toolStripButtonValidate.Click += new System.EventHandler(this.toolStripButtonValidate_Click);
             // 
@@ -501,6 +501,7 @@
             this.Controls.Add(this.toolStripMain);
             this.Name = "ShuffleBuilder";
             this.Size = new System.Drawing.Size(914, 662);
+            this.TabIcon = ((System.Drawing.Image)(resources.GetObject("$this.TabIcon")));
             this.ConnectionUpdated += new XrmToolBox.Extensibility.PluginControlBase.ConnectionUpdatedHandler(this.ShuffleBuilder_ConnectionUpdated);
             this.treeviewMenuStrip.ResumeLayout(false);
             this.nodeMenu.ResumeLayout(false);

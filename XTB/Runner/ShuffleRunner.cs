@@ -12,10 +12,14 @@ using XrmToolBox.Extensibility.Interfaces;
 
 namespace Innofactor.Crm.Shuffle.Runner
 {
-    public partial class ShuffleRunner : PluginControlBase, IMessageBusHost
+    public partial class ShuffleRunner : PluginControlBase, IMessageBusHost, IGitHubPlugin
     {
         private bool shuffeling = false;
         private bool datafilerequired = true;
+
+        public string RepositoryName => "Innofactor.Crm.CI";
+
+        public string UserName => "Innofactor";
 
         public ShuffleRunner()
         {

@@ -15,7 +15,7 @@ using Clipboard = Innofactor.Crm.Shuffle.Builder.AppCode.Clipboard;
 
 namespace Innofactor.Crm.Shuffle.Builder
 {
-    public partial class ShuffleBuilder : PluginControlBase, IMessageBusHost
+    public partial class ShuffleBuilder : PluginControlBase, IMessageBusHost, IGitHubPlugin
     {
         internal Clipboard clipboard = new Clipboard();
         private XmlDocument definitionDoc;
@@ -40,6 +40,10 @@ namespace Innofactor.Crm.Shuffle.Builder
                 return solutionsUnmanaged;
             }
         }
+
+        public string RepositoryName => "Innofactor.Crm.CI";
+
+        public string UserName => "Innofactor";
 
         public ShuffleBuilder()
         {
