@@ -19,22 +19,53 @@ namespace Cinteros.Crm.Utils.Shuffle
     /// </summary>
     public partial class Shuffler
     {
+        #region Public Fields
+
+        /// <summary>Dictionary with solutions and versions read from CRM using the /A:V directive.</summary>
+        public Dictionary<string, Version> ExistingSolutionVersions = null;
+
+        #endregion Public Fields
+
+        #region Private Fields
+
+        private readonly IServicable crmsvc;
+        private readonly ILoggable log;
         private XmlDocument definition;
         private string definitionpath;
-        private readonly ILoggable log;
-        private readonly IServicable crmsvc;
         private Dictionary<Guid, Guid> guidmap = null;
         private bool stoponerror = false;
         private int timeout = 120;
 
-        /// <summary>Dictionary with solutions and versions read from CRM using the /A:V directive.</summary>
-        public Dictionary<string, Version> ExistingSolutionVersions = null;
+        #endregion Private Fields
+
+        #region Public Constructors
+
+        /// <summary>General constructor for the Shuffler class</summary>
+        /// <param name="container"></param>
+        public Shuffler(CintContainer container)
+        {
+            this.crmsvc = container.Service;
+            this.log = container.Logger;
+        }
+
+        #endregion Public Constructors
+
+        #region Public Delegates
 
         /// <summary>Event handler to receive notifications in consuming code</summary>
         /// <param name="sender"></param>
         /// <param name="a">Arguments passed in notification</param>
         public delegate void ShuffleEventHandler(object sender, ShuffleEventArgs a);
+
+        #endregion Public Delegates
+
+        #region Public Events
+
         public event EventHandler<ShuffleEventArgs> RaiseShuffleEvent;
+
+        #endregion Public Events
+
+        #region Public Properties
 
         /// <summary>Shuffle Definition to be used</summary>
         public XmlDocument Definition
@@ -47,6 +78,10 @@ namespace Cinteros.Crm.Utils.Shuffle
                 definition = value;
             }
         }
+
+        #endregion Public Properties
+
+        #region Public Methods
 
         /// <summary>Export data according to shuffle definition in Definition to format Type</summary>
         /// <param name="Definition">Shuffle Definition</param>
@@ -147,143 +182,6 @@ namespace Cinteros.Crm.Utils.Shuffle
             return result;
         }
 
-        /// <summary>General constructor for the Shuffler class</summary>
-        /// <param name="container"></param>
-        public Shuffler(CintContainer container)
-        {
-            this.crmsvc = container.Service;
-            this.log = container.Logger;
-        }
-
-        /// <summary>
-        /// Export entities from CRM to dictionary of blocks with entities
-        /// </summary>
-        /// <returns>Blocks with exported entities</returns>
-        public ShuffleBlocks ExportFromCRM()
-        {
-            log.StartSection("ExportFromCRM");
-            if (definition == null)
-            {
-                throw new ArgumentNullException("Definition", "Shuffle definition must be specified to export data");
-            }
-            ShuffleBlocks blocks = new ShuffleBlocks();
-            ExistingSolutionVersions = null;
-            XmlNode xRoot = CintXML.FindChild(definition, "ShuffleDefinition");
-            XmlNode xBlocks = CintXML.FindChild(xRoot, "Blocks");
-            if (xBlocks != null)
-            {
-                stoponerror = CintXML.GetBoolAttribute(xRoot, "StopOnError", false);
-                timeout = CintXML.GetIntAttribute(xRoot, "Timeout", -1);
-                double savedtimeout = -1;
-                if (timeout > -1)
-                {
-                    SendLine("Setting timeout: {0} minutes", timeout);
-                    OrganizationServiceProxy orgsvcpxy = crmsvc.GetService<OrganizationServiceProxy>();
-                    savedtimeout = orgsvcpxy.Timeout.TotalMinutes;
-                    orgsvcpxy.Timeout = new TimeSpan(0, timeout, 0);
-                }
-
-                int totalBlocks = xBlocks.ChildNodes.Count;
-                int currentBlock = 0;
-                foreach (XmlNode xBlock in xBlocks.ChildNodes)
-                {
-                    currentBlock++;
-                    SendStatus(totalBlocks, currentBlock, -1, -1);
-                    if (xBlock.NodeType == XmlNodeType.Element)
-                    {
-                        switch (xBlock.Name)
-                        {
-                            case "DataBlock":
-                                CintDynEntityCollection cExported = ExportDataBlock(blocks, xBlock);
-                                string name = CintXML.GetAttribute(xBlock, "Name");
-                                if (cExported != null)
-                                {
-                                    if (blocks.ContainsKey(name))
-                                    {
-                                        SendLine("Block already added: {0}", name);
-                                    }
-                                    else
-                                    {
-                                        blocks.Add(name, cExported);
-                                    }
-                                }
-                                break;
-                            case "SolutionBlock":
-                                if (ExistingSolutionVersions == null)
-                                {
-                                    GetCurrentVersions();
-                                }
-                                ExportSolutionBlock(xBlock);
-                                break;
-                        }
-                    }
-                }
-                SendStatus(0, 0, 0, 0);
-                if (savedtimeout > -1)
-                {
-                    OrganizationServiceProxy orgsvcpxy = crmsvc.GetService<OrganizationServiceProxy>();
-                    orgsvcpxy.Timeout = new TimeSpan(0, (int)savedtimeout, 0);
-                }
-            }
-            log.EndSection();
-            return blocks;
-        }
-
-        /// <summary>
-        /// Serialize blocks with entities with given serialization type
-        /// </summary>
-        /// <param name="blocks"></param>
-        /// <param name="type"></param>
-        /// <param name="delimeter">Optional, only required for SerializationType: Text</param>
-        /// <returns></returns>
-        public XmlDocument Serialize(ShuffleBlocks blocks, SerializationType type, char delimeter)
-        {
-            log.StartSection("Serialize");
-            XmlDocument xml = null;
-            if (blocks.Count > 0)
-            {
-                SendLine("Serializing {0} blocks with type {1}", blocks.Count, type);
-                xml = new XmlDocument();
-                XmlNode root = xml.CreateElement("ShuffleData");
-                xml.AppendChild(root);
-                CintXML.AppendAttribute(root, "Type", type.ToString());
-                CintXML.AppendAttribute(root, "ExportTime", DateTime.Now.ToString("s"));
-                switch (type)
-                {
-                    case SerializationType.Full:
-                    case SerializationType.Simple:
-                    case SerializationType.SimpleWithValue:
-                    case SerializationType.SimpleNoId:
-                    case SerializationType.Explicit:
-                        foreach (string block in blocks.Keys)
-                        {
-                            SendLine("Serializing {0} records in block {1}", blocks[block].Count, block);
-                            XmlNode xBlock = xml.CreateElement("Block");
-                            root.AppendChild(xBlock);
-                            CintXML.AppendAttribute(xBlock, "Name", block);
-                            CintXML.AppendAttribute(xBlock, "Count", blocks[block].Count.ToString());
-                            XmlDocument xSerialized = blocks[block].Serialize((SerializationStyle)type);
-                            xBlock.AppendChild(xml.ImportNode(xSerialized.ChildNodes[0], true));
-                        }
-                        break;
-                    case SerializationType.Text:
-                        CintXML.AppendAttribute(root, "Delimeter", delimeter.ToString());
-                        StringBuilder text = new StringBuilder();
-                        foreach (string block in blocks.Keys)
-                        {
-                            SendLine("Serializing {0} records in block {1}", blocks[block].Count, block);
-                            text.AppendLine("<<<" + block + ">>>");
-                            string serializedblock = blocks[block].ToTextFile(delimeter);
-                            text.Append(serializedblock);
-                        }
-                        CintXML.AddCDATANode(root, "Text", text.ToString());
-                        break;
-                }
-            }
-            log.EndSection();
-            return xml;
-        }
-
         /// <summary>
         /// Deserialize xml/string to blocks with entities
         /// </summary>
@@ -363,6 +261,81 @@ namespace Cinteros.Crm.Utils.Shuffle
         }
 
         /// <summary>
+        /// Export entities from CRM to dictionary of blocks with entities
+        /// </summary>
+        /// <returns>Blocks with exported entities</returns>
+        public ShuffleBlocks ExportFromCRM()
+        {
+            log.StartSection("ExportFromCRM");
+            if (definition == null)
+            {
+                throw new ArgumentNullException("Definition", "Shuffle definition must be specified to export data");
+            }
+            ShuffleBlocks blocks = new ShuffleBlocks();
+            ExistingSolutionVersions = null;
+            XmlNode xRoot = CintXML.FindChild(definition, "ShuffleDefinition");
+            XmlNode xBlocks = CintXML.FindChild(xRoot, "Blocks");
+            if (xBlocks != null)
+            {
+                stoponerror = CintXML.GetBoolAttribute(xRoot, "StopOnError", false);
+                timeout = CintXML.GetIntAttribute(xRoot, "Timeout", -1);
+                double savedtimeout = -1;
+                if (timeout > -1)
+                {
+                    SendLine("Setting timeout: {0} minutes", timeout);
+                    OrganizationServiceProxy orgsvcpxy = crmsvc.GetService<OrganizationServiceProxy>();
+                    savedtimeout = orgsvcpxy.Timeout.TotalMinutes;
+                    orgsvcpxy.Timeout = new TimeSpan(0, timeout, 0);
+                }
+
+                int totalBlocks = xBlocks.ChildNodes.Count;
+                int currentBlock = 0;
+                foreach (XmlNode xBlock in xBlocks.ChildNodes)
+                {
+                    currentBlock++;
+                    SendStatus(totalBlocks, currentBlock, -1, -1);
+                    if (xBlock.NodeType == XmlNodeType.Element)
+                    {
+                        switch (xBlock.Name)
+                        {
+                            case "DataBlock":
+                                CintDynEntityCollection cExported = ExportDataBlock(blocks, xBlock);
+                                string name = CintXML.GetAttribute(xBlock, "Name");
+                                if (cExported != null)
+                                {
+                                    if (blocks.ContainsKey(name))
+                                    {
+                                        SendLine("Block already added: {0}", name);
+                                    }
+                                    else
+                                    {
+                                        blocks.Add(name, cExported);
+                                    }
+                                }
+                                break;
+
+                            case "SolutionBlock":
+                                if (ExistingSolutionVersions == null)
+                                {
+                                    GetCurrentVersions();
+                                }
+                                ExportSolutionBlock(xBlock);
+                                break;
+                        }
+                    }
+                }
+                SendStatus(0, 0, 0, 0);
+                if (savedtimeout > -1)
+                {
+                    OrganizationServiceProxy orgsvcpxy = crmsvc.GetService<OrganizationServiceProxy>();
+                    orgsvcpxy.Timeout = new TimeSpan(0, (int)savedtimeout, 0);
+                }
+            }
+            log.EndSection();
+            return blocks;
+        }
+
+        /// <summary>
         /// Import entities to CRM from dictionary of blocks
         /// </summary>
         /// <param name="blocks">Blocks with entities to import</param>
@@ -429,6 +402,7 @@ namespace Cinteros.Crm.Utils.Shuffle
                                 failed += dataresult.Item5;
                                 references.AddRange(dataresult.Item6);
                                 break;
+
                             case "SolutionBlock":
                                 var solutionresult = ImportSolutionBlock(xBlock);
                                 switch (solutionresult)
@@ -453,11 +427,71 @@ namespace Cinteros.Crm.Utils.Shuffle
             return new Tuple<int, int, int, int, int, EntityReferenceCollection>(created, updated, skipped, deleted, failed, references);
         }
 
+        /// <summary>
+        /// Serialize blocks with entities with given serialization type
+        /// </summary>
+        /// <param name="blocks"></param>
+        /// <param name="type"></param>
+        /// <param name="delimeter">Optional, only required for SerializationType: Text</param>
+        /// <returns></returns>
+        public XmlDocument Serialize(ShuffleBlocks blocks, SerializationType type, char delimeter)
+        {
+            log.StartSection("Serialize");
+            XmlDocument xml = null;
+            if (blocks.Count > 0)
+            {
+                SendLine("Serializing {0} blocks with type {1}", blocks.Count, type);
+                xml = new XmlDocument();
+                XmlNode root = xml.CreateElement("ShuffleData");
+                xml.AppendChild(root);
+                CintXML.AppendAttribute(root, "Type", type.ToString());
+                CintXML.AppendAttribute(root, "ExportTime", DateTime.Now.ToString("s"));
+                switch (type)
+                {
+                    case SerializationType.Full:
+                    case SerializationType.Simple:
+                    case SerializationType.SimpleWithValue:
+                    case SerializationType.SimpleNoId:
+                    case SerializationType.Explicit:
+                        foreach (string block in blocks.Keys)
+                        {
+                            SendLine("Serializing {0} records in block {1}", blocks[block].Count, block);
+                            XmlNode xBlock = xml.CreateElement("Block");
+                            root.AppendChild(xBlock);
+                            CintXML.AppendAttribute(xBlock, "Name", block);
+                            CintXML.AppendAttribute(xBlock, "Count", blocks[block].Count.ToString());
+                            XmlDocument xSerialized = blocks[block].Serialize((SerializationStyle)type);
+                            xBlock.AppendChild(xml.ImportNode(xSerialized.ChildNodes[0], true));
+                        }
+                        break;
+
+                    case SerializationType.Text:
+                        CintXML.AppendAttribute(root, "Delimeter", delimeter.ToString());
+                        StringBuilder text = new StringBuilder();
+                        foreach (string block in blocks.Keys)
+                        {
+                            SendLine("Serializing {0} records in block {1}", blocks[block].Count, block);
+                            text.AppendLine("<<<" + block + ">>>");
+                            string serializedblock = blocks[block].ToTextFile(delimeter);
+                            text.Append(serializedblock);
+                        }
+                        CintXML.AddCDATANode(root, "Text", text.ToString());
+                        break;
+                }
+            }
+            log.EndSection();
+            return xml;
+        }
+
+        #endregion Public Methods
+
+        #region Protected Methods
+
         /// <summary></summary>
         /// <param name="e"></param>
-        /// <remarks>Wrap event invocations inside a protected virtual method 
-        /// to allow derived classes to override the event invocation behavior 
-        /// Exempel från: http://msdn.microsoft.com/en-us/library/w369ty8x.aspx </remarks> 
+        /// <remarks>Wrap event invocations inside a protected virtual method
+        /// to allow derived classes to override the event invocation behavior
+        /// Exempel från: http://msdn.microsoft.com/en-us/library/w369ty8x.aspx </remarks>
         protected virtual void OnRaiseShuffleEvent(ShuffleEventArgs e)
         {
             EventHandler<ShuffleEventArgs> handler = RaiseShuffleEvent;
@@ -467,7 +501,9 @@ namespace Cinteros.Crm.Utils.Shuffle
             }
         }
 
-        #region Private helper methods
+        #endregion Protected Methods
+
+        #region Private Methods
 
         private CintDynEntityCollection GetExistingSolutions()
         {
@@ -483,15 +519,15 @@ namespace Cinteros.Crm.Utils.Shuffle
             SendText("\n", false);
         }
 
-        private void SendLineUpdate(string msg, params object[] args)
-        {
-            SendText(msg, true, args);
-            SendLine();
-        }
-
         private void SendLine(string msg, params object[] args)
         {
             SendText(msg, false, args);
+            SendLine();
+        }
+
+        private void SendLineUpdate(string msg, params object[] args)
+        {
+            SendText(msg, true, args);
             SendLine();
         }
 
@@ -523,6 +559,6 @@ namespace Cinteros.Crm.Utils.Shuffle
             OnRaiseShuffleEvent(new ShuffleEventArgs(msg, totalBlocks, currentBlock, blockRecords, currentRecord, replacelast));
         }
 
-        #endregion
+        #endregion Private Methods
     }
 }

@@ -5,15 +5,14 @@ using Microsoft.Xrm.Sdk.Query;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
 
 namespace Cinteros.Crm.Utils.Shuffle
 {
     public partial class Shuffler
     {
+        #region Private Methods
+
         private void ExportSolutionBlock(XmlNode xBlock)
         {
             log.StartSection("ExportSolutionBlock");
@@ -105,42 +104,6 @@ namespace Cinteros.Crm.Utils.Shuffle
             log.EndSection();
         }
 
-        private void SetNewSolutionVersion(string setversion, CintDynEntity cdSolution, Version currentversion)
-        {
-            Version newversion = new Version();
-            if (setversion.Equals("IncrementAll", StringComparison.OrdinalIgnoreCase))
-            {
-                newversion = new Version("1.0.0.0");
-                foreach (var existingversion in ExistingSolutionVersions.Values)
-                {
-                    if (existingversion > newversion)
-                    {
-                        newversion = existingversion;
-                    }
-                }
-                newversion = IncrementVersion(newversion);
-            }
-            else if (setversion.Equals("Increment", StringComparison.OrdinalIgnoreCase))
-            {
-                newversion = IncrementVersion(currentversion);
-            }
-            else if (setversion.Equals("Current", StringComparison.OrdinalIgnoreCase))
-            {
-                newversion = currentversion;
-            }
-            else
-            {
-                newversion = new Version(setversion);
-            }
-            if (!currentversion.Equals(newversion))
-            {
-                SendLine("Setting version: {0}", newversion);
-                CintDynEntity cdSolUpd = cdSolution.Clone(true);
-                cdSolUpd.AddProperty("version", newversion.ToString());
-                cdSolUpd.Save();
-            }
-        }
-
         private CintDynEntity GetAndVerifySolutionForExport(string name)
         {
             CintDynEntityCollection cSolutions = CintDynEntity.RetrieveMultiple(crmsvc, "solution",
@@ -178,6 +141,7 @@ namespace Cinteros.Crm.Utils.Shuffle
                         {
                             case "DataBlock":
                                 break;
+
                             case "SolutionBlock":
                                 var xmlNode = CintXML.FindChild(xBlock, "Export");
                                 if (xmlNode != null)
@@ -208,5 +172,43 @@ namespace Cinteros.Crm.Utils.Shuffle
             log.Log("Increasing {0} to {1}", version, newversion);
             return new Version(newversion);
         }
+
+        private void SetNewSolutionVersion(string setversion, CintDynEntity cdSolution, Version currentversion)
+        {
+            Version newversion;
+            if (setversion.Equals("IncrementAll", StringComparison.OrdinalIgnoreCase))
+            {
+                newversion = new Version("1.0.0.0");
+                foreach (var existingversion in ExistingSolutionVersions.Values)
+                {
+                    if (existingversion > newversion)
+                    {
+                        newversion = existingversion;
+                    }
+                }
+                newversion = IncrementVersion(newversion);
+            }
+            else if (setversion.Equals("Increment", StringComparison.OrdinalIgnoreCase))
+            {
+                newversion = IncrementVersion(currentversion);
+            }
+            else if (setversion.Equals("Current", StringComparison.OrdinalIgnoreCase))
+            {
+                newversion = currentversion;
+            }
+            else
+            {
+                newversion = new Version(setversion);
+            }
+            if (!currentversion.Equals(newversion))
+            {
+                SendLine("Setting version: {0}", newversion);
+                CintDynEntity cdSolUpd = cdSolution.Clone(true);
+                cdSolUpd.AddProperty("version", newversion.ToString());
+                cdSolUpd.Save();
+            }
+        }
+
+        #endregion Private Methods
     }
 }

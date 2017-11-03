@@ -14,6 +14,240 @@ namespace Cinteros.Crm.Utils.Shuffle
 {
     public partial class Shuffler
     {
+        #region Private Methods
+
+        private static bool EntityAttributesEqual(List<string> matchattributes, CintDynEntity entity1, CintDynEntity entity2)
+        {
+            var match = true;
+            foreach (var attr in matchattributes)
+            {
+                var srcvalue = "";
+                if (attr == entity1.PrimaryIdAttribute)
+                {
+                    srcvalue = entity1.Id.ToString();
+                }
+                else
+                {
+                    srcvalue = entity1.PropertyAsBaseType(attr, "<null>", false, false, true).ToString();
+                }
+                var trgvalue = entity2.PropertyAsBaseType(attr, "<null>", false, false, true).ToString();
+                if (srcvalue != trgvalue)
+                {
+                    match = false;
+                    break;
+                }
+            }
+            return match;
+        }
+
+        private static string GetEntityDisplayString(XmlNode xMatch, CintDynEntity cdEntity)
+        {
+            var unique = new List<string>();
+            if (xMatch != null && xMatch.ChildNodes.Count > 0)
+            {
+                foreach (XmlNode xMatchAttr in xMatch.ChildNodes)
+                {
+                    string matchdisplay = CintXML.GetAttribute(xMatchAttr, "Display");
+                    if (string.IsNullOrEmpty(matchdisplay))
+                    {
+                        matchdisplay = CintXML.GetAttribute(xMatchAttr, "Name");
+                    }
+                    var matchvalue = "<null>";
+                    if (cdEntity.Contains(matchdisplay, true))
+                    {
+                        if (cdEntity.Entity[matchdisplay] is EntityReference)
+                        {   // Don't use PropertyAsString, that would perform GetRelated that we don't want due to performance
+                            var entref = cdEntity.Property<EntityReference>(matchdisplay, null);
+                            if (!string.IsNullOrEmpty(entref.Name))
+                            {
+                                matchvalue = entref.Name;
+                            }
+                            else
+                            {
+                                matchvalue = entref.LogicalName + ":" + entref.Id.ToString();
+                            }
+                        }
+                        else
+                        {
+                            matchvalue = cdEntity.PropertyAsString(matchdisplay, "", false, false, true);
+                        }
+                    }
+                    unique.Add(matchvalue);
+                }
+            }
+            if (unique.Count == 0)
+            {
+                unique.Add(cdEntity.Id.ToString());
+            }
+            return string.Join(", ", unique);
+        }
+
+        private static void ReplaceUpdateInfo(CintDynEntity cdEntity)
+        {
+            List<string> removeAttr = new List<string>();
+            List<KeyValuePair<string, object>> newAttr = new List<KeyValuePair<string, object>>();
+            foreach (KeyValuePair<string, object> attr in cdEntity.Attributes)
+            {
+                if (attr.Key == "createdby")
+                {
+                    if (!cdEntity.Attributes.Contains("createdonbehalfby"))
+                    {
+                        newAttr.Add(new KeyValuePair<string, object>("createdonbehalfby", attr.Value));
+                    }
+                    removeAttr.Add("createdby");
+                }
+                else if (attr.Key == "modifiedby")
+                {
+                    if (!cdEntity.Attributes.Contains("modifiedonbehalfby"))
+                    {
+                        newAttr.Add(new KeyValuePair<string, object>("modifiedonbehalfby", attr.Value));
+                    }
+                    removeAttr.Add("modifiedby");
+                }
+                else if (attr.Key == "createdon")
+                {
+                    if (!cdEntity.Attributes.Contains("overriddencreatedon"))
+                    {
+                        newAttr.Add(new KeyValuePair<string, object>("overriddencreatedon", attr.Value));
+                    }
+                    removeAttr.Add("createdon");
+                }
+            }
+            foreach (string key in removeAttr)
+            {
+                cdEntity.Attributes.Remove(key);
+            }
+            if (newAttr.Count > 0)
+            {
+                cdEntity.Attributes.AddRange(newAttr);
+            }
+        }
+
+        private CintDynEntityCollection GetAllRecordsForMatching(List<string> allattributes, CintDynEntity cdEntity)
+        {
+            log.StartSection(MethodBase.GetCurrentMethod().Name);
+            QueryExpression qMatch = new QueryExpression(cdEntity.Name);
+            qMatch.ColumnSet = new ColumnSet(allattributes.ToArray());
+#if DEBUG
+            log.Log("Retrieving all records for {0}:\n{1}", cdEntity.Name, CintQryExp.ConvertToFetchXml(qMatch, crmsvc));
+#endif
+            CintDynEntityCollection matches = CintDynEntity.RetrieveMultiple(crmsvc, qMatch, log);
+            SendLine("Pre-retrieved {0} records for matching", matches.Count);
+            log.EndSection();
+            return matches;
+        }
+
+        private List<string> GetMatchAttributes(XmlNode xMatch)
+        {
+            var result = new List<string>();
+            if (xMatch != null)
+            {
+                foreach (XmlNode xMatchAttr in xMatch.ChildNodes)
+                {
+                    var matchattr = CintXML.GetAttribute(xMatchAttr, "Name");
+                    if (string.IsNullOrEmpty(matchattr))
+                    {
+                        throw new ArgumentOutOfRangeException("Match Attribute name not set");
+                    }
+                    result.Add(matchattr);
+                }
+            }
+            return result;
+        }
+
+        private CintDynEntityCollection GetMatchingRecords(CintDynEntity cdEntity, List<string> matchattributes, List<string> updateattributes, bool preretrieveall, ref CintDynEntityCollection cAllRecordsToMatch)
+        {
+            log.StartSection(MethodBase.GetCurrentMethod().Name);
+            CintDynEntityCollection matches = null;
+            var allattributes = new List<string>();
+            allattributes.Add(cdEntity.PrimaryIdAttribute);
+            if (cdEntity.Contains("ownerid"))
+            {
+                allattributes.Add("ownerid");
+            }
+            if (cdEntity.Contains("statecode") || cdEntity.Contains("statuscode"))
+            {
+                allattributes.Add("statecode");
+                allattributes.Add("statuscode");
+            }
+            allattributes = allattributes.Union(matchattributes.Union(updateattributes)).ToList();
+            if (preretrieveall)
+            {
+                if (cAllRecordsToMatch == null)
+                {
+                    cAllRecordsToMatch = GetAllRecordsForMatching(allattributes, cdEntity);
+                }
+                matches = GetMatchingRecordsFromPreRetrieved(matchattributes, cdEntity, cAllRecordsToMatch);
+            }
+            else
+            {
+                QueryExpression qMatch = new QueryExpression(cdEntity.Name);
+                // We need to be able to see if any attributes have changed, so lets make sure matching records have all the attributes that will be updated
+                qMatch.ColumnSet = new ColumnSet(allattributes.ToArray());
+
+                foreach (var matchattr in matchattributes)
+                {
+                    object value = null;
+                    if (cdEntity.Entity.Contains(matchattr))
+                    {
+                        value = CintEntity.AttributeToBaseType(cdEntity.Entity[matchattr]);
+                    }
+                    else if (matchattr == cdEntity.PrimaryIdAttribute)
+                    {
+                        value = cdEntity.Id;
+                    }
+                    if (value != null)
+                    {
+                        CintQryExp.AppendCondition(qMatch.Criteria, LogicalOperator.And, matchattr, Microsoft.Xrm.Sdk.Query.ConditionOperator.Equal, value);
+                    }
+                    else
+                    {
+                        CintQryExp.AppendCondition(qMatch.Criteria, LogicalOperator.And, matchattr, Microsoft.Xrm.Sdk.Query.ConditionOperator.Null, null);
+                    }
+                }
+#if DEBUG
+                log.Log("Finding matches for {0}:\n{1}", cdEntity, CintQryExp.ConvertToFetchXml(qMatch, crmsvc));
+#endif
+                matches = CintDynEntity.RetrieveMultiple(crmsvc, qMatch, log);
+            }
+            log.EndSection();
+            return matches;
+        }
+
+        private CintDynEntityCollection GetMatchingRecordsFromPreRetrieved(List<string> matchattributes, CintDynEntity cdEntity, CintDynEntityCollection cAllRecordsToMatch)
+        {
+            log.StartSection(MethodBase.GetCurrentMethod().Name);
+            log.Log("Searching matches for: {0} {1}", cdEntity.Id, cdEntity);
+            var result = new CintDynEntityCollection();
+            foreach (var cdRecord in cAllRecordsToMatch)
+            {
+                if (EntityAttributesEqual(matchattributes, cdEntity, cdRecord))
+                {
+                    result.Add(cdRecord);
+                    log.Log("Found match: {0} {1}", cdRecord.Id, cdRecord);
+                }
+            }
+            log.Log("Returned matches: {0}", result.Count);
+            log.EndSection();
+            return result;
+        }
+
+        private List<string> GetUpdateAttributes(CintDynEntityCollection entities)
+        {
+            var result = new List<string>();
+            foreach (var entity in entities)
+            {
+                foreach (var attribute in entity.Attributes.Keys)
+                {
+                    if (!result.Contains(attribute))
+                    {
+                        result.Add(attribute);
+                    }
+                }
+            }
+            return result;
+        }
+
         private Tuple<int, int, int, int, int, EntityReferenceCollection> ImportDataBlock(XmlNode xBlock, CintDynEntityCollection cEntities)
         {
             log.StartSection("ImportDataBlock");
@@ -115,6 +349,7 @@ namespace Cinteros.Crm.Utils.Shuffle
                                 if (type == "Entity" || string.IsNullOrEmpty(type))
                                 {
                                     #region Entity
+
                                     if (matchattributes.Count == 0)
                                     {
                                         if (save == "Never" || save == "UpdateOnly")
@@ -219,11 +454,12 @@ namespace Cinteros.Crm.Utils.Shuffle
                                         guidmap.Add(oldid, newid);
                                     }
 
-                                    #endregion
+                                    #endregion Entity
                                 }
                                 else if (type == "Intersect")
                                 {
                                     #region Intersect
+
                                     if (cdEntity.Attributes.Count != 2)
                                     {
                                         throw new ArgumentOutOfRangeException("Attributes", cdEntity.Attributes.Count, "Invalid Attribute count for intersect object");
@@ -256,7 +492,8 @@ namespace Cinteros.Crm.Utils.Shuffle
                                             throw;
                                         }
                                     }
-                                    #endregion
+
+                                    #endregion Intersect
                                 }
                             }
                             catch (Exception ex)
@@ -275,6 +512,7 @@ namespace Cinteros.Crm.Utils.Shuffle
                         SendLine("Created: {0} Updated: {1} Skipped: {2} Deleted: {3} Failed: {4}", created, updated, skipped, deleted, failed);
                     }
                     break;
+
                 default:
                     throw new ArgumentOutOfRangeException("Type", xBlock.Name, "Invalid Block type");
             }
@@ -282,195 +520,18 @@ namespace Cinteros.Crm.Utils.Shuffle
             return new Tuple<int, int, int, int, int, EntityReferenceCollection>(created, updated, skipped, deleted, failed, references);
         }
 
-        private CintDynEntityCollection GetMatchingRecords(CintDynEntity cdEntity, List<string> matchattributes, List<string> updateattributes, bool preretrieveall, ref CintDynEntityCollection cAllRecordsToMatch)
+        private void ReplaceGuids(CintDynEntity cdEntity, bool includeid)
         {
-            log.StartSection(MethodBase.GetCurrentMethod().Name);
-            CintDynEntityCollection matches = null;
-            var allattributes = new List<string>();
-            allattributes.Add(cdEntity.PrimaryIdAttribute);
-            if (cdEntity.Contains("ownerid"))
+            foreach (KeyValuePair<string, object> prop in cdEntity.Attributes)
             {
-                allattributes.Add("ownerid");
-            }
-            if (cdEntity.Contains("statecode") || cdEntity.Contains("statuscode"))
-            {
-                allattributes.Add("statecode");
-                allattributes.Add("statuscode");
-            }
-            allattributes = allattributes.Union(matchattributes.Union(updateattributes)).ToList();
-            if (preretrieveall)
-            {
-                if (cAllRecordsToMatch == null)
-                {
-                    cAllRecordsToMatch = GetAllRecordsForMatching(allattributes, cdEntity);
-                }
-                matches = GetMatchingRecordsFromPreRetrieved(matchattributes, cdEntity, cAllRecordsToMatch);
-            }
-            else
-            {
-                QueryExpression qMatch = new QueryExpression(cdEntity.Name);
-                // We need to be able to see if any attributes have changed, so lets make sure matching records have all the attributes that will be updated
-                qMatch.ColumnSet = new ColumnSet(allattributes.ToArray());
-
-                foreach (var matchattr in matchattributes)
-                {
-                    object value = null;
-                    if (cdEntity.Entity.Contains(matchattr))
-                    {
-                        value = CintEntity.AttributeToBaseType(cdEntity.Entity[matchattr]);
-                    }
-                    else if (matchattr == cdEntity.PrimaryIdAttribute)
-                    {
-                        value = cdEntity.Id;
-                    }
-                    if (value != null)
-                    {
-                        CintQryExp.AppendCondition(qMatch.Criteria, LogicalOperator.And, matchattr, Microsoft.Xrm.Sdk.Query.ConditionOperator.Equal, value);
-                    }
+                if (prop.Value is Guid && guidmap.ContainsKey((Guid)prop.Value))
+                    if (includeid)
+                        throw new NotImplementedException("Cannot handle replacement of Guid type attributes");
                     else
-                    {
-                        CintQryExp.AppendCondition(qMatch.Criteria, LogicalOperator.And, matchattr, Microsoft.Xrm.Sdk.Query.ConditionOperator.Null, null);
-                    }
-                }
-#if DEBUG
-                log.Log("Finding matches for {0}:\n{1}", cdEntity, CintQryExp.ConvertToFetchXml(qMatch, crmsvc));
-#endif
-                matches = CintDynEntity.RetrieveMultiple(crmsvc, qMatch, log);
+                        log.Log("No action, we don't care about the guid of the object");
+                if (prop.Value is EntityReference && guidmap.ContainsKey(((EntityReference)prop.Value).Id))
+                    ((EntityReference)prop.Value).Id = guidmap[((EntityReference)prop.Value).Id];
             }
-            log.EndSection();
-            return matches;
-        }
-
-        private CintDynEntityCollection GetAllRecordsForMatching(List<string> allattributes, CintDynEntity cdEntity)
-        {
-            log.StartSection(MethodBase.GetCurrentMethod().Name);
-            QueryExpression qMatch = new QueryExpression(cdEntity.Name);
-            qMatch.ColumnSet = new ColumnSet(allattributes.ToArray());
-#if DEBUG
-            log.Log("Retrieving all records for {0}:\n{1}", cdEntity.Name, CintQryExp.ConvertToFetchXml(qMatch, crmsvc));
-#endif
-            CintDynEntityCollection matches = CintDynEntity.RetrieveMultiple(crmsvc, qMatch, log);
-            SendLine("Pre-retrieved {0} records for matching", matches.Count);
-            log.EndSection();
-            return matches;
-        }
-
-        private CintDynEntityCollection GetMatchingRecordsFromPreRetrieved(List<string> matchattributes, CintDynEntity cdEntity, CintDynEntityCollection cAllRecordsToMatch)
-        {
-            log.StartSection(MethodBase.GetCurrentMethod().Name);
-            log.Log("Searching matches for: {0} {1}", cdEntity.Id, cdEntity);
-            var result = new CintDynEntityCollection();
-            foreach (var cdRecord in cAllRecordsToMatch)
-            {
-                if (EntityAttributesEqual(matchattributes, cdEntity, cdRecord))
-                {
-                    result.Add(cdRecord);
-                    log.Log("Found match: {0} {1}", cdRecord.Id, cdRecord);
-                }
-            }
-            log.Log("Returned matches: {0}", result.Count);
-            log.EndSection();
-            return result;
-        }
-
-        private static bool EntityAttributesEqual(List<string> matchattributes, CintDynEntity entity1, CintDynEntity entity2)
-        {
-            var match = true;
-            foreach (var attr in matchattributes)
-            {
-                var srcvalue = "";
-                if (attr == entity1.PrimaryIdAttribute)
-                {
-                    srcvalue = entity1.Id.ToString();
-                }
-                else
-                {
-                    srcvalue = entity1.PropertyAsBaseType(attr, "<null>", false, false, true).ToString();
-                }
-                var trgvalue = entity2.PropertyAsBaseType(attr, "<null>", false, false, true).ToString();
-                if (srcvalue != trgvalue)
-                {
-                    match = false;
-                    break;
-                }
-            }
-            return match;
-        }
-
-        private List<string> GetMatchAttributes(XmlNode xMatch)
-        {
-            var result = new List<string>();
-            if (xMatch != null)
-            {
-                foreach (XmlNode xMatchAttr in xMatch.ChildNodes)
-                {
-                    var matchattr = CintXML.GetAttribute(xMatchAttr, "Name");
-                    if (string.IsNullOrEmpty(matchattr))
-                    {
-                        throw new ArgumentOutOfRangeException("Match Attribute name not set");
-                    }
-                    result.Add(matchattr);
-                }
-            }
-            return result;
-        }
-
-        private List<string> GetUpdateAttributes(CintDynEntityCollection entities)
-        {
-            var result = new List<string>();
-            foreach (var entity in entities)
-            {
-                foreach (var attribute in entity.Attributes.Keys)
-                {
-                    if (!result.Contains(attribute))
-                    {
-                        result.Add(attribute);
-                    }
-                }
-            }
-            return result;
-        }
-
-        private static string GetEntityDisplayString(XmlNode xMatch, CintDynEntity cdEntity)
-        {
-            var unique = new List<string>();
-            if (xMatch != null && xMatch.ChildNodes.Count > 0)
-            {
-                foreach (XmlNode xMatchAttr in xMatch.ChildNodes)
-                {
-                    string matchdisplay = CintXML.GetAttribute(xMatchAttr, "Display");
-                    if (string.IsNullOrEmpty(matchdisplay))
-                    {
-                        matchdisplay = CintXML.GetAttribute(xMatchAttr, "Name");
-                    }
-                    var matchvalue = "<null>";
-                    if (cdEntity.Contains(matchdisplay, true))
-                    {
-                        if (cdEntity.Entity[matchdisplay] is EntityReference)
-                        {   // Don't use PropertyAsString, that would perform GetRelated that we don't want due to performance
-                            var entref = cdEntity.Property<EntityReference>(matchdisplay, null);
-                            if (!string.IsNullOrEmpty(entref.Name))
-                            {
-                                matchvalue = entref.Name;
-                            }
-                            else
-                            {
-                                matchvalue = entref.LogicalName + ":" + entref.Id.ToString();
-                            }
-                        }
-                        else
-                        {
-                            matchvalue = cdEntity.PropertyAsString(matchdisplay, "", false, false, true);
-                        }
-                    }
-                    unique.Add(matchvalue);
-                }
-            }
-            if (unique.Count == 0)
-            {
-                unique.Add(cdEntity.Id.ToString());
-            }
-            return string.Join(", ", unique);
         }
 
         private bool SaveEntity(CintDynEntity cdNewEntity, CintDynEntity cdMatchEntity, bool updateInactiveRecord, bool updateIdentical, int pos, string identifier)
@@ -557,59 +618,6 @@ namespace Cinteros.Crm.Utils.Shuffle
             return recordSaved;
         }
 
-        private void ReplaceGuids(CintDynEntity cdEntity, bool includeid)
-        {
-            foreach (KeyValuePair<string, object> prop in cdEntity.Attributes)
-            {
-                if (prop.Value is Guid && guidmap.ContainsKey((Guid)prop.Value))
-                    if (includeid)
-                        throw new NotImplementedException("Cannot handle replacement of Guid type attributes");
-                    else
-                        log.Log("No action, we don't care about the guid of the object");
-                if (prop.Value is EntityReference && guidmap.ContainsKey(((EntityReference)prop.Value).Id))
-                    ((EntityReference)prop.Value).Id = guidmap[((EntityReference)prop.Value).Id];
-            }
-        }
-
-        private static void ReplaceUpdateInfo(CintDynEntity cdEntity)
-        {
-            List<string> removeAttr = new List<string>();
-            List<KeyValuePair<string, object>> newAttr = new List<KeyValuePair<string, object>>();
-            foreach (KeyValuePair<string, object> attr in cdEntity.Attributes)
-            {
-                if (attr.Key == "createdby")
-                {
-                    if (!cdEntity.Attributes.Contains("createdonbehalfby"))
-                    {
-                        newAttr.Add(new KeyValuePair<string, object>("createdonbehalfby", attr.Value));
-                    }
-                    removeAttr.Add("createdby");
-                }
-                else if (attr.Key == "modifiedby")
-                {
-                    if (!cdEntity.Attributes.Contains("modifiedonbehalfby"))
-                    {
-                        newAttr.Add(new KeyValuePair<string, object>("modifiedonbehalfby", attr.Value));
-                    }
-                    removeAttr.Add("modifiedby");
-                }
-                else if (attr.Key == "createdon")
-                {
-                    if (!cdEntity.Attributes.Contains("overriddencreatedon"))
-                    {
-                        newAttr.Add(new KeyValuePair<string, object>("overriddencreatedon", attr.Value));
-                    }
-                    removeAttr.Add("createdon");
-                }
-            }
-            foreach (string key in removeAttr)
-            {
-                cdEntity.Attributes.Remove(key);
-            }
-            if (newAttr.Count > 0)
-            {
-                cdEntity.Attributes.AddRange(newAttr);
-            }
-        }
+        #endregion Private Methods
     }
 }

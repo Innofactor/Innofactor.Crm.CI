@@ -16,144 +16,36 @@ namespace Cinteros.Crm.Utils.Shuffle
 {
     public partial class Shuffler
     {
-        private ItemImportResult ImportSolutionBlock(XmlNode xBlock)
+        #region Private Methods
+
+        private static string ExtractErrorMessage(string message)
         {
-            log.StartSection("ImportSolutionBlock");
-            var importResult = ItemImportResult.None;
-            if (xBlock.Name != "SolutionBlock")
+            const string fault = "(Fault Detail is equal to Microsoft.Xrm.Sdk.OrganizationServiceFault).: ";
+            const string unhandled = "Unhandled Exception: ";
+            while (message.Contains(fault))
             {
-                throw new ArgumentOutOfRangeException("Type", xBlock.Name, "Invalid Block type");
+                message = message.Substring(message.IndexOf(fault, StringComparison.InvariantCultureIgnoreCase) + fault.Length);
             }
-            XmlNode xImport = CintXML.FindChild(xBlock, "Import");
-            if (xImport != null)
+            message = message.Replace("&lt;", "<").Replace("&gt;", ">");
+            while (message.Contains("<InnerFault>") && message.Contains("</InnerFault>"))
             {
-                string name = CintXML.GetAttribute(xBlock, "Name");
-                log.Log("Block: {0}", name);
-                SendStatus(name, null);
-                string type = CintXML.GetAttribute(xImport, "Type");
-                SendLine();
-                SendLine("Importing solution: {0}", name);
-
-                string filename = GetSolutionFilename(xBlock, name, type);
-                var version = ExtractVersionFromSolutionZip(filename);
-                try
+                message = message.Substring(message.IndexOf("<InnerFault>", StringComparison.InvariantCultureIgnoreCase) + 9);
+                message = message.Substring(0, message.LastIndexOf("</InnerFault>", StringComparison.InvariantCultureIgnoreCase));
+            }
+            if (message.Contains("<Message>") && message.Contains("</Message>"))
+            {
+                message = message.Substring(message.IndexOf("<Message>", StringComparison.InvariantCultureIgnoreCase) + 9);
+                message = message.Substring(0, message.LastIndexOf("</Message>", StringComparison.InvariantCultureIgnoreCase));
+            }
+            else if (message.StartsWith(unhandled))
+            {
+                message = message.Substring(message.IndexOf(unhandled, StringComparison.InvariantCultureIgnoreCase) + unhandled.Length);
+                if (message.Contains(":"))
                 {
-                    ValidatePreReqs(xImport, version);
-                    SolutionImportConditions ImportCondition = CheckIfImportRequired(xImport, name, version);
-                    if (ImportCondition != SolutionImportConditions.Skip)
-                    {
-                        if (DoImportSolution(xImport, filename, version))
-                        {
-                            if (ImportCondition == SolutionImportConditions.Create)
-                            {
-                                importResult = ItemImportResult.Created;
-                            }
-                            else
-                            {
-                                importResult = ItemImportResult.Updated;
-                            }
-                        }
-                        else
-                        {
-                            importResult = ItemImportResult.Failed;
-                            log.Log("Failed during import");
-                        }
-                        bool publish = CintXML.GetBoolAttribute(xImport, "PublishAll", false);
-                        if (publish)
-                        {
-                            SendLine("Publishing customizations");
-                            crmsvc.Execute(new PublishAllXmlRequest());
-                        }
-                    }
-                    else
-                    {
-                        importResult = ItemImportResult.Skipped;
-                        log.Log("Skipped due to import condition");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    log.Log(ex);
-                    importResult = ItemImportResult.Failed;
-                    if (stoponerror)
-                    {
-                        throw;
-                    }
+                    message = message.Split(':')[0];
                 }
             }
-            log.EndSection();
-            return importResult;
-        }
-
-        private void ValidatePreReqs(XmlNode xImport, Version thisversion)
-        {
-            log.StartSection("ValidatePreReqs");
-            XmlNode xPreReqs = CintXML.FindChild(xImport, "PreRequisites");
-            if (xPreReqs != null)
-            {
-                CintDynEntityCollection cSolutions = GetExistingSolutions();
-                foreach (XmlNode xPreReq in xPreReqs.ChildNodes)
-                {
-                    if (xPreReq.NodeType == XmlNodeType.Element && xPreReq.Name == "Solution")
-                    {
-                        bool valid = false;
-                        string name = CintXML.GetAttribute(xPreReq, "Name");
-                        string comparer = CintXML.GetAttribute(xPreReq, "Comparer");
-                        var version = new Version();
-                        log.Log("Prereq: {0} {1} {2}", name, comparer, version);
-
-                        if (comparer.Contains("this"))
-                        {
-                            version = thisversion;
-                            comparer = comparer.Replace("-this", "");
-                        }
-                        else if (comparer != "any")
-                        {
-                            version = new Version(CintXML.GetAttribute(xPreReq, "Version").Replace('*', '0'));
-                        }
-
-                        foreach (CintDynEntity cdSolution in cSolutions)
-                        {
-                            if (cdSolution.Property("uniquename", "") == name)
-                            {
-                                log.Log("Found matching solution");
-                                switch (comparer)
-                                {
-                                    case "any":
-                                        valid = true;
-                                        break;
-                                    case "eq":
-                                        valid = new Version(cdSolution.Property("version", "1.0.0.0")).Equals(version);
-                                        break;
-                                    case "ge":
-                                        valid = new Version(cdSolution.Property("version", "<undefined>")) >= version;
-                                        break;
-                                    default:
-                                        throw new ArgumentOutOfRangeException("Comparer", comparer, "Invalid comparer value");
-                                }
-                            }
-                            if (valid)
-                            {
-                                break;
-                            }
-                        }
-                        if (valid)
-                        {
-                            SendLine("Prerequisite {0} {1} {2} is satisfied", name, comparer, version);
-                        }
-                        else
-                        {
-                            SendLine("Prerequisite {0} {1} {2} is NOT satisfied", name, comparer, version);
-                            throw new Exception("Prerequisite NOT satisfied (" + name + " " + comparer + " " + version + ")");
-                        }
-                    }
-                }
-            }
-            else
-            {
-                log.Log("No prereqs for solution import");
-            }
-            log.EndSection();
+            return message;
         }
 
         private SolutionImportConditions CheckIfImportRequired(XmlNode xImport, string name, Version thisversion)
@@ -195,82 +87,6 @@ namespace Cinteros.Crm.Utils.Shuffle
             log.Log("Import Condition: {0}", result);
             log.EndSection();
             return result;
-        }
-
-        private Version ExtractVersionFromSolutionZip(string filename)
-        {
-            log.StartSection("ExtractVersionFromSolutionZip");
-            using (ZipFile zip = ZipFile.Read(filename))
-            {
-                zip["solution.xml"].Extract(definitionpath, ExtractExistingFileAction.OverwriteSilently);
-            }
-            if (!System.IO.File.Exists(definitionpath + "\\solution.xml"))
-            {
-                throw new Exception("Unable to unzip solution.xml from file: " + filename);
-            }
-            XmlDocument xSolution = new XmlDocument();
-            xSolution.Load(definitionpath + "\\solution.xml");
-            System.IO.File.Delete(definitionpath + "\\solution.xml");
-            XmlNode xRoot = CintXML.FindChild(xSolution, "ImportExportXml");
-            if (xRoot == null)
-            {
-                throw new XmlException("Cannot find root element ImportExportXml");
-            }
-            XmlNode xManifest = CintXML.FindChild(xRoot, "SolutionManifest");
-            if (xManifest == null)
-            {
-                throw new XmlException("Cannot find element SolutionManifest");
-            }
-            XmlNode xVersion = CintXML.FindChild(xManifest, "Version");
-            if (xVersion == null)
-            {
-                throw new XmlException("Cannot find element Version");
-            }
-            var version = new Version(xVersion.InnerText);
-            log.Log("Version {0} extracted", version);
-            log.EndSection();
-            return version;
-        }
-
-        private string GetSolutionFilename(XmlNode xBlock, string name, string type)
-        {
-            log.StartSection("GetSolutionFilename");
-            string file = CintXML.GetAttribute(xBlock, "File");
-            if (string.IsNullOrWhiteSpace(file))
-            {
-                file = name;
-            }
-            string path = CintXML.GetAttribute(xBlock, "Path");
-            if (string.IsNullOrWhiteSpace(path) && !string.IsNullOrWhiteSpace(definitionpath))
-            {
-                path = definitionpath;
-            }
-            path += path.EndsWith("\\") ? "" : "\\";
-            string filename;
-            if (type == "Managed")
-            {
-                filename = path + file + "_managed.zip";
-            }
-            else if (type == "Unmanaged")
-            {
-                filename = path + file + ".zip";
-            }
-            else
-            {
-                throw new ArgumentOutOfRangeException("Type", type, "Invalid Solution type");
-            }
-
-            if (filename.Contains("%"))
-            {
-                IDictionary envvars = Environment.GetEnvironmentVariables();
-                foreach (DictionaryEntry de in envvars)
-                {
-                    filename = filename.Replace("%" + de.Key.ToString() + "%", de.Value.ToString());
-                }
-            }
-            log.Log("Filename: {0}", filename);
-            log.EndSection();
-            return filename;
         }
 
         private bool DoImportSolution(XmlNode xImport, string filename, Version version)
@@ -428,36 +244,6 @@ namespace Cinteros.Crm.Utils.Shuffle
             return result;
         }
 
-        private static string ExtractErrorMessage(string message)
-        {
-            const string fault = "(Fault Detail is equal to Microsoft.Xrm.Sdk.OrganizationServiceFault).: ";
-            const string unhandled = "Unhandled Exception: ";
-            while (message.Contains(fault))
-            {
-                message = message.Substring(message.IndexOf(fault) + fault.Length);
-            }
-            message = message.Replace("&lt;", "<").Replace("&gt;", ">");
-            while (message.Contains("<InnerFault>") && message.Contains("</InnerFault>"))
-            {
-                message = message.Substring(message.IndexOf("<InnerFault>") + 9);
-                message = message.Substring(0, message.LastIndexOf("</InnerFault>"));
-            }
-            if (message.Contains("<Message>") && message.Contains("</Message>"))
-            {
-                message = message.Substring(message.IndexOf("<Message>") + 9);
-                message = message.Substring(0, message.LastIndexOf("</Message>"));
-            }
-            else if (message.StartsWith(unhandled))
-            {
-                message = message.Substring(message.IndexOf(unhandled) + unhandled.Length);
-                if (message.Contains(":"))
-                {
-                    message = message.Split(':')[0];
-                }
-            }
-            return message;
-        }
-
         private bool DoImportSolutionSync(ImportSolutionRequest impSolReq, ref Exception ex)
         {
             log.StartSection(MethodBase.GetCurrentMethod().Name);
@@ -477,6 +263,151 @@ namespace Cinteros.Crm.Utils.Shuffle
             }
             log.EndSection();
             return result;
+        }
+
+        private Version ExtractVersionFromSolutionZip(string filename)
+        {
+            log.StartSection("ExtractVersionFromSolutionZip");
+            using (ZipFile zip = ZipFile.Read(filename))
+            {
+                zip["solution.xml"].Extract(definitionpath, ExtractExistingFileAction.OverwriteSilently);
+            }
+            if (!System.IO.File.Exists(definitionpath + "\\solution.xml"))
+            {
+                throw new Exception("Unable to unzip solution.xml from file: " + filename);
+            }
+            XmlDocument xSolution = new XmlDocument();
+            xSolution.Load(definitionpath + "\\solution.xml");
+            System.IO.File.Delete(definitionpath + "\\solution.xml");
+            XmlNode xRoot = CintXML.FindChild(xSolution, "ImportExportXml");
+            if (xRoot == null)
+            {
+                throw new XmlException("Cannot find root element ImportExportXml");
+            }
+            XmlNode xManifest = CintXML.FindChild(xRoot, "SolutionManifest");
+            if (xManifest == null)
+            {
+                throw new XmlException("Cannot find element SolutionManifest");
+            }
+            XmlNode xVersion = CintXML.FindChild(xManifest, "Version");
+            if (xVersion == null)
+            {
+                throw new XmlException("Cannot find element Version");
+            }
+            var version = new Version(xVersion.InnerText);
+            log.Log("Version {0} extracted", version);
+            log.EndSection();
+            return version;
+        }
+
+        private string GetSolutionFilename(XmlNode xBlock, string name, string type)
+        {
+            log.StartSection("GetSolutionFilename");
+            string file = CintXML.GetAttribute(xBlock, "File");
+            if (string.IsNullOrWhiteSpace(file))
+            {
+                file = name;
+            }
+            string path = CintXML.GetAttribute(xBlock, "Path");
+            if (string.IsNullOrWhiteSpace(path) && !string.IsNullOrWhiteSpace(definitionpath))
+            {
+                path = definitionpath;
+            }
+            path += path.EndsWith("\\") ? "" : "\\";
+            string filename;
+            if (type == "Managed")
+            {
+                filename = path + file + "_managed.zip";
+            }
+            else if (type == "Unmanaged")
+            {
+                filename = path + file + ".zip";
+            }
+            else
+            {
+                throw new ArgumentOutOfRangeException("Type", type, "Invalid Solution type");
+            }
+
+            if (filename.Contains("%"))
+            {
+                IDictionary envvars = Environment.GetEnvironmentVariables();
+                foreach (DictionaryEntry de in envvars)
+                {
+                    filename = filename.Replace("%" + de.Key.ToString() + "%", de.Value.ToString());
+                }
+            }
+            log.Log("Filename: {0}", filename);
+            log.EndSection();
+            return filename;
+        }
+
+        private ItemImportResult ImportSolutionBlock(XmlNode xBlock)
+        {
+            log.StartSection("ImportSolutionBlock");
+            var importResult = ItemImportResult.None;
+            if (xBlock.Name != "SolutionBlock")
+            {
+                throw new ArgumentOutOfRangeException("Type", xBlock.Name, "Invalid Block type");
+            }
+            XmlNode xImport = CintXML.FindChild(xBlock, "Import");
+            if (xImport != null)
+            {
+                string name = CintXML.GetAttribute(xBlock, "Name");
+                log.Log("Block: {0}", name);
+                SendStatus(name, null);
+                string type = CintXML.GetAttribute(xImport, "Type");
+                SendLine();
+                SendLine("Importing solution: {0}", name);
+
+                string filename = GetSolutionFilename(xBlock, name, type);
+                var version = ExtractVersionFromSolutionZip(filename);
+                try
+                {
+                    ValidatePreReqs(xImport, version);
+                    SolutionImportConditions ImportCondition = CheckIfImportRequired(xImport, name, version);
+                    if (ImportCondition != SolutionImportConditions.Skip)
+                    {
+                        if (DoImportSolution(xImport, filename, version))
+                        {
+                            if (ImportCondition == SolutionImportConditions.Create)
+                            {
+                                importResult = ItemImportResult.Created;
+                            }
+                            else
+                            {
+                                importResult = ItemImportResult.Updated;
+                            }
+                        }
+                        else
+                        {
+                            importResult = ItemImportResult.Failed;
+                            log.Log("Failed during import");
+                        }
+                        bool publish = CintXML.GetBoolAttribute(xImport, "PublishAll", false);
+                        if (publish)
+                        {
+                            SendLine("Publishing customizations");
+                            crmsvc.Execute(new PublishAllXmlRequest());
+                        }
+                    }
+                    else
+                    {
+                        importResult = ItemImportResult.Skipped;
+                        log.Log("Skipped due to import condition");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    log.Log(ex);
+                    importResult = ItemImportResult.Failed;
+                    if (stoponerror)
+                    {
+                        throw;
+                    }
+                }
+            }
+            log.EndSection();
+            return importResult;
         }
 
         private bool ReadAndLogSolutionImportJobStatus(Guid jobid)
@@ -528,5 +459,81 @@ namespace Cinteros.Crm.Utils.Shuffle
             log.EndSection();
             return success;
         }
+
+        private void ValidatePreReqs(XmlNode xImport, Version thisversion)
+        {
+            log.StartSection("ValidatePreReqs");
+            XmlNode xPreReqs = CintXML.FindChild(xImport, "PreRequisites");
+            if (xPreReqs != null)
+            {
+                CintDynEntityCollection cSolutions = GetExistingSolutions();
+                foreach (XmlNode xPreReq in xPreReqs.ChildNodes)
+                {
+                    if (xPreReq.NodeType == XmlNodeType.Element && xPreReq.Name == "Solution")
+                    {
+                        bool valid = false;
+                        string name = CintXML.GetAttribute(xPreReq, "Name");
+                        string comparer = CintXML.GetAttribute(xPreReq, "Comparer");
+                        var version = new Version();
+                        log.Log("Prereq: {0} {1} {2}", name, comparer, version);
+
+                        if (comparer.Contains("this"))
+                        {
+                            version = thisversion;
+                            comparer = comparer.Replace("-this", "");
+                        }
+                        else if (comparer != "any")
+                        {
+                            version = new Version(CintXML.GetAttribute(xPreReq, "Version").Replace('*', '0'));
+                        }
+
+                        foreach (CintDynEntity cdSolution in cSolutions)
+                        {
+                            if (cdSolution.Property("uniquename", "") == name)
+                            {
+                                log.Log("Found matching solution");
+                                switch (comparer)
+                                {
+                                    case "any":
+                                        valid = true;
+                                        break;
+
+                                    case "eq":
+                                        valid = new Version(cdSolution.Property("version", "1.0.0.0")).Equals(version);
+                                        break;
+
+                                    case "ge":
+                                        valid = new Version(cdSolution.Property("version", "<undefined>")) >= version;
+                                        break;
+
+                                    default:
+                                        throw new ArgumentOutOfRangeException("Comparer", comparer, "Invalid comparer value");
+                                }
+                            }
+                            if (valid)
+                            {
+                                break;
+                            }
+                        }
+                        if (valid)
+                        {
+                            SendLine("Prerequisite {0} {1} {2} is satisfied", name, comparer, version);
+                        }
+                        else
+                        {
+                            SendLine("Prerequisite {0} {1} {2} is NOT satisfied", name, comparer, version);
+                            throw new Exception("Prerequisite NOT satisfied (" + name + " " + comparer + " " + version + ")");
+                        }
+                    }
+                }
+            }
+            else
+            {
+                log.Log("No prereqs for solution import");
+            }
+            log.EndSection();
+        }
+
+        #endregion Private Methods
     }
 }

@@ -250,14 +250,22 @@ namespace Cinteros.Crm.Utils.Shuffle
             {
                 Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
                 string assemblyname = assembly.ManifestModule.ToString();
-                if (log != null) log.Log("Original assembly name: {0}", assemblyname);
+                if (log != null)
+                {
+                    log.Log("Original assembly name: {0}", assemblyname);
+                }
+
                 if (assemblyname.ToUpperInvariant().EndsWith(".DLL"))
                 {
                     assemblyname = assemblyname.Substring(0, assemblyname.Length - 4);
                 }
                 assemblyname = assemblyname.Replace("Merged", "");
                 assemblyname = assemblyname.Replace("..", ".");
-                if (log != null) log.Log("Fixed assemblyname: {0}", assemblyname);
+                if (log != null)
+                {
+                    log.Log("Fixed assemblyname: {0}", assemblyname);
+                }
+
                 Stream stream = assembly.GetManifestResourceStream(assemblyname + ".Resources.ShuffleDefinition.xsd");
                 if (stream == null)
                 {
@@ -281,7 +289,11 @@ namespace Cinteros.Crm.Utils.Shuffle
             }
             catch (XmlSchemaValidationException ex)
             {
-                if (log != null) log.Log(ex);
+                if (log != null)
+                {
+                    log.Log(ex);
+                }
+
                 throw;
             }
             return result;
