@@ -248,37 +248,23 @@ namespace Cinteros.Crm.Utils.Shuffle
             var result = "";
             try
             {
-                Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
-                string assemblyname = assembly.ManifestModule.ToString();
-                if (log != null)
-                {
-                    log.Log("Original assembly name: {0}", assemblyname);
-                }
+                Assembly assembly = Assembly.GetExecutingAssembly();
+                var shufdefresource = assembly.GetManifestResourceNames().Where(n => n.ToLowerInvariant().EndsWith("shuffledefinition.xsd")).FirstOrDefault();
+                var qryexpresource = assembly.GetManifestResourceNames().Where(n => n.ToLowerInvariant().EndsWith("queryexpression.xsd")).FirstOrDefault();
 
-                if (assemblyname.ToUpperInvariant().EndsWith(".DLL"))
-                {
-                    assemblyname = assemblyname.Substring(0, assemblyname.Length - 4);
-                }
-                assemblyname = assemblyname.Replace("Merged", "");
-                assemblyname = assemblyname.Replace("..", ".");
-                if (log != null)
-                {
-                    log.Log("Fixed assemblyname: {0}", assemblyname);
-                }
-
-                Stream stream = assembly.GetManifestResourceStream(assemblyname + ".Resources.ShuffleDefinition.xsd");
+                Stream stream = assembly.GetManifestResourceStream(shufdefresource);
                 if (stream == null)
                 {
-                    result = "Cannot find resource " + assemblyname + ".Resources.ShuffleDefinition.xsd";
+                    result = "Cannot find resource " + shufdefresource;
                 }
                 else
                 {
                     def.Schemas = new XmlSchemaSet();
                     def.Schemas.Add(null, XmlReader.Create(stream));
-                    stream = assembly.GetManifestResourceStream(assemblyname + ".Resources.QueryExpression.xsd");
+                    stream = assembly.GetManifestResourceStream(qryexpresource);
                     if (stream == null)
                     {
-                        result = "Cannot find resource " + assemblyname + ".Resources.QueryExpression.xsd";
+                        result = "Cannot find resource " + qryexpresource;
                     }
                     else
                     {

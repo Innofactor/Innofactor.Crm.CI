@@ -74,7 +74,10 @@ namespace Cinteros.Crm.Utils.Shuffle
             set
             {
                 var result = ShuffleHelper.ValidateDefinitionXml(value, log);
-                SendLine(result);
+                if (!string.IsNullOrEmpty(result))
+                {
+                    SendLine(result);
+                }
                 definition = value;
             }
         }
