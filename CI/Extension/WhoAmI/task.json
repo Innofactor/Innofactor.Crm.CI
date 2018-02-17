@@ -1,7 +1,7 @@
 ﻿{
   "id": "ba5aa140-c74d-4dd4-9f1c-18f4c48cf05d",
   "name": "WhoAmI",
-  "friendlyName": "DevUtils - WhoAmI",
+  "friendlyName": "Innofactor DevOps: WhoAmI",
   "description": "Dynamics 365 WhoAmIRequest.",
   "author": "Innofactor Sweden",
   "helpMarkDown": "",
@@ -14,7 +14,7 @@
   "version": {
     "Major": "9",
     "Minor": "0",
-    "Patch": "4"
+    "Patch": "5"
   },
   "minimumAgentVersion": "1.95.0",
   "instanceNameFormat": "WhoAmI",
