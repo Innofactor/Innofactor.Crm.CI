@@ -2,7 +2,7 @@
   "manifestVersion": 1,
   "id": "cinteros-devutils-ci-build-tasks",
   "name": "DevOps for Microsoft Dynamics 365",
-  "version": "9.0.1",
+  "version": "9.0.5",
   "publisher": "InnofactorSE",
   "targets": [
     {
@@ -90,6 +90,9 @@
     },
     {
       "path": "MinifyJS"
+    },
+    {
+      "path": "WhoAmI"
     }
   ],
   "contributions": [
@@ -151,6 +154,16 @@
       ],
       "properties": {
         "name": "MinifyJS"
+      }
+    },
+    {
+      "id": "WhoAmI",
+      "type": "ms.vss-distributed-task.task",
+      "targets": [
+        "ms.vss-distributed-task.tasks"
+      ],
+      "properties": {
+        "name": "WhoAmI"
       }
     }
   ]

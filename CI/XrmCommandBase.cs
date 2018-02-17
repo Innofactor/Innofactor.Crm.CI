@@ -5,6 +5,7 @@
 using Cinteros.Crm.Utils.Common;
 using Microsoft.Xrm.Tooling.Connector;
 using System.Management.Automation;
+using System.Net;
 
 namespace Cinteros.Crm.Utils.CI.Cmdlets
 {
@@ -29,6 +30,7 @@ namespace Cinteros.Crm.Utils.CI.Cmdlets
         protected override void BeginProcessing()
         {
             base.BeginProcessing();
+            SetSecurityProtocol();
             WriteDebug("Connecting to CRM");
             WriteVerbose("Creating CrmServiceClient with: " + ConnectionString);
             ServiceClient = new CrmServiceClient(ConnectionString);
@@ -49,6 +51,20 @@ namespace Cinteros.Crm.Utils.CI.Cmdlets
                 ServiceClient.OrganizationServiceProxy.Timeout = new System.TimeSpan(0, 0, Timeout);
             }
             Container = new CintContainer(new CrmServiceProxy(ServiceClient.OrganizationServiceProxy), CommandRuntime.ToString(), true);
+        }
+
+        private void SetSecurityProtocol()
+        {
+            WriteVerbose(string.Format("Current Security Protocol: {0}", ServicePointManager.SecurityProtocol));
+            if (!ServicePointManager.SecurityProtocol.HasFlag(SecurityProtocolType.Tls11))
+            {
+                ServicePointManager.SecurityProtocol = ServicePointManager.SecurityProtocol ^ SecurityProtocolType.Tls11;
+            }
+            if (!ServicePointManager.SecurityProtocol.HasFlag(SecurityProtocolType.Tls12))
+            {
+                ServicePointManager.SecurityProtocol = ServicePointManager.SecurityProtocol ^ SecurityProtocolType.Tls12;
+            }
+            WriteVerbose(string.Format("Modified Security Protocol: {0}", ServicePointManager.SecurityProtocol));
         }
 
         protected override void EndProcessing()

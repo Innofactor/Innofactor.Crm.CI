@@ -1,0 +1,37 @@
+﻿{
+  "id": "ba5aa140-c74d-4dd4-9f1c-18f4c48cf05d",
+  "name": "WhoAmI",
+  "friendlyName": "DevUtils - WhoAmI",
+  "description": "Dynamics 365 WhoAmIRequest.",
+  "author": "Innofactor Sweden",
+  "helpMarkDown": "",
+  "category": "Build",
+  "visibility": [
+    "Build",
+    "Release"
+  ],
+  "demands": [],
+  "version": {
+    "Major": "9",
+    "Minor": "0",
+    "Patch": "4"
+  },
+  "minimumAgentVersion": "1.95.0",
+  "instanceNameFormat": "WhoAmI",
+  "inputs": [
+    {
+      "name": "crmConnectionString",
+      "type": "string",
+      "label": "CRM Connection String",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "For more information on format: https://msdn.microsoft.com/en-gb/library/mt608573.aspx"
+    }
+  ],
+  "execution": {
+    "PowerShell3": {
+      "target": "WhoAmI.ps1",
+      "argumentFormat": "$(crmConnectionString)"
+    }
+  }
+}

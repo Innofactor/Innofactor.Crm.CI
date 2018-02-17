@@ -278,7 +278,7 @@ namespace Cinteros.Crm.Utils.CI.Cmdlets.WebResources
         /// <summary>
         /// Updates the provided web resource
         /// </summary>
-        /// <param name="script">Web resource to update</param>
+        /// <param name="wr">Web resource to update</param>
         internal static void UpdateWebResource(this CintContainer container, CintDynEntity wr)
         {
             try
