@@ -75,7 +75,8 @@ namespace Innofactor.Crm.Shuffle.Runner
                 {
                     shuffeling = true;
                     EnableShuffle();
-                    var container = new CintContainer(new CrmServiceProxy(Service), "ShuffleRunner", true);
+                    var logpath = Path.Combine(Paths.LogsPath, "ShuffleRunner");
+                    var container = new CintContainer(new CrmServiceProxy(Service), logpath, true);
                     var log = container.Logger;
                     var location = System.Reflection.Assembly.GetExecutingAssembly().Location;
                     var verinfo = FileVersionInfo.GetVersionInfo(location);
