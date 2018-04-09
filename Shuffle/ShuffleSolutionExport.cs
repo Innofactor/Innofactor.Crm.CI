@@ -124,7 +124,7 @@ namespace Cinteros.Crm.Utils.Shuffle
 
         /// <summary>Get the current versions for all solutions defined in the definition file</summary>
         /// <remarks>Results will be placed in the public dictionary <c ref="ExistingSolutionVersions">ExistingSolutionVersions</c></remarks>
-        private void GetCurrentVersions()
+        public void GetCurrentVersions()
         {
             log.StartSection("GetCurrentVersions");
             ExistingSolutionVersions = new Dictionary<string, Version>();

@@ -32,11 +32,11 @@
     <DocumentationFile>bin\Release\Innofactor.Crm.CI.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Cinteros.Crm.Utils.Common, Version=9.0.1802.6, Culture=neutral, PublicKeyToken=0b6cd78ab2e51f2b, processorArchitecture=MSIL">
-      <HintPath>..\packages\Innofactor.Xrm.DevUtils.Common.9.0.1802.6\lib\net452\Cinteros.Crm.Utils.Common.dll</HintPath>
+    <Reference Include="Cinteros.Crm.Utils.Common, Version=9.0.1804.5, Culture=neutral, PublicKeyToken=0b6cd78ab2e51f2b, processorArchitecture=MSIL">
+      <HintPath>..\packages\Innofactor.Xrm.DevUtils.Common.9.0.1804.5\lib\net452\Cinteros.Crm.Utils.Common.dll</HintPath>
     </Reference>
-    <Reference Include="Cinteros.Crm.Utils.Misc, Version=9.0.1802.6, Culture=neutral, PublicKeyToken=0b6cd78ab2e51f2b, processorArchitecture=MSIL">
-      <HintPath>..\packages\Innofactor.Xrm.DevUtils.Common.9.0.1802.6\lib\net452\Cinteros.Crm.Utils.Misc.dll</HintPath>
+    <Reference Include="Cinteros.Crm.Utils.Misc, Version=9.0.1804.5, Culture=neutral, PublicKeyToken=0b6cd78ab2e51f2b, processorArchitecture=MSIL">
+      <HintPath>..\packages\Innofactor.Xrm.DevUtils.Common.9.0.1804.5\lib\net452\Cinteros.Crm.Utils.Misc.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Crm.Sdk.Proxy, Version=9.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.CrmSdk.CoreAssemblies.9.0.0.7\lib\net452\Microsoft.Crm.Sdk.Proxy.dll</HintPath>

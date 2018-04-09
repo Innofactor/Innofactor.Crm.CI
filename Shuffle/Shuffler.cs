@@ -5,6 +5,7 @@ using Cinteros.Crm.Utils.Shuffle.Types;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Client;
 using Microsoft.Xrm.Sdk.Query;
+using Microsoft.Xrm.Tooling.Connector;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -285,10 +286,7 @@ namespace Cinteros.Crm.Utils.Shuffle
                 double savedtimeout = -1;
                 if (timeout > -1)
                 {
-                    SendLine("Setting timeout: {0} minutes", timeout);
-                    OrganizationServiceProxy orgsvcpxy = crmsvc.GetService<OrganizationServiceProxy>();
-                    savedtimeout = orgsvcpxy.Timeout.TotalMinutes;
-                    orgsvcpxy.Timeout = new TimeSpan(0, timeout, 0);
+                    savedtimeout = SetTimeout();
                 }
 
                 int totalBlocks = xBlocks.ChildNodes.Count;
@@ -330,8 +328,7 @@ namespace Cinteros.Crm.Utils.Shuffle
                 SendStatus(0, 0, 0, 0);
                 if (savedtimeout > -1)
                 {
-                    OrganizationServiceProxy orgsvcpxy = crmsvc.GetService<OrganizationServiceProxy>();
-                    orgsvcpxy.Timeout = new TimeSpan(0, (int)savedtimeout, 0);
+                    ResetTimeout(savedtimeout);
                 }
             }
             log.EndSection();
@@ -368,17 +365,7 @@ namespace Cinteros.Crm.Utils.Shuffle
                 double savedtimeout = -1;
                 if (timeout > -1)
                 {
-                    try
-                    {
-                        SendLine("Setting timeout: {0} minutes", timeout);
-                        OrganizationServiceProxy orgsvcpxy = crmsvc.GetService<OrganizationServiceProxy>();
-                        savedtimeout = orgsvcpxy.Timeout.TotalMinutes;
-                        orgsvcpxy.Timeout = new TimeSpan(0, timeout, 0);
-                    }
-                    catch (InvalidPluginExecutionException)
-                    {   // Couldn't cast to correct service type, for some reason...
-                        savedtimeout = -1;
-                    }
+                    savedtimeout = SetTimeout();
                 }
 
                 int totalBlocks = xBlocks.ChildNodes.Count;
@@ -422,8 +409,7 @@ namespace Cinteros.Crm.Utils.Shuffle
                 SendStatus(0, 0, 0, 0);
                 if (savedtimeout > -1)
                 {
-                    OrganizationServiceProxy orgsvcpxy = crmsvc.GetService<OrganizationServiceProxy>();
-                    orgsvcpxy.Timeout = new TimeSpan(0, (int)savedtimeout, 0);
+                    ResetTimeout(savedtimeout);
                 }
             }
             log.EndSection();
@@ -484,6 +470,35 @@ namespace Cinteros.Crm.Utils.Shuffle
             }
             log.EndSection();
             return xml;
+        }
+
+        private double SetTimeout()
+        {
+            SendLine("Setting timeout: {0} minutes", timeout);
+            double savedtimeout = -1;
+            if (crmsvc.Service is OrganizationServiceProxy orgsvcpxy)
+            {
+                savedtimeout = orgsvcpxy.Timeout.TotalMinutes;
+                orgsvcpxy.Timeout = new TimeSpan(0, timeout, 0);
+            }
+            else if (crmsvc.Service is CrmServiceClient svcclient)
+            {
+                savedtimeout = svcclient.OrganizationServiceProxy.Timeout.TotalMinutes;
+                svcclient.OrganizationServiceProxy.Timeout = new TimeSpan(0, timeout, 0);
+            }
+            return savedtimeout;
+        }
+
+        private void ResetTimeout(double savedtimeout)
+        {
+            if (crmsvc.Service is OrganizationServiceProxy orgsvcpxy)
+            {
+                orgsvcpxy.Timeout = new TimeSpan(0, (int)savedtimeout, 0);
+            }
+            else if (crmsvc.Service is CrmServiceClient svcclient)
+            {
+                svcclient.OrganizationServiceProxy.Timeout = new TimeSpan(0, (int)savedtimeout, 0);
+            }
         }
 
         #endregion Public Methods
