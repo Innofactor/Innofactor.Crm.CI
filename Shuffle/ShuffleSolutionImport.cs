@@ -98,7 +98,7 @@ namespace Cinteros.Crm.Utils.Shuffle
             Exception ex = null;
             SendLine("Importing solution: {0} Version: {1}", filename, version);
             byte[] fileBytes = File.ReadAllBytes(filename);
-            ImportSolutionRequest impSolReq = new ImportSolutionRequest()
+            var impSolReq = new ImportSolutionRequest()
             {
                 CustomizationFile = fileBytes,
                 OverwriteUnmanagedCustomizations = overwrite,
@@ -135,14 +135,13 @@ namespace Cinteros.Crm.Utils.Shuffle
             // Code cred to Wael Hamze
             // http://waelhamze.com/2013/11/17/asynchronous-solution-import-dynamics-crm-2013/
             var result = false;
-            ExecuteAsyncRequest asyncRequest = new ExecuteAsyncRequest()
+            var asyncRequest = new ExecuteAsyncRequest()
             {
                 Request = impSolReq
             };
-            ExecuteAsyncResponse asyncResponse = crmsvc.Execute(asyncRequest) as ExecuteAsyncResponse;
+            var asyncResponse = crmsvc.Execute(asyncRequest) as ExecuteAsyncResponse;
             var asyncJobId = asyncResponse.AsyncJobId;
-            DateTime end = timeout > 0 ? DateTime.Now.AddMinutes(timeout) : DateTime.Now.AddMinutes(2);
-            log.Log("Timout until: {0}", end.ToString("HH:mm:ss.fff"));
+            var end = DateTime.MaxValue;
             var importStatus = -1;
             var progress = 0;
             var statustext = "Submitting job";
@@ -152,8 +151,8 @@ namespace Cinteros.Crm.Utils.Shuffle
                 CintDynEntity cdAsyncOperation = null;
                 try
                 {
-                    cdAsyncOperation = CintDynEntity.Retrieve("asyncoperation", asyncJobId,
-                        new ColumnSet("asyncoperationid", "statecode", "statuscode", "message", "friendlymessage"), crmsvc, log);
+                    cdAsyncOperation = CintDynEntity.Retrieve(SystemJob.EntityName, asyncJobId,
+                        new ColumnSet(SystemJob.PrimaryKey, SystemJob.Status, SystemJob.StatusReason, SystemJob.Message, SystemJob.Friendlymessage), crmsvc, log);
                 }
                 catch (Exception asyncex)
                 {
@@ -163,21 +162,31 @@ namespace Cinteros.Crm.Utils.Shuffle
                 }
                 if (cdAsyncOperation != null)
                 {
-                    statustext = cdAsyncOperation.PropertyAsString("statuscode", "?", false, false);
-                    var newStatus = cdAsyncOperation.Property("statuscode", new OptionSetValue()).Value;
+                    statustext = cdAsyncOperation.PropertyAsString(SystemJob.StatusReason, "?", false, false);
+                    var newStatus = cdAsyncOperation.Property(SystemJob.StatusReason, new OptionSetValue()).Value;
                     if (newStatus != importStatus)
                     {
                         importStatus = newStatus;
+                        if (end.Equals(DateTime.MaxValue) && importStatus != (int)SystemJob.StatusReason_OptionSet.Waiting)
+                        {
+                            end = timeout > 0 ? DateTime.Now.AddMinutes(timeout) : DateTime.Now.AddMinutes(2);
+                            SendLineUpdate("Import job picked up at {0}", DateTime.Now);
+                            log.Log("Timout until: {0}", end.ToString("HH:mm:ss.fff"));
+                            SendLine("Import status: {0}", statustext);
+                        }
                         SendLineUpdate("Import status: {0}", statustext);
-                        log.Log("Import message:\n{0}", cdAsyncOperation.Property("message", "<none>"));
-                        if (importStatus == 30)
+                        log.Log("Import message:\n{0}", cdAsyncOperation.Property(SystemJob.Message, "<none>"));
+                        if (importStatus == (int)SystemJob.StatusReason_OptionSet.Succeeded)
                         {   // Succeeded
                             result = true;
                             break;
                         }
-                        else if (importStatus == 21 || importStatus == 22 || importStatus == 31 || importStatus == 32)
+                        else if (importStatus == (int)SystemJob.StatusReason_OptionSet.Pausing
+                            || importStatus == (int)SystemJob.StatusReason_OptionSet.Canceling
+                            || importStatus == (int)SystemJob.StatusReason_OptionSet.Failed
+                            || importStatus == (int)SystemJob.StatusReason_OptionSet.Canceled)
                         {   // Error statuses
-                            var friendlymessage = cdAsyncOperation.Property("friendlymessage", "");
+                            var friendlymessage = cdAsyncOperation.Property(SystemJob.Friendlymessage, "");
                             SendLine("Message: {0}", friendlymessage);
                             if (friendlymessage == "Access is denied.")
                             {
@@ -186,7 +195,7 @@ namespace Cinteros.Crm.Utils.Shuffle
                             }
                             else
                             {
-                                var message = cdAsyncOperation.Property("message", "<none>");
+                                var message = cdAsyncOperation.Property(SystemJob.Message, "<none>");
                                 message = ExtractErrorMessage(message);
                                 if (!string.IsNullOrWhiteSpace(message) && !message.Equals(friendlymessage, StringComparison.InvariantCultureIgnoreCase))
                                 {
@@ -198,8 +207,8 @@ namespace Cinteros.Crm.Utils.Shuffle
                                 }
                             }
                             ex = new Exception(string.Format("Solution Import Failed: {0} - {1}",
-                                cdAsyncOperation.PropertyAsString("statecode", "?", false, false),
-                                cdAsyncOperation.PropertyAsString("statuscode", "?", false, false)));
+                                cdAsyncOperation.PropertyAsString(SystemJob.Status, "?", false, false),
+                                cdAsyncOperation.PropertyAsString(SystemJob.StatusReason, "?", false, false)));
                             break;
                         }
                     }
@@ -209,13 +218,13 @@ namespace Cinteros.Crm.Utils.Shuffle
                 {   // In progress, read percent
                     try
                     {
-                        var job = CintDynEntity.Retrieve("importjob", impSolReq.ImportJobId, new ColumnSet("progress"), crmsvc, log);
+                        var job = CintDynEntity.Retrieve(ImportJob.EntityName, impSolReq.ImportJobId, new ColumnSet(ImportJob.Progress), crmsvc, log);
                         if (job != null)
                         {
-                            var newProgress = job.Property("progress", 0D);
-                            if (newProgress > progress + 5)
+                            var newProgress = Convert.ToInt32(Math.Round(job.Property(ImportJob.Progress, 0D)));
+                            if (newProgress > progress)
                             {
-                                progress = Convert.ToInt32(Math.Round(newProgress));
+                                progress = newProgress;
                                 SendStatus(-1, -1, 100, progress);
                                 SendLineUpdate("Import status: {0} - {1}%", statustext, progress);
                             }
