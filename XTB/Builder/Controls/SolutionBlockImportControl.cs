@@ -57,7 +57,7 @@ namespace Innofactor.Crm.Shuffle.Builder.Controls
                 {
                     MessageBox.Show("Invalid type currently selected: " + type);
                 }
-            } 
+            }
             controlsCheckSum = ControlsChecksum();
         }
 
@@ -78,7 +78,7 @@ namespace Innofactor.Crm.Shuffle.Builder.Controls
             {
                 MessageBox.Show("Select type");
                 return;
-            } 
+            }
             foreach (var chk in GetCheckboxes())
             {
                 var key = chk.Tag.ToString();
@@ -108,12 +108,7 @@ namespace Innofactor.Crm.Shuffle.Builder.Controls
         /// <param name="parameters">Lsit of parameter</param>
         private void SendSaveMessage(Dictionary<string, string> collection)
         {
-            SaveEventArgs sea = new SaveEventArgs { AttributeCollection = collection };
-
-            if (Saved != null)
-            {
-                Saved(this, sea);
-            }
+            Saved?.Invoke(this, new SaveEventArgs { AttributeCollection = collection });
         }
 
         public string ControlsChecksum()
@@ -131,10 +126,7 @@ namespace Innofactor.Crm.Shuffle.Builder.Controls
         {
             if (controlsCheckSum != ControlsChecksum())
             {
-                if (MessageBox.Show("Save changes?", "Question", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
-                {
-                    Save();
-                }
+                Save();
             }
         }
     }

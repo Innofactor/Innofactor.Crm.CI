@@ -71,12 +71,7 @@ namespace Innofactor.Crm.Shuffle.Builder.Controls
         /// <param name="parameters">Lsit of parameter</param>
         private void SendSaveMessage(Dictionary<string, string> collection)
         {
-            SaveEventArgs sea = new SaveEventArgs { AttributeCollection = collection };
-
-            if (Saved != null)
-            {
-                Saved(this, sea);
-            }
+            Saved?.Invoke(this, new SaveEventArgs { AttributeCollection = collection });
         }
 
         private void cmbType_SelectedIndexChanged(object sender, EventArgs e)
@@ -93,10 +88,7 @@ namespace Innofactor.Crm.Shuffle.Builder.Controls
         {
             if (controlsCheckSum != ControlsChecksum())
             {
-                if (MessageBox.Show("Save changes?", "Question", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
-                {
-                    Save();
-                }
+                Save();
             }
         }
     }
