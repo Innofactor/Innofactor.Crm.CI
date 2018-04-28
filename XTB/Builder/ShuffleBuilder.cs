@@ -9,13 +9,15 @@ using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 using System.Xml;
+using System.Xml.Linq;
 using XrmToolBox.Extensibility;
+using XrmToolBox.Extensibility.Args;
 using XrmToolBox.Extensibility.Interfaces;
 using Clipboard = Innofactor.Crm.Shuffle.Builder.AppCode.Clipboard;
 
 namespace Innofactor.Crm.Shuffle.Builder
 {
-    public partial class ShuffleBuilder : PluginControlBase, IMessageBusHost, IGitHubPlugin
+    public partial class ShuffleBuilder : PluginControlBase, IMessageBusHost, IGitHubPlugin, IStatusBarMessenger
     {
         internal Clipboard clipboard = new Clipboard();
         private XmlDocument definitionDoc;
@@ -24,6 +26,10 @@ namespace Innofactor.Crm.Shuffle.Builder
         private CintDynEntityCollection solutionsUnmanaged = null;
         private List<EntityMetadata> entities = null;
         private bool working = false;
+        private bool buttonsEnabled = true;
+
+        public event EventHandler<MessageBusEventArgs> OnOutgoingMessage;
+        public event EventHandler<StatusBarMessageEventArgs> SendMessageToStatusBar;
 
         public List<EntityMetadata> Entities
         {
@@ -132,31 +138,6 @@ namespace Innofactor.Crm.Shuffle.Builder
             }
         }
 
-        private bool BuildAndValidateXml()
-        {
-            // Build the Xml from TreeView
-            var doc = new XmlDocument();
-            XmlNode rootNode = doc.CreateElement("root");
-            doc.AppendChild(rootNode);
-
-            AddXmlNode(tvDefinition.Nodes[0], rootNode);
-            definitionDoc = new XmlDocument();
-            definitionDoc.LoadXml(doc.SelectSingleNode("root/ShuffleDefinition").OuterXml);
-
-            var result = false;
-            try
-            {
-                ShuffleHelper.ValidateDefinitionXml(definitionDoc, null);
-                result = true;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-
-            return result;
-        }
-
         private void tsbItemSave_Click(object sender, EventArgs e)
         {
             ((IDefinitionSavable)panelContainer.Controls[0]).Save();
@@ -186,226 +167,128 @@ namespace Innofactor.Crm.Shuffle.Builder
 
         private void tvDefinitionNodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
         {
-            TreeNode selectedNode = e.Node;
-            selectedNode.TreeView.SelectedNode = selectedNode;
-            var collec = (Dictionary<string, string>)selectedNode.Tag;
-
-            TreeNodeHelper.AddContextMenu(e.Node, this);
-            Control existingControl = panelContainer.Controls.Count > 0 ? panelContainer.Controls[0] : null;
-            this.deleteToolStripMenuItem.Text = "Delete " + selectedNode.Text;
-
-            UserControl ctrl = null;
-            switch (selectedNode.Text.Split(' ')[0])
+            if (e.Button == MouseButtons.Right)
             {
-                case "ShuffleDefinition":
-                    ctrl = new ShuffleDefinitionControl(collec, this);
-                    break;
-                case "DataBlock":
-                    ctrl = new DataBlockControl(collec, this);
-                    break;
-                case "SolutionBlock":
-                    ctrl = new SolutionBlockControl(collec, this);
-                    break;
-                case "Export":
-                    if (selectedNode.Parent != null && selectedNode.Parent.Text.StartsWith("DataBlock"))
-                    {
-                        ctrl = new DataBlockExportControl(collec, this);
-                    }
-                    else if (selectedNode.Parent != null && selectedNode.Parent.Text.StartsWith("SolutionBlock"))
-                    {
-                        ctrl = new SolutionBlockExportControl(collec, this);
-                    }
-                    break;
-                case "Import":
-                    if (selectedNode.Parent != null && selectedNode.Parent.Text.StartsWith("DataBlock"))
-                    {
-                        ctrl = new DataBlockImportControl(collec, this);
-                    }
-                    else if (selectedNode.Parent != null && selectedNode.Parent.Text.StartsWith("SolutionBlock"))
-                    {
-                        ctrl = new SolutionBlockImportControl(collec, this);
-                    }
-                    break;
-
-                case "Relation":
-                    ctrl = new RelationControl(collec, selectedNode, this);
-                    break;
-
-                case "Attribute":
-                    if (selectedNode.Parent != null && selectedNode.Parent.Text.StartsWith("Attributes"))
-                    {
-                        ctrl = new ExportAttributeControl(collec, this);
-                    }
-                    else if (selectedNode.Parent != null && selectedNode.Parent.Text.StartsWith("Match"))
-                    {
-                        ctrl = new ImportAttributeControl(collec, this);
-                    }
-                    break;
-                case "Filter":
-                    ctrl = new FilterControl(collec, this);
-                    break;
-
-                case "Sort":
-                    ctrl = new SortControl(collec, this);
-                    break;
-
-                case "Match":
-                    ctrl = new ImportMatchControl(collec, this);
-                    break;
-
-                case "Settings":
-                    ctrl = new SettingsControl(collec, this);
-                    break;
-
-                case "Solution":
-                    if (selectedNode.Parent != null && selectedNode.Parent.Text.StartsWith("PreRequisites"))
-                    {
-                        ctrl = new PreReqSolutionControl(collec, this);
-                    }
-                    break;
-
-                default:
-                    {
-                        panelContainer.Controls.Clear();
-                        tsbItemSave.Visible = false;
-                    }
-                    break;
-            }
-            if (ctrl != null)
-            {
-                panelContainer.Controls.Add(ctrl);
-                ctrl.BringToFront();
-                if (existingControl != null) panelContainer.Controls.Remove(existingControl);
-                tsbItemSave.Visible = true;
+                HandleNodeSelection(e.Node);
             }
 
-            ManageMenuDisplay();
+            //TreeNode selectedNode = e.Node;
+            //selectedNode.TreeView.SelectedNode = selectedNode;
+            //var collec = (Dictionary<string, string>)selectedNode.Tag;
+
+            //TreeNodeHelper.AddContextMenu(e.Node, this);
+            //Control existingControl = panelContainer.Controls.Count > 0 ? panelContainer.Controls[0] : null;
+            //this.deleteToolStripMenuItem.Text = "Delete " + selectedNode.Text;
+
+            //UserControl ctrl = null;
+            //switch (selectedNode.Text.Split(' ')[0])
+            //{
+            //    case "ShuffleDefinition":
+            //        ctrl = new ShuffleDefinitionControl(collec, this);
+            //        break;
+            //    case "DataBlock":
+            //        ctrl = new DataBlockControl(collec, this);
+            //        break;
+            //    case "SolutionBlock":
+            //        ctrl = new SolutionBlockControl(collec, this);
+            //        break;
+            //    case "Export":
+            //        if (selectedNode.Parent != null && selectedNode.Parent.Text.StartsWith("DataBlock"))
+            //        {
+            //            ctrl = new DataBlockExportControl(collec, this);
+            //        }
+            //        else if (selectedNode.Parent != null && selectedNode.Parent.Text.StartsWith("SolutionBlock"))
+            //        {
+            //            ctrl = new SolutionBlockExportControl(collec, this);
+            //        }
+            //        break;
+            //    case "Import":
+            //        if (selectedNode.Parent != null && selectedNode.Parent.Text.StartsWith("DataBlock"))
+            //        {
+            //            ctrl = new DataBlockImportControl(collec, this);
+            //        }
+            //        else if (selectedNode.Parent != null && selectedNode.Parent.Text.StartsWith("SolutionBlock"))
+            //        {
+            //            ctrl = new SolutionBlockImportControl(collec, this);
+            //        }
+            //        break;
+
+            //    case "Relation":
+            //        ctrl = new RelationControl(collec, selectedNode, this);
+            //        break;
+
+            //    case "Attribute":
+            //        if (selectedNode.Parent != null && selectedNode.Parent.Text.StartsWith("Attributes"))
+            //        {
+            //            ctrl = new ExportAttributeControl(collec, this);
+            //        }
+            //        else if (selectedNode.Parent != null && selectedNode.Parent.Text.StartsWith("Match"))
+            //        {
+            //            ctrl = new ImportAttributeControl(collec, this);
+            //        }
+            //        break;
+            //    case "Filter":
+            //        ctrl = new FilterControl(collec, this);
+            //        break;
+
+            //    case "Sort":
+            //        ctrl = new SortControl(collec, this);
+            //        break;
+
+            //    case "Match":
+            //        ctrl = new ImportMatchControl(collec, this);
+            //        break;
+
+            //    case "Settings":
+            //        ctrl = new SettingsControl(collec, this);
+            //        break;
+
+            //    case "Solution":
+            //        if (selectedNode.Parent != null && selectedNode.Parent.Text.StartsWith("PreRequisites"))
+            //        {
+            //            ctrl = new PreReqSolutionControl(collec, this);
+            //        }
+            //        break;
+
+            //    default:
+            //        {
+            //            panelContainer.Controls.Clear();
+            //            tsbItemSave.Visible = false;
+            //        }
+            //        break;
+            //}
+            //if (ctrl != null)
+            //{
+            //    panelContainer.Controls.Add(ctrl);
+            //    ctrl.BringToFront();
+            //    if (existingControl != null) panelContainer.Controls.Remove(existingControl);
+            //    tsbItemSave.Visible = true;
+            //}
+
+            //ManageMenuDisplay();
         }
 
         private void tvDefinition_AfterSelect(object sender, TreeViewEventArgs e)
         {
-            var e2 = new TreeNodeMouseClickEventArgs(e.Node, MouseButtons.Left, 1, 0, 0);
+            HandleNodeSelection(e.Node);
+            //var e2 = new TreeNodeMouseClickEventArgs(e.Node, MouseButtons.Left, 1, 0, 0);
 
-            tvDefinitionNodeMouseClick(tvDefinition, e2);
+            //tvDefinitionNodeMouseClick(tvDefinition, e2);
         }
 
         private void NodeMenuItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
-            if (e.ClickedItem.Text.StartsWith("Delete"))
-            {
-                tvDefinition.SelectedNode.Remove();
-            }
-            else if (e.ClickedItem.Text == "Cut" || e.ClickedItem.Text == "Copy" || e.ClickedItem.Text == "Paste")
-            {
-                if (e.ClickedItem.Text == "Cut")
-                    clipboard.Cut(tvDefinition.SelectedNode);
-                else if (e.ClickedItem.Text == "Copy")
-                    clipboard.Copy(tvDefinition.SelectedNode);
-                else
-                    clipboard.Paste(tvDefinition.SelectedNode);
-            }
-            else
-            {
-                string nodeText = e.ClickedItem.Name.Remove(0, 3);
-                nodeText = nodeText.Substring(0, nodeText.IndexOf("ToolStripMenuItem"));
-
-                var newNode = new TreeNode(nodeText);
-                newNode.Tag = new Dictionary<string, string>();
-                newNode.Name = newNode.Text.Replace(" ", "");
-                var e2 = new TreeNodeMouseClickEventArgs(newNode, MouseButtons.Left, 1, 0, 0);
-
-                if (newNode.Text == "Export" && tvDefinition.SelectedNode.Text.StartsWith("DataBlock"))
-                {
-                    var attributesNode = AddChildNode(newNode, "Attributes");
-                    var firstAttributeNode = AddChildNode(attributesNode, "Attribute");
-                }
-                else if (newNode.Text == "Import" && tvDefinition.SelectedNode.Text.StartsWith("DataBlock"))
-                {
-                    var matchNode = AddChildNode(newNode, "Match");
-                    var firstAttributeNode = AddChildNode(matchNode, "Attribute");
-                }
-
-                if (nodeText == "Filter")
-                {
-                    int i = 0;
-                    while (i < tvDefinition.SelectedNode.Nodes.Count &&
-                        tvDefinition.SelectedNode.Nodes[i].Text.StartsWith("Filter"))
-                    {
-                        i++;
-                    }
-                    tvDefinition.SelectedNode.Nodes.Insert(i, newNode);
-                }
-                else if (nodeText == "Sort")
-                {
-                    int i = 0;
-                    while (i < tvDefinition.SelectedNode.Nodes.Count &&
-                        (tvDefinition.SelectedNode.Nodes[i].Text.StartsWith("Filter") ||
-                         tvDefinition.SelectedNode.Nodes[i].Text.StartsWith("Sort")))
-                    {
-                        i++;
-                    }
-                    tvDefinition.SelectedNode.Nodes.Insert(i, newNode);
-                }
-                else
-                {
-                    tvDefinition.SelectedNode.Nodes.Add(newNode);
-                }
-                tvDefinitionNodeMouseClick(tvDefinition, e2);
-            }
+            HandleNodeMenuClick(e.ClickedItem.Tag?.ToString() ?? e.ClickedItem.Text);
         }
 
         private void toolStripButtonMoveDown_Click(object sender, EventArgs e)
         {
-            toolStripButtonMoveDown.Enabled = false;
 
-            TreeNode tnmNode = tvDefinition.SelectedNode;
-            TreeNode tnmNextNode = tnmNode.NextNode;
-
-            if (tnmNextNode != null)
-            {
-                int idxBegin = tnmNode.Index;
-                int idxEnd = tnmNextNode.Index;
-                TreeNode tnmNodeParent = tnmNode.Parent;
-                if (tnmNodeParent != null)
-                {
-                    tnmNode.Remove();
-                    tnmNextNode.Remove();
-
-                    tnmNodeParent.Nodes.Insert(idxBegin, tnmNextNode);
-                    tnmNodeParent.Nodes.Insert(idxEnd, tnmNode);
-
-                    tvDefinition.SelectedNode = tnmNode;
-                }
-            }
-
-            toolStripButtonMoveDown.Enabled = true;
         }
 
         private void toolStripButtonMoveUp_Click(object sender, EventArgs e)
         {
-            toolStripButtonMoveUp.Enabled = false;
 
-            TreeNode tnmNode = tvDefinition.SelectedNode;
-            TreeNode tnmPreviousNode = tnmNode.PrevNode;
-
-            if (tnmPreviousNode != null)
-            {
-                int idxBegin = tnmNode.Index;
-                int idxEnd = tnmPreviousNode.Index;
-                TreeNode tnmNodeParent = tnmNode.Parent;
-                if (tnmNodeParent != null)
-                {
-                    tnmNode.Remove();
-                    tnmPreviousNode.Remove();
-
-                    tnmNodeParent.Nodes.Insert(idxEnd, tnmNode);
-                    tnmNodeParent.Nodes.Insert(idxBegin, tnmPreviousNode);
-
-                    tvDefinition.SelectedNode = tnmNode;
-                }
-            }
-
-            toolStripButtonMoveUp.Enabled = true;
         }
 
         private void toolStripButtonDelete_Click(object sender, EventArgs e)
@@ -439,6 +322,32 @@ namespace Innofactor.Crm.Shuffle.Builder
             xcdDialog.ShowDialog();
         }
 
+        private void toolStripButtonRunit_Click(object sender, EventArgs e)
+        {
+            var args = new MessageBusEventArgs("Shuffle Runner")
+            {
+                TargetArgument = fileName
+            };
+            try
+            {
+                OnOutgoingMessage(this, args);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Calliung Shuffle Runner failed:\n" + ex.Message);
+            }
+        }
+
+        private void tvDefinition_KeyDown(object sender, KeyEventArgs e)
+        {
+            HandleTVKeyDown(e);
+        }
+
+        internal void QuickActionLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            HandleNodeMenuClick((sender as LinkLabel)?.Tag?.ToString());
+        }
+
         #endregion
 
         /// <summary>
@@ -467,6 +376,7 @@ namespace Innofactor.Crm.Shuffle.Builder
                 {
                     tvDefinition.Nodes[0].Nodes[0].Expand();
                 }
+                UpdateLiveXML();
             };
 
             if (tvDefinition.InvokeRequired)
@@ -479,6 +389,11 @@ namespace Innofactor.Crm.Shuffle.Builder
             }
         }
 
+        internal void EnableControls()
+        {
+            EnableControls(buttonsEnabled);
+        }
+
         internal void EnableControls(bool enabled)
         {
             MethodInvoker mi = delegate
@@ -486,9 +401,9 @@ namespace Innofactor.Crm.Shuffle.Builder
                 toolStripButtonSave.Enabled = enabled;
                 toolStripButtonOpen.Enabled = enabled;
                 toolStripButtonRunit.Enabled = enabled && !string.IsNullOrEmpty(fileName);
-                gbSiteMap.Enabled = enabled;
-                gbProperties.Enabled = enabled;
-                lblFilename.Text = string.IsNullOrEmpty(fileName) ? "<no file selected>" : fileName;
+                tvDefinition.Enabled = enabled;
+                SendMessageToStatusBar(this, new StatusBarMessageEventArgs(string.IsNullOrEmpty(fileName) ? "<no file selected>" : fileName));
+                buttonsEnabled = enabled;
             };
 
             if (InvokeRequired)
@@ -499,6 +414,39 @@ namespace Innofactor.Crm.Shuffle.Builder
             {
                 mi();
             }
+        }
+
+        private bool BuildAndValidateXml(bool validate = true)
+        {
+            var result = string.Empty;
+            if (tvDefinition.Nodes.Count > 0 && validate)
+            {
+                // Build the Xml from TreeView
+                var def = GetDefinitionDocument();
+                try
+                {
+                    result = ShuffleHelper.ValidateDefinitionXml(def, null);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+            }
+            return string.IsNullOrEmpty(result);
+        }
+
+        private XmlDocument GetDefinitionDocument()
+        {
+            var doc = new XmlDocument();
+            if (tvDefinition.Nodes.Count > 0)
+            {
+                XmlNode rootNode = doc.CreateElement("root");
+                doc.AppendChild(rootNode);
+                TreeNodeHelper.AddXmlNode(tvDefinition.Nodes[0], rootNode);
+                var xmlbody = doc.SelectSingleNode("root/ShuffleDefinition").OuterXml;
+                doc.LoadXml(xmlbody);
+            }
+            return doc;
         }
 
         /// <summary>
@@ -545,6 +493,7 @@ namespace Innofactor.Crm.Shuffle.Builder
         {
             tvDefinition.SelectedNode.Tag = e.AttributeCollection;
             TreeNodeHelper.SetNodeText(tvDefinition.SelectedNode);
+            UpdateLiveXML();
         }
 
         /// <summary>
@@ -554,13 +503,12 @@ namespace Innofactor.Crm.Shuffle.Builder
         {
             TreeNode selectedNode = tvDefinition.SelectedNode;
 
-            tsbItemSave.Enabled = selectedNode != null;
-            toolStripButtonDelete.Enabled = selectedNode != null && selectedNode.Text != "ShuffleDefinition";
-            toolStripButtonMoveUp.Enabled = selectedNode != null && selectedNode.Parent != null &&
-                                            selectedNode.Index != 0;
-            toolStripButtonMoveDown.Enabled = selectedNode != null && selectedNode.Parent != null &&
-                                              selectedNode.Index != selectedNode.Parent.Nodes.Count - 1;
-            toolStripButtonDisplayXml.Enabled = selectedNode != null;
+            //toolStripButtonDelete.Enabled = selectedNode != null && selectedNode.Text != "ShuffleDefinition";
+            //toolStripButtonMoveUp.Enabled = selectedNode != null && selectedNode.Parent != null &&
+            //                                selectedNode.Index != 0;
+            //toolStripButtonMoveDown.Enabled = selectedNode != null && selectedNode.Parent != null &&
+            //                                  selectedNode.Index != selectedNode.Parent.Nodes.Count - 1;
+            //toolStripButtonDisplayXml.Enabled = selectedNode != null;
 
             toolStripButtonSave.Enabled = tvDefinition.Nodes.Count > 0;
         }
@@ -674,21 +622,361 @@ namespace Innofactor.Crm.Shuffle.Builder
             throw new NotImplementedException("Shuffle Builder cannot accept calls from other plugins in this version");
         }
 
-        public event EventHandler<MessageBusEventArgs> OnOutgoingMessage;
-
-        private void toolStripButtonRunit_Click(object sender, EventArgs e)
+        private void HandleNodeSelection(TreeNode node)
         {
-            var args = new MessageBusEventArgs("Shuffle Runner")
+            if (!working)
             {
-                TargetArgument = fileName
-            };
+                if (tvDefinition.SelectedNode != node)
+                {
+                    tvDefinition.SelectedNode = node;
+                    return;
+                }
+
+                UserControl ctrl = null;
+                Control existingControl = panelContainer.Controls.Count > 0 ? panelContainer.Controls[0] : null;
+                if (node != null)
+                {
+                    TreeNodeHelper.AddContextMenu(node, this);
+                    this.deleteToolStripMenuItem.Text = "Delete " + node.Name;
+                    var collec = (Dictionary<string, string>)node.Tag;
+
+                    switch (node.Name)
+                    {
+                        case "ShuffleDefinition":
+                            ctrl = new ShuffleDefinitionControl(collec, this);
+                            break;
+                        case "DataBlock":
+                            ctrl = new DataBlockControl(collec, this);
+                            break;
+                        case "SolutionBlock":
+                            ctrl = new SolutionBlockControl(collec, this);
+                            break;
+                        case "Export":
+                            if (node.Parent != null && node.Parent.Text.StartsWith("DataBlock"))
+                            {
+                                ctrl = new DataBlockExportControl(collec, this);
+                            }
+                            else if (node.Parent != null && node.Parent.Text.StartsWith("SolutionBlock"))
+                            {
+                                ctrl = new SolutionBlockExportControl(collec, this);
+                            }
+                            break;
+                        case "Import":
+                            if (node.Parent != null && node.Parent.Text.StartsWith("DataBlock"))
+                            {
+                                ctrl = new DataBlockImportControl(collec, this);
+                            }
+                            else if (node.Parent != null && node.Parent.Text.StartsWith("SolutionBlock"))
+                            {
+                                ctrl = new SolutionBlockImportControl(collec, this);
+                            }
+                            break;
+
+                        case "Relation":
+                            ctrl = new RelationControl(collec, node, this);
+                            break;
+
+                        case "Attribute":
+                            if (node.Parent != null && node.Parent.Text.StartsWith("Attributes"))
+                            {
+                                ctrl = new ExportAttributeControl(collec, this);
+                            }
+                            else if (node.Parent != null && node.Parent.Text.StartsWith("Match"))
+                            {
+                                ctrl = new ImportAttributeControl(collec, this);
+                            }
+                            break;
+                        case "Filter":
+                            ctrl = new FilterControl(collec, this);
+                            break;
+
+                        case "Sort":
+                            ctrl = new SortControl(collec, this);
+                            break;
+
+                        case "Match":
+                            ctrl = new ImportMatchControl(collec, this);
+                            break;
+
+                        case "Settings":
+                            ctrl = new SettingsControl(collec, this);
+                            break;
+
+                        case "Solution":
+                            if (node.Parent != null && node.Parent.Text.StartsWith("PreRequisites"))
+                            {
+                                ctrl = new PreReqSolutionControl(collec, this);
+                            }
+                            break;
+
+                        default:
+                            {
+                                panelContainer.Controls.Clear();
+                            }
+                            break;
+                    }
+                }
+                if (ctrl != null)
+                {
+                    panelContainer.Controls.Add(ctrl);
+                    ctrl.BringToFront();
+                    ctrl.Dock = DockStyle.Fill;
+                }
+                if (existingControl != null) panelContainer.Controls.Remove(existingControl);
+            }
+            ManageMenuDisplay();
+        }
+
+        private void HandleTVKeyDown(KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Delete)
+            {
+                if (deleteToolStripMenuItem.Enabled)
+                {
+                    if (MessageBox.Show(deleteToolStripMenuItem.Text + " ?", "Confirm", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation) == DialogResult.OK)
+                    {
+                        HandleNodeMenuClick(deleteToolStripMenuItem.Tag?.ToString());
+                    }
+                }
+                e.Handled = true;
+                e.SuppressKeyPress = true;
+            }
+            else if (e.KeyCode == Keys.Insert)
+            {
+                addMenu.Show(tvDefinition.PointToScreen(tvDefinition.Location));
+            }
+            else if (e.Control && e.KeyCode == Keys.K && commentToolStripMenuItem.Enabled)
+            {
+                HandleNodeMenuClick(commentToolStripMenuItem.Tag?.ToString());
+            }
+            else if (e.Control && e.KeyCode == Keys.U && uncommentToolStripMenuItem.Enabled)
+            {
+                HandleNodeMenuClick(uncommentToolStripMenuItem.Tag?.ToString());
+            }
+            else if (e.Control && e.KeyCode == Keys.Up && moveUpToolStripMenuItem.Enabled)
+            {
+                toolStripButtonMoveUp_Click(null, null);
+            }
+            else if (e.Control && e.KeyCode == Keys.Down && moveDownToolStripMenuItem.Enabled)
+            {
+                toolStripButtonMoveDown_Click(null, null);
+            }
+        }
+
+        private void HandleNodeMenuClick(string ClickedTag)
+        {
+            if (ClickedTag == null || ClickedTag == "Add")
+                return;
+            TreeNode updateNode = null;
+            if (ClickedTag == "Delete")
+            {
+                DeleteNode();
+            }
+            else if (ClickedTag == "Comment")
+            {
+                CommentNode();
+            }
+            else if (ClickedTag == "Uncomment")
+            {
+                UncommentNode();
+            }
+            else if (ClickedTag == "Cut" || ClickedTag == "Copy" || ClickedTag == "Paste")
+            {
+                if (ClickedTag == "Cut")
+                    clipboard.Cut(tvDefinition.SelectedNode);
+                else if (ClickedTag == "Copy")
+                    clipboard.Copy(tvDefinition.SelectedNode);
+                else
+                    clipboard.Paste(tvDefinition.SelectedNode);
+            }
+            else
+            {
+                string nodeText = ClickedTag;
+                updateNode = TreeNodeHelper.AddChildNode(tvDefinition.SelectedNode, nodeText);
+                HandleNodeSelection(updateNode);
+            }
+            if (updateNode != null)
+            {
+                TreeNodeHelper.SetNodeTooltip(updateNode);
+            }
+            UpdateLiveXML();
+
+            return;
+
+            if (ClickedTag.StartsWith("Delete"))
+            {
+
+            }
+            else if (ClickedTag == "Cut" || ClickedTag == "Copy" || ClickedTag == "Paste")
+            {
+                if (ClickedTag == "Cut")
+                    clipboard.Cut(tvDefinition.SelectedNode);
+                else if (ClickedTag == "Copy")
+                    clipboard.Copy(tvDefinition.SelectedNode);
+                else
+                    clipboard.Paste(tvDefinition.SelectedNode);
+            }
+            else
+            {
+                string nodeText = ClickedTag;
+                nodeText = nodeText.Substring(0, nodeText.IndexOf("ToolStripMenuItem"));
+
+                var newNode = new TreeNode(nodeText);
+                newNode.Tag = new Dictionary<string, string>();
+                newNode.Name = newNode.Text.Replace(" ", "");
+                var e2 = new TreeNodeMouseClickEventArgs(newNode, MouseButtons.Left, 1, 0, 0);
+
+                if (newNode.Text == "Export" && tvDefinition.SelectedNode.Text.StartsWith("DataBlock"))
+                {
+                    var attributesNode = AddChildNode(newNode, "Attributes");
+                    var firstAttributeNode = AddChildNode(attributesNode, "Attribute");
+                }
+                else if (newNode.Text == "Import" && tvDefinition.SelectedNode.Text.StartsWith("DataBlock"))
+                {
+                    var matchNode = AddChildNode(newNode, "Match");
+                    var firstAttributeNode = AddChildNode(matchNode, "Attribute");
+                }
+
+                if (nodeText == "Filter")
+                {
+                    int i = 0;
+                    while (i < tvDefinition.SelectedNode.Nodes.Count &&
+                        tvDefinition.SelectedNode.Nodes[i].Text.StartsWith("Filter"))
+                    {
+                        i++;
+                    }
+                    tvDefinition.SelectedNode.Nodes.Insert(i, newNode);
+                }
+                else if (nodeText == "Sort")
+                {
+                    int i = 0;
+                    while (i < tvDefinition.SelectedNode.Nodes.Count &&
+                        (tvDefinition.SelectedNode.Nodes[i].Text.StartsWith("Filter") ||
+                         tvDefinition.SelectedNode.Nodes[i].Text.StartsWith("Sort")))
+                    {
+                        i++;
+                    }
+                    tvDefinition.SelectedNode.Nodes.Insert(i, newNode);
+                }
+                else
+                {
+                    tvDefinition.SelectedNode.Nodes.Add(newNode);
+                }
+                tvDefinitionNodeMouseClick(tvDefinition, e2);
+            }
+
+        }
+
+        internal void UpdateLiveXML()
+        {
+            var xml = string.Empty;
+            string GetXml()
+            {
+                if (string.IsNullOrWhiteSpace(xml))
+                {
+                    xml = GetXmlString(true, false);
+                }
+                return xml;
+            }
+            txtXML.Text = GetXml();
             try
             {
-                OnOutgoingMessage(this, args);
+                txtXML.Process();
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Calliung Shuffle Runner failed:\n" + ex.Message);
+                MessageBox.Show(ex.Message, "XML Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private string GetXmlString(bool format, bool validate)
+        {
+            var xml = string.Empty;
+            if (BuildAndValidateXml(validate))
+            {
+                if (tvDefinition.Nodes.Count > 0)
+                {
+                    var doc = GetDefinitionDocument();
+                    xml = doc.OuterXml;
+                }
+                if (format)
+                {
+                    XDocument doc = XDocument.Parse(xml);
+                    xml = doc.ToString();
+                }
+            }
+            return xml;
+        }
+
+        private void DeleteNode()
+        {
+            tvDefinition.SelectedNode.Remove();
+        }
+
+        private void CommentNode()
+        {
+            var node = tvDefinition.SelectedNode;
+            if (node != null)
+            {
+                var doc = new XmlDocument();
+                XmlNode rootNode = doc.CreateElement("root");
+                doc.AppendChild(rootNode);
+                TreeNodeHelper.AddXmlNode(node, rootNode);
+                XDocument xdoc = XDocument.Parse(rootNode.InnerXml);
+                var comment = xdoc.ToString();
+                if (node.Nodes != null && node.Nodes.Count > 0)
+                {
+                    comment = "\r\n" + comment + "\r\n";
+                }
+                if (comment.Contains("--"))
+                {
+                    comment = comment.Replace("--", "~~");
+                }
+                if (comment.EndsWith("-"))
+                {
+                    comment = comment.Substring(0, comment.Length - 1) + "~";
+                }
+                var commentNode = doc.CreateComment(comment);
+                var parent = node.Parent;
+                var index = node.Index;
+                node.Parent.Nodes.Remove(node);
+                tvDefinition.SelectedNode = TreeNodeHelper.AddTreeViewNode(parent, commentNode, this, index);
+            }
+        }
+
+        private void UncommentNode()
+        {
+            var node = tvDefinition.SelectedNode;
+            if (node != null && node.Tag is Dictionary<string, string>)
+            {
+                var coll = node.Tag as Dictionary<string, string>;
+                if (coll.ContainsKey("#comment"))
+                {
+                    var comment = coll["#comment"];
+                    if (comment.Contains("~~"))
+                    {
+                        comment = comment.Replace("~~", "--");
+                    }
+                    if (comment.EndsWith("~"))
+                    {
+                        comment = comment.Substring(0, comment.Length - 1) + "-";
+                    }
+                    var doc = new XmlDocument();
+                    try
+                    {
+                        doc.LoadXml(comment);
+                        var parent = node.Parent;
+                        var index = node.Index;
+                        node.Parent.Nodes.Remove(node);
+                        tvDefinition.SelectedNode = TreeNodeHelper.AddTreeViewNode(parent, doc.DocumentElement, this, index);
+                        tvDefinition.SelectedNode.Expand();
+                    }
+                    catch (XmlException ex)
+                    {
+                        var msg = "Comment does contain well formatted xml.\nError description:\n\n" + ex.Message;
+                        MessageBox.Show(msg, "Uncomment", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    }
+                }
             }
         }
     }
