@@ -261,26 +261,33 @@ namespace Innofactor.Crm.Shuffle.Builder.AppCode
         {
             if (node != null)
             {
-                var doc = new XmlDocument();
-                XmlNode rootNode = doc.CreateElement("root");
-                doc.AppendChild(rootNode);
-                TreeNodeHelper.AddXmlNode(node, rootNode);
-                var tooltip = "";
-                try
-                {
-                    XDocument xdoc = XDocument.Parse(rootNode.InnerXml);
-                    tooltip = xdoc.ToString();
-                }
-                catch
-                {
-                    tooltip = rootNode.InnerXml;
-                }
+                string tooltip = GetNodeXml(node);
                 node.ToolTipText = tooltip;
                 if (node.Parent != null)
                 {
                     SetNodeTooltip(node.Parent);
                 }
             }
+        }
+
+        internal static string GetNodeXml(TreeNode node)
+        {
+            var doc = new XmlDocument();
+            XmlNode rootNode = doc.CreateElement("root");
+            doc.AppendChild(rootNode);
+            TreeNodeHelper.AddXmlNode(node, rootNode);
+            var tooltip = "";
+            try
+            {
+                XDocument xdoc = XDocument.Parse(rootNode.InnerXml);
+                tooltip = xdoc.ToString();
+            }
+            catch
+            {
+                tooltip = rootNode.InnerXml;
+            }
+
+            return tooltip;
         }
 
         internal static void AddXmlNode(TreeNode currentNode, XmlNode parentXmlNode)

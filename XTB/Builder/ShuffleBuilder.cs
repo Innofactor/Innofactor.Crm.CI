@@ -725,6 +725,7 @@ namespace Innofactor.Crm.Shuffle.Builder
                 if (existingControl != null) panelContainer.Controls.Remove(existingControl);
             }
             ManageMenuDisplay();
+            ShowNodeXml(node);
         }
 
         private void HandleTVKeyDown(KeyEventArgs e)
@@ -882,6 +883,19 @@ namespace Innofactor.Crm.Shuffle.Builder
             try
             {
                 txtXML.Process();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "XML Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void ShowNodeXml(TreeNode node)
+        {
+            txtPropertyXml.Text = TreeNodeHelper.GetNodeXml(node);
+            try
+            {
+                txtPropertyXml.Process();
             }
             catch (Exception ex)
             {
