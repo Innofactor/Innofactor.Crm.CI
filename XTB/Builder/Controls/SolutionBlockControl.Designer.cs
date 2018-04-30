@@ -53,6 +53,7 @@
             this.txtPath.Name = "txtPath";
             this.txtPath.Size = new System.Drawing.Size(234, 20);
             this.txtPath.TabIndex = 2;
+            this.txtPath.Tag = "Path";
             // 
             // lblEntity
             // 
@@ -80,6 +81,7 @@
             this.txtFile.Name = "txtFile";
             this.txtFile.Size = new System.Drawing.Size(234, 20);
             this.txtFile.TabIndex = 3;
+            this.txtFile.Tag = "File";
             // 
             // cmbName
             // 
@@ -93,6 +95,7 @@
             this.cmbName.Name = "cmbName";
             this.cmbName.Size = new System.Drawing.Size(234, 21);
             this.cmbName.TabIndex = 1;
+            this.cmbName.Tag = "Name|true";
             // 
             // SolutionBlockControl
             // 
@@ -105,8 +108,6 @@
             this.Controls.Add(this.lblEntity);
             this.Controls.Add(this.lblTimeout);
             this.Name = "SolutionBlockControl";
-            this.Size = new System.Drawing.Size(450, 150);
-            this.Leave += new System.EventHandler(this.DataBlockControl_Leave);
             this.ResumeLayout(false);
             this.PerformLayout();
 

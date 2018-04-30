@@ -158,6 +158,7 @@ namespace Innofactor.Crm.Shuffle.Builder.AppCode
                 }
                 if (tree.addMenu.Items.Count == 0)
                 {
+                    AddLinkFromCapability(tree, "nothing to add", string.Empty);
                     var dummy = tree.addMenu.Items.Add("nothing to add");
                     dummy.Enabled = false;
                 }
@@ -182,9 +183,17 @@ namespace Innofactor.Crm.Shuffle.Builder.AppCode
             link.TabIndex = tree.gbNodeQuickActions.Controls.Count;
             link.TabStop = true;
             link.Text = name;
-            link.Tag = tag ?? name;
-            link.LinkBehavior = LinkBehavior.HoverUnderline;
-            link.LinkClicked += tree.QuickActionLink_LinkClicked;
+            var tagstr = tag ?? name;
+            if (!string.IsNullOrEmpty(tagstr))
+            {
+                link.Tag = tagstr;
+                link.LinkBehavior = LinkBehavior.HoverUnderline;
+                link.LinkClicked += tree.QuickActionLink_LinkClicked;
+            }
+            else
+            {
+                link.Enabled = false;
+            }
             tree.gbNodeQuickActions.Controls.Add(link);
             if (!alignright)
             {

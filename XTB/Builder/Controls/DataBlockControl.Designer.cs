@@ -55,6 +55,7 @@
             this.txtName.Name = "txtName";
             this.txtName.Size = new System.Drawing.Size(234, 20);
             this.txtName.TabIndex = 1;
+            this.txtName.Tag = "Name|true";
             // 
             // txtEntity
             // 
@@ -64,6 +65,7 @@
             this.txtEntity.Name = "txtEntity";
             this.txtEntity.Size = new System.Drawing.Size(234, 20);
             this.txtEntity.TabIndex = 3;
+            this.txtEntity.Tag = "Entity|true";
             // 
             // lblEntity
             // 
@@ -98,6 +100,7 @@
             this.cmbType.Name = "cmbType";
             this.cmbType.Size = new System.Drawing.Size(234, 21);
             this.cmbType.TabIndex = 5;
+            this.cmbType.Tag = "Type|false";
             this.cmbType.SelectedIndexChanged += new System.EventHandler(this.cmbType_SelectedIndexChanged);
             // 
             // txtIntersect
@@ -109,6 +112,7 @@
             this.txtIntersect.Name = "txtIntersect";
             this.txtIntersect.Size = new System.Drawing.Size(234, 20);
             this.txtIntersect.TabIndex = 7;
+            this.txtIntersect.Tag = "IntersectName|false";
             // 
             // lblIntersect
             // 
@@ -133,7 +137,6 @@
             this.Controls.Add(this.lblTimeout);
             this.Name = "DataBlockControl";
             this.Size = new System.Drawing.Size(450, 150);
-            this.Leave += new System.EventHandler(this.DataBlockControl_Leave);
             this.ResumeLayout(false);
             this.PerformLayout();
 

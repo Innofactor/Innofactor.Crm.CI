@@ -64,6 +64,7 @@ namespace Innofactor.Crm.Shuffle.Builder.Controls
             this.cmbType.Name = "cmbType";
             this.cmbType.Size = new System.Drawing.Size(234, 21);
             this.cmbType.TabIndex = 1;
+            this.cmbType.Tag = "Type|true";
             // 
             // label2
             // 
@@ -90,6 +91,7 @@ namespace Innofactor.Crm.Shuffle.Builder.Controls
             this.chkPublish.Name = "chkPublish";
             this.chkPublish.Size = new System.Drawing.Size(15, 14);
             this.chkPublish.TabIndex = 3;
+            this.chkPublish.Tag = "PublishBeforeExport";
             this.chkPublish.UseVisualStyleBackColor = true;
             // 
             // txtVersion
@@ -98,6 +100,7 @@ namespace Innofactor.Crm.Shuffle.Builder.Controls
             this.txtVersion.Name = "txtVersion";
             this.txtVersion.Size = new System.Drawing.Size(234, 20);
             this.txtVersion.TabIndex = 2;
+            this.txtVersion.Tag = "SetVersion";
             // 
             // txtTarget
             // 
@@ -105,6 +108,7 @@ namespace Innofactor.Crm.Shuffle.Builder.Controls
             this.txtTarget.Name = "txtTarget";
             this.txtTarget.Size = new System.Drawing.Size(234, 20);
             this.txtTarget.TabIndex = 10;
+            this.txtTarget.Tag = "TargetVersion";
             // 
             // label4
             // 
@@ -128,8 +132,6 @@ namespace Innofactor.Crm.Shuffle.Builder.Controls
             this.Controls.Add(this.cmbType);
             this.Controls.Add(this.label1);
             this.Name = "SolutionBlockExportControl";
-            this.Size = new System.Drawing.Size(450, 150);
-            this.Leave += new System.EventHandler(this.DataBlockImportControl_Leave);
             this.ResumeLayout(false);
             this.PerformLayout();
 

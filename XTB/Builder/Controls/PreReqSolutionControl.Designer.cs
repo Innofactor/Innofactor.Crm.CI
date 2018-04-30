@@ -53,6 +53,7 @@
             this.txtName.Name = "txtName";
             this.txtName.Size = new System.Drawing.Size(234, 20);
             this.txtName.TabIndex = 1;
+            this.txtName.Tag = "Name|true";
             // 
             // lblType
             // 
@@ -81,6 +82,7 @@
             this.cmbComparer.Name = "cmbComparer";
             this.cmbComparer.Size = new System.Drawing.Size(234, 21);
             this.cmbComparer.TabIndex = 5;
+            this.cmbComparer.Tag = "Comparer|true";
             this.cmbComparer.SelectedIndexChanged += new System.EventHandler(this.cmbType_SelectedIndexChanged);
             // 
             // txtVersion
@@ -92,6 +94,7 @@
             this.txtVersion.Name = "txtVersion";
             this.txtVersion.Size = new System.Drawing.Size(234, 20);
             this.txtVersion.TabIndex = 7;
+            this.txtVersion.Tag = "Version";
             // 
             // lblIntersect
             // 
@@ -113,8 +116,6 @@
             this.Controls.Add(this.txtName);
             this.Controls.Add(this.lblTimeout);
             this.Name = "PreReqSolutionControl";
-            this.Size = new System.Drawing.Size(450, 150);
-            this.Leave += new System.EventHandler(this.DataBlockControl_Leave);
             this.ResumeLayout(false);
             this.PerformLayout();
 

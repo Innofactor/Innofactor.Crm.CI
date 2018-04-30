@@ -119,7 +119,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Builder\AppCode\IComboBoxItem.cs" />
     <Compile Include="Builder\AppCode\TreeNodeCapabilities.cs" />
+    <Compile Include="Builder\Controls\ControlBase.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Builder\Controls\ControlBase.Designer.cs">
+      <DependentUpon>ControlBase.cs</DependentUpon>
+    </Compile>
     <Compile Include="Builder\DefinitionNodeCapabilities.cs" />
     <Compile Include="Builder\XMLViewer\CharacterEncoder.cs" />
     <Compile Include="Builder\XMLViewer\XMLViewer.cs">
@@ -160,7 +167,6 @@
     <Compile Include="Builder\Controls\FilterControl.Designer.cs">
       <DependentUpon>FilterControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="Builder\Controls\IDefinitionSavable.cs" />
     <Compile Include="Builder\Controls\ImportAttributeControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -253,6 +259,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Builder\Controls\ControlBase.resx">
+      <DependentUpon>ControlBase.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Builder\Controls\DataBlockControl.resx">
       <DependentUpon>DataBlockControl.cs</DependentUpon>
     </EmbeddedResource>

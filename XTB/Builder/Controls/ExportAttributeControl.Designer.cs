@@ -51,6 +51,7 @@
             this.txtName.Name = "txtName";
             this.txtName.Size = new System.Drawing.Size(234, 20);
             this.txtName.TabIndex = 1;
+            this.txtName.Tag = "Name|true";
             // 
             // chkIncludeNull
             // 
@@ -59,6 +60,7 @@
             this.chkIncludeNull.Name = "chkIncludeNull";
             this.chkIncludeNull.Size = new System.Drawing.Size(15, 14);
             this.chkIncludeNull.TabIndex = 2;
+            this.chkIncludeNull.Tag = "IncludeNull";
             this.chkIncludeNull.UseVisualStyleBackColor = true;
             // 
             // lblIncludeNull
@@ -80,7 +82,6 @@
             this.Controls.Add(this.lblName);
             this.Name = "ExportAttributeControl";
             this.Size = new System.Drawing.Size(450, 150);
-            this.Leave += new System.EventHandler(this.ExportAttributeControl_Leave);
             this.ResumeLayout(false);
             this.PerformLayout();
 

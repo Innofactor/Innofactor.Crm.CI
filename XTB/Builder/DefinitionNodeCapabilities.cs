@@ -39,6 +39,7 @@ namespace Innofactor.Crm.Shuffle.Builder.AppCode
                 case "export":
                     if (node.Parent.Name.ToLowerInvariant().StartsWith("datablock"))
                     {
+                        ChildTypes.Add(new ChildNodeCapabilities("Attributes", false));
                         ChildTypes.Add(new ChildNodeCapabilities("Filter", true));
                         ChildTypes.Add(new ChildNodeCapabilities("Sort", true));
                     }

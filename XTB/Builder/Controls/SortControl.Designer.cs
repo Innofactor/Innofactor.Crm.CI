@@ -51,6 +51,7 @@
             this.txtAttribute.Name = "txtAttribute";
             this.txtAttribute.Size = new System.Drawing.Size(234, 20);
             this.txtAttribute.TabIndex = 1;
+            this.txtAttribute.Tag = "Attribute|true";
             // 
             // lblEntity
             // 
@@ -76,6 +77,7 @@
             this.cmbType.Name = "cmbType";
             this.cmbType.Size = new System.Drawing.Size(234, 21);
             this.cmbType.TabIndex = 2;
+            this.cmbType.Tag = "Type";
             // 
             // SortControl
             // 
@@ -86,8 +88,6 @@
             this.Controls.Add(this.txtAttribute);
             this.Controls.Add(this.lblTimeout);
             this.Name = "SortControl";
-            this.Size = new System.Drawing.Size(450, 150);
-            this.Leave += new System.EventHandler(this.SortControl_Leave);
             this.ResumeLayout(false);
             this.PerformLayout();
 

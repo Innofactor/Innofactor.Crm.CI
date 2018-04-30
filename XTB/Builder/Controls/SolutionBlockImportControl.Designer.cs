@@ -150,6 +150,7 @@ namespace Innofactor.Crm.Shuffle.Builder.Controls
             this.cmbType.Name = "cmbType";
             this.cmbType.Size = new System.Drawing.Size(234, 21);
             this.cmbType.TabIndex = 12;
+            this.cmbType.Tag = "Type|true";
             // 
             // label6
             // 
@@ -178,7 +179,6 @@ namespace Innofactor.Crm.Shuffle.Builder.Controls
             this.Controls.Add(this.chkOverSame);
             this.Name = "SolutionBlockImportControl";
             this.Size = new System.Drawing.Size(450, 306);
-            this.Leave += new System.EventHandler(this.DataBlockExportControl_Leave);
             this.ResumeLayout(false);
             this.PerformLayout();
 

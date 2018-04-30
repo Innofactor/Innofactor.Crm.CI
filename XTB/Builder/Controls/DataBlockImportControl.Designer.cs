@@ -36,8 +36,8 @@ namespace Innofactor.Crm.Shuffle.Builder.Controls
             this.cmbDelete = new System.Windows.Forms.ComboBox();
             this.label4 = new System.Windows.Forms.Label();
             this.chkUpdateInactive = new System.Windows.Forms.CheckBox();
-            this.label5 = new System.Windows.Forms.Label();
-            this.label6 = new System.Windows.Forms.Label();
+            this.lblDeprecated = new System.Windows.Forms.Label();
+            this.lblDeprOverwrite = new System.Windows.Forms.Label();
             this.txtOverwrite = new System.Windows.Forms.TextBox();
             this.label7 = new System.Windows.Forms.Label();
             this.chkUpdateIdentical = new System.Windows.Forms.CheckBox();
@@ -50,6 +50,7 @@ namespace Innofactor.Crm.Shuffle.Builder.Controls
             this.chkCreateWithId.Name = "chkCreateWithId";
             this.chkCreateWithId.Size = new System.Drawing.Size(15, 14);
             this.chkCreateWithId.TabIndex = 2;
+            this.chkCreateWithId.Tag = "CreateWithId|false|false";
             this.chkCreateWithId.UseVisualStyleBackColor = true;
             // 
             // label1
@@ -78,6 +79,7 @@ namespace Innofactor.Crm.Shuffle.Builder.Controls
             this.cmbSave.Name = "cmbSave";
             this.cmbSave.Size = new System.Drawing.Size(234, 21);
             this.cmbSave.TabIndex = 6;
+            this.cmbSave.Tag = "Save|false|CreateUpdate";
             // 
             // label2
             // 
@@ -113,7 +115,7 @@ namespace Innofactor.Crm.Shuffle.Builder.Controls
             this.cmbDelete.Name = "cmbDelete";
             this.cmbDelete.Size = new System.Drawing.Size(234, 21);
             this.cmbDelete.TabIndex = 8;
-            this.cmbDelete.SelectedIndexChanged += new System.EventHandler(this.cmbDelete_SelectedIndexChanged);
+            this.cmbDelete.Tag = "Delete|false|None";
             // 
             // label4
             // 
@@ -131,25 +133,28 @@ namespace Innofactor.Crm.Shuffle.Builder.Controls
             this.chkUpdateInactive.Name = "chkUpdateInactive";
             this.chkUpdateInactive.Size = new System.Drawing.Size(15, 14);
             this.chkUpdateInactive.TabIndex = 10;
+            this.chkUpdateInactive.Tag = "UpdateInactive|false|false";
             this.chkUpdateInactive.UseVisualStyleBackColor = true;
             // 
-            // label5
+            // lblDeprecated
             // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(4, 154);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(66, 13);
-            this.label5.TabIndex = 12;
-            this.label5.Text = "Deprecated:";
+            this.lblDeprecated.AutoSize = true;
+            this.lblDeprecated.Location = new System.Drawing.Point(4, 154);
+            this.lblDeprecated.Name = "lblDeprecated";
+            this.lblDeprecated.Size = new System.Drawing.Size(66, 13);
+            this.lblDeprecated.TabIndex = 12;
+            this.lblDeprecated.Text = "Deprecated:";
+            this.lblDeprecated.Visible = false;
             // 
-            // label6
+            // lblDeprOverwrite
             // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(7, 171);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(52, 13);
-            this.label6.TabIndex = 13;
-            this.label6.Text = "Overwrite";
+            this.lblDeprOverwrite.AutoSize = true;
+            this.lblDeprOverwrite.Location = new System.Drawing.Point(7, 171);
+            this.lblDeprOverwrite.Name = "lblDeprOverwrite";
+            this.lblDeprOverwrite.Size = new System.Drawing.Size(52, 13);
+            this.lblDeprOverwrite.TabIndex = 13;
+            this.lblDeprOverwrite.Text = "Overwrite";
+            this.lblDeprOverwrite.Visible = false;
             // 
             // txtOverwrite
             // 
@@ -157,6 +162,8 @@ namespace Innofactor.Crm.Shuffle.Builder.Controls
             this.txtOverwrite.Name = "txtOverwrite";
             this.txtOverwrite.Size = new System.Drawing.Size(234, 20);
             this.txtOverwrite.TabIndex = 20;
+            this.txtOverwrite.Tag = "Overwrite";
+            this.txtOverwrite.Visible = false;
             // 
             // label7
             // 
@@ -174,6 +181,7 @@ namespace Innofactor.Crm.Shuffle.Builder.Controls
             this.chkUpdateIdentical.Name = "chkUpdateIdentical";
             this.chkUpdateIdentical.Size = new System.Drawing.Size(15, 14);
             this.chkUpdateIdentical.TabIndex = 15;
+            this.chkUpdateIdentical.Tag = "UpdateIdentical|false|false";
             this.chkUpdateIdentical.UseVisualStyleBackColor = true;
             // 
             // DataBlockImportControl
@@ -183,8 +191,8 @@ namespace Innofactor.Crm.Shuffle.Builder.Controls
             this.Controls.Add(this.label7);
             this.Controls.Add(this.chkUpdateIdentical);
             this.Controls.Add(this.txtOverwrite);
-            this.Controls.Add(this.label6);
-            this.Controls.Add(this.label5);
+            this.Controls.Add(this.lblDeprOverwrite);
+            this.Controls.Add(this.lblDeprecated);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.chkUpdateInactive);
             this.Controls.Add(this.label3);
@@ -195,7 +203,6 @@ namespace Innofactor.Crm.Shuffle.Builder.Controls
             this.Controls.Add(this.chkCreateWithId);
             this.Name = "DataBlockImportControl";
             this.Size = new System.Drawing.Size(450, 205);
-            this.Leave += new System.EventHandler(this.DataBlockImportControl_Leave);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -211,8 +218,8 @@ namespace Innofactor.Crm.Shuffle.Builder.Controls
         private System.Windows.Forms.ComboBox cmbDelete;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.CheckBox chkUpdateInactive;
-        private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Label lblDeprecated;
+        private System.Windows.Forms.Label lblDeprOverwrite;
         private System.Windows.Forms.TextBox txtOverwrite;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.CheckBox chkUpdateIdentical;

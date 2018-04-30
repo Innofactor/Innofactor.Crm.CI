@@ -55,6 +55,7 @@
             this.txtAttribute.Name = "txtAttribute";
             this.txtAttribute.Size = new System.Drawing.Size(234, 20);
             this.txtAttribute.TabIndex = 1;
+            this.txtAttribute.Tag = "Attribute|true";
             // 
             // lblEntity
             // 
@@ -94,6 +95,7 @@
             this.cmbType.Name = "cmbType";
             this.cmbType.Size = new System.Drawing.Size(234, 21);
             this.cmbType.TabIndex = 3;
+            this.cmbType.Tag = "Type|true";
             // 
             // txtValue
             // 
@@ -103,6 +105,7 @@
             this.txtValue.Name = "txtValue";
             this.txtValue.Size = new System.Drawing.Size(234, 20);
             this.txtValue.TabIndex = 4;
+            this.txtValue.Tag = "Value";
             // 
             // lblIntersect
             // 
@@ -171,6 +174,7 @@
             this.cmbOperator.Name = "cmbOperator";
             this.cmbOperator.Size = new System.Drawing.Size(234, 21);
             this.cmbOperator.TabIndex = 2;
+            this.cmbOperator.Tag = "Operator|true";
             // 
             // FilterControl
             // 
@@ -185,8 +189,6 @@
             this.Controls.Add(this.txtAttribute);
             this.Controls.Add(this.lblTimeout);
             this.Name = "FilterControl";
-            this.Size = new System.Drawing.Size(450, 150);
-            this.Leave += new System.EventHandler(this.FilterControl_Leave);
             this.ResumeLayout(false);
             this.PerformLayout();
 

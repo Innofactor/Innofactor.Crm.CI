@@ -51,6 +51,7 @@
             this.txtName.Name = "txtName";
             this.txtName.Size = new System.Drawing.Size(234, 20);
             this.txtName.TabIndex = 1;
+            this.txtName.Tag = "Name|true";
             // 
             // lblIncludeNull
             // 
@@ -69,6 +70,7 @@
             this.txtDisplay.Name = "txtDisplay";
             this.txtDisplay.Size = new System.Drawing.Size(234, 20);
             this.txtDisplay.TabIndex = 4;
+            this.txtDisplay.Tag = "Display";
             // 
             // ImportAttributeControl
             // 
@@ -80,8 +82,6 @@
             this.Controls.Add(this.txtName);
             this.Controls.Add(this.lblName);
             this.Name = "ImportAttributeControl";
-            this.Size = new System.Drawing.Size(450, 150);
-            this.Leave += new System.EventHandler(this.ImportAttributeControl_Leave);
             this.ResumeLayout(false);
             this.PerformLayout();
 
