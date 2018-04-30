@@ -135,9 +135,7 @@ namespace Innofactor.Crm.Shuffle.Builder.AppCode
         {
 
             tree.addMenu.Items.Clear();
-            var tmplbl = tree.lblQAExpander;
-            tree.gbQuickActions.Controls.Clear();
-            tree.gbQuickActions.Controls.Add(tmplbl);
+            tree.gbNodeQuickActions.Controls.Clear();
             if (node == null && tree.tvDefinition.Nodes.Count > 0)
             {
                 node = tree.tvDefinition.Nodes[0];
@@ -181,13 +179,13 @@ namespace Innofactor.Crm.Shuffle.Builder.AppCode
             var link = new LinkLabel();
             link.AutoSize = true;
             link.Dock = alignright ? DockStyle.Right : DockStyle.Left;
-            link.TabIndex = tree.gbQuickActions.Controls.Count;
+            link.TabIndex = tree.gbNodeQuickActions.Controls.Count;
             link.TabStop = true;
             link.Text = name;
             link.Tag = tag ?? name;
             link.LinkBehavior = LinkBehavior.HoverUnderline;
             link.LinkClicked += tree.QuickActionLink_LinkClicked;
-            tree.gbQuickActions.Controls.Add(link);
+            tree.gbNodeQuickActions.Controls.Add(link);
             if (!alignright)
             {
                 link.BringToFront();
@@ -252,6 +250,19 @@ namespace Innofactor.Crm.Shuffle.Builder.AppCode
                 else
                 {
                     parentNode.Nodes.Insert(pos, childNode);
+                }
+                if (parentNode.Name == "DataBlock")
+                {
+                    if (name == "Export")
+                    {
+                        var attributesNode = AddChildNode(childNode, "Attributes");
+                        AddChildNode(attributesNode, "Attribute");
+                    }
+                    else if (name == "Import")
+                    {
+                        var matchNode = AddChildNode(childNode, "Match");
+                        AddChildNode(matchNode, "Attribute");
+                    }
                 }
             }
             return childNode;
