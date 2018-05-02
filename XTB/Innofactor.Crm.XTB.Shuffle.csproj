@@ -120,12 +120,19 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Builder\AppCode\IComboBoxItem.cs" />
+    <Compile Include="Builder\AppCode\MetadataHelper.cs" />
     <Compile Include="Builder\AppCode\TreeNodeCapabilities.cs" />
     <Compile Include="Builder\Controls\ControlBase.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Builder\Controls\ControlBase.Designer.cs">
       <DependentUpon>ControlBase.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Builder\Controls\FetchControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Builder\Controls\FetchControl.Designer.cs">
+      <DependentUpon>FetchControl.cs</DependentUpon>
     </Compile>
     <Compile Include="Builder\DefinitionNodeCapabilities.cs" />
     <Compile Include="Builder\XMLViewer\CharacterEncoder.cs" />
@@ -273,6 +280,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Builder\Controls\ExportAttributeControl.resx">
       <DependentUpon>ExportAttributeControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Builder\Controls\FetchControl.resx">
+      <DependentUpon>FetchControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Builder\Controls\FilterControl.resx">
       <DependentUpon>FilterControl.cs</DependentUpon>

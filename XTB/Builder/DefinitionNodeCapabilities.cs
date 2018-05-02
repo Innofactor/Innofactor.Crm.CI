@@ -4,6 +4,7 @@
 // BLOG: http://mscrmtools.blogspot.com
 
 using Cinteros.Xrm.XmlEditorUtils;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace Innofactor.Crm.Shuffle.Builder.AppCode
@@ -39,9 +40,17 @@ namespace Innofactor.Crm.Shuffle.Builder.AppCode
                 case "export":
                     if (node.Parent.Name.ToLowerInvariant().StartsWith("datablock"))
                     {
-                        ChildTypes.Add(new ChildNodeCapabilities("Attributes", false));
-                        ChildTypes.Add(new ChildNodeCapabilities("Filter", true));
-                        ChildTypes.Add(new ChildNodeCapabilities("Sort", true));
+                        if (!node.Nodes.Cast<TreeNode>().Any(n => n.Name == "FetchXML"))
+                        {
+                            ChildTypes.Add(new ChildNodeCapabilities("Attributes", false));
+                            ChildTypes.Add(new ChildNodeCapabilities("Filter", true));
+                            ChildTypes.Add(new ChildNodeCapabilities("Sort", true));
+                        }
+                        if (node.Nodes.Count == 0)
+                        {
+                            ChildTypes.Add(new ChildNodeCapabilities("-", false));
+                            ChildTypes.Add(new ChildNodeCapabilities("FetchXML", false));
+                        }
                     }
                     else if (node.Parent.Name.ToLowerInvariant().StartsWith("solutionblock"))
                     {
@@ -59,7 +68,7 @@ namespace Innofactor.Crm.Shuffle.Builder.AppCode
                     }
                     break;
                 case "attributes":
-                    Delete = false;
+                    //Delete = false;
                     ChildTypes.Add(new ChildNodeCapabilities("Attribute", true));
                     break;
                 case "match":

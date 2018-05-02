@@ -149,6 +149,7 @@ namespace Innofactor.Crm.Shuffle.Builder.AppCode
                     if (childcapability.Name == "-")
                     {
                         tree.addMenu.Items.Add(new ToolStripSeparator());
+                        AddLinkSeparator(tree);
                     }
                     else if (childcapability.Multiple || !node.Nodes.ContainsKey(childcapability.Name))
                     {
@@ -173,6 +174,16 @@ namespace Innofactor.Crm.Shuffle.Builder.AppCode
                 node.ContextMenuStrip = tree.nodeMenu;
             }
             return;
+        }
+
+        private static void AddLinkSeparator(ShuffleBuilder tree)
+        {
+            var sep = new Label();
+            sep.AutoSize = true;
+            sep.Dock = DockStyle.Left;
+            sep.Text = "|";
+            tree.gbNodeQuickActions.Controls.Add(sep);
+            sep.BringToFront();
         }
 
         private static void AddLinkFromCapability(ShuffleBuilder tree, string name, string tag = null, bool alignright = false)
@@ -264,8 +275,8 @@ namespace Innofactor.Crm.Shuffle.Builder.AppCode
                 {
                     if (name == "Export")
                     {
-                        var attributesNode = AddChildNode(childNode, "Attributes");
-                        AddChildNode(attributesNode, "Attribute");
+                        //var attributesNode = AddChildNode(childNode, "Attributes");
+                        //AddChildNode(attributesNode, "Attribute");
                     }
                     else if (name == "Import")
                     {

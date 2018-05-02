@@ -24,9 +24,14 @@ namespace Innofactor.Crm.Shuffle.Builder.Controls
 
         #region Public Constructors
 
-        public ControlBase(Dictionary<string, string> collection, ShuffleBuilder shuffleBuilder)
+        public ControlBase()
         {
             InitializeComponent();
+        }
+
+        public ControlBase(Dictionary<string, string> collection, ShuffleBuilder shuffleBuilder)
+            : this()
+        {
             this.shuffleBuilder = shuffleBuilder;
             if (collection != null)
             {
@@ -64,6 +69,7 @@ namespace Innofactor.Crm.Shuffle.Builder.Controls
         public virtual void PopulateControls()
         {
             // Nothing in base class, but possible to override
+            FillControls();
         }
 
         public virtual void Save()
@@ -152,7 +158,6 @@ namespace Innofactor.Crm.Shuffle.Builder.Controls
         private void ControlBase_Load(object sender, EventArgs e)
         {
             PopulateControls();
-            FillControls();
         }
 
         private string ControlsChecksum()
