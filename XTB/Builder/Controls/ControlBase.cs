@@ -132,6 +132,10 @@ namespace Innofactor.Crm.Shuffle.Builder.Controls
             {
                 result = ((TextBox)control).Text;
             }
+            else if (control is RichTextBox)
+            {
+                result = ((RichTextBox)control).Text;
+            }
             else if (control is ComboBox)
             {
                 var item = ((ComboBox)control).SelectedItem;
