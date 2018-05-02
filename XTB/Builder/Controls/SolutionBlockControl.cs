@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using Cinteros.Crm.Utils.Slim;
+using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace Innofactor.Crm.Shuffle.Builder.Controls
@@ -19,20 +21,26 @@ namespace Innofactor.Crm.Shuffle.Builder.Controls
 
         public override void PopulateControls()
         {
-            cmbName.Items.Clear();
-            if (shuffleBuilder.Solutions != null && shuffleBuilder.Solutions.Count > 0)
+            if (shuffleBuilder.Solutions == null)
             {
-                //cmbName.Items.AddRange(shuffleBuilder.Solutions.ToArray());
-                foreach (var solution in shuffleBuilder.Solutions)
-                {
-                    cmbName.Items.Add(solution.Property("uniquename", "-"));
-                }
+                shuffleBuilder.LoadSolutions(PopulateControls);
+                return;
+            }
+            cmbName.Items.Clear();
+            cmbName.Items.AddRange(shuffleBuilder.Solutions.Entities
+                .Select(s => s.Property("uniquename", string.Empty))
+                .Where(s => !string.IsNullOrEmpty(s))
+                .OrderBy(s => s)
+                .ToArray());
+            if (cmbName.Items.Count > 0)
+            {
                 cmbName.DropDownStyle = ComboBoxStyle.DropDown;
             }
             else
             {
                 cmbName.DropDownStyle = ComboBoxStyle.Simple;
             }
+            base.PopulateControls();
         }
     }
 }

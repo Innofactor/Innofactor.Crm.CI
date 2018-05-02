@@ -37,6 +37,7 @@ namespace Innofactor.Crm.Shuffle.Builder.Controls
                 }
                 i++;
             }
+            base.PopulateControls();
         }
     }
 }

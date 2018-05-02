@@ -3,10 +3,13 @@ using Cinteros.Crm.Utils.Shuffle;
 using Innofactor.Crm.Shuffle.Builder.AppCode;
 using Innofactor.Crm.Shuffle.Builder.Controls;
 using Innofactor.Crm.Shuffle.Builder.Forms;
+using Microsoft.Xrm.Sdk;
+using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Metadata;
 using Microsoft.Xrm.Sdk.Query;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
 using System.Xml;
 using System.Xml.Linq;
@@ -20,18 +23,21 @@ namespace Innofactor.Crm.Shuffle.Builder
     public partial class ShuffleBuilder : PluginControlBase, IMessageBusHost, IGitHubPlugin, IStatusBarMessenger
     {
         internal Clipboard clipboard = new Clipboard();
-        private XmlDocument definitionDoc;
         private string fileName;
         private static string definitionTemplate = "<ShuffleDefinition><Blocks></Blocks></ShuffleDefinition>";
+
         private bool working = false;
         private bool buttonsEnabled = true;
+        private List<EntityMetadata> entities = null;
+        private Dictionary<string, List<AttributeMetadata>> attributes = null;
+        private EntityCollection solutions = null;
 
         public event EventHandler<MessageBusEventArgs> OnOutgoingMessage;
         public event EventHandler<StatusBarMessageEventArgs> SendMessageToStatusBar;
 
-        public List<EntityMetadata> Entities { get; } = null;
-
-        public CintDynEntityCollection Solutions { get; private set; } = null;
+        public List<EntityMetadata> Entities => entities;
+        public Dictionary<string, List<AttributeMetadata>> Attributes => attributes;
+        public EntityCollection Solutions => solutions;
 
         public string RepositoryName => "Innofactor.Crm.CI";
 
@@ -44,16 +50,17 @@ namespace Innofactor.Crm.Shuffle.Builder
 
         private void ShuffleBuilder_ConnectionUpdated(object sender, ConnectionUpdatedEventArgs e)
         {
-            GetSolutions();
+            solutions = null;
+            entities = null;
         }
 
         #region Event handlers
 
         private void toolStripButtonNew_Click(object sender, EventArgs e)
         {
-            definitionDoc = new XmlDocument();
-            definitionDoc.LoadXml(definitionTemplate);
-            DisplayDefinition();
+            var doc = new XmlDocument();
+            doc.LoadXml(definitionTemplate);
+            DisplayDefinition(doc);
         }
 
         private void toolStripButtonOpen_Click(object sender, EventArgs e)
@@ -68,12 +75,12 @@ namespace Innofactor.Crm.Shuffle.Builder
             {
                 EnableControls(false);
 
-                definitionDoc = new XmlDocument();
-                definitionDoc.Load(ofd.FileName);
+                var doc = new XmlDocument();
+                doc.Load(ofd.FileName);
 
-                if (definitionDoc.DocumentElement.Name != "ShuffleDefinition" ||
-                    definitionDoc.DocumentElement.ChildNodes.Count > 0 &&
-                    definitionDoc.DocumentElement.ChildNodes[0].Name == "ShuffleDefinition")
+                if (doc.DocumentElement.Name != "ShuffleDefinition" ||
+                    doc.DocumentElement.ChildNodes.Count > 0 &&
+                    doc.DocumentElement.ChildNodes[0].Name == "ShuffleDefinition")
                 {
                     MessageBox.Show(this, "Invalid Xml: Definition XML root must be ShuffleDefinition!", "Error",
                                     MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -83,7 +90,7 @@ namespace Innofactor.Crm.Shuffle.Builder
                 else
                 {
                     fileName = ofd.FileName;
-                    DisplayDefinition();
+                    DisplayDefinition(doc);
                     EnableControls(true);
                 }
             }
@@ -99,6 +106,12 @@ namespace Innofactor.Crm.Shuffle.Builder
 
         private void toolStripButtonSave_Click(object sender, EventArgs e)
         {
+            if (!BuildAndValidateXml() &&
+                MessageBox.Show("Save anyway?", "Shuffle Builder", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+            {
+                return;
+            }
+
             var sfd = new SaveFileDialog
             {
                 Title = "Select a location to save the SiteMap as a Xml file",
@@ -110,16 +123,9 @@ namespace Innofactor.Crm.Shuffle.Builder
             {
                 fileName = sfd.FileName;
                 EnableControls(false);
-
-                if (BuildAndValidateXml())
-                {
-                    definitionDoc.Save(fileName);
-                    MessageBox.Show(this, "ShuffleDefinition saved!", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
-                else if (MessageBox.Show("Save anyway?", "Shuffle Builder", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
-                {
-                    definitionDoc.Save(fileName);
-                }
+                var doc = GetDefinitionDocument();
+                doc.Save(fileName);
+                MessageBox.Show(this, "ShuffleDefinition saved!", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 EnableControls(true);
             }
         }
@@ -173,11 +179,11 @@ namespace Innofactor.Crm.Shuffle.Builder
         /// <summary>
         ///     Loads the Definition from the extracted Xml solution files
         /// </summary>
-        private void DisplayDefinition()
+        private void DisplayDefinition(XmlDocument doc)
         {
             XmlNode definitionXmlNode = null;
 
-            MethodInvoker miReadDefinition = delegate { definitionXmlNode = definitionDoc.DocumentElement; };
+            MethodInvoker miReadDefinition = delegate { definitionXmlNode = doc.DocumentElement; };
 
             if (InvokeRequired)
                 Invoke(miReadDefinition);
@@ -249,6 +255,10 @@ namespace Innofactor.Crm.Shuffle.Builder
                 }
                 catch (Exception ex)
                 {
+                    if (string.IsNullOrEmpty(result))
+                    {
+                        result = ex.Message;
+                    }
                     MessageBox.Show(ex.Message);
                 }
             }
@@ -311,6 +321,10 @@ namespace Innofactor.Crm.Shuffle.Builder
         /// <param name="e"></param>
         internal void CtrlSaved(object sender, SaveEventArgs e)
         {
+            if (tvDefinition.SelectedNode == null)
+            {
+                return;
+            }
             tvDefinition.SelectedNode.Tag = e.AttributeCollection;
             TreeNodeHelper.SetNodeText(tvDefinition.SelectedNode);
             UpdateLiveXML();
@@ -396,43 +410,88 @@ namespace Innofactor.Crm.Shuffle.Builder
             CloseTool();
         }
 
-        private void GetSolutions()
+        internal void LoadSolutions(Action callback)
         {
-            if (Service == null)
+            WorkAsync(new WorkAsyncInfo
             {
-                return;
-            }
-            if (working)
-            {
-                return;
-            }
-            working = true;
-            WorkAsync(new WorkAsyncInfo("Loading solutions",
-                (eventargs) =>
+                Message = "Loading solutions",
+                Work = (worker, args) =>
                 {
-                    var svc = new CrmServiceProxy(Service);
-                    var log = new PluginLogger("ShuffleBuilder", true, "");
-                    try
-                    {
-                        Solutions = CintDynEntity.RetrieveMultiple(svc, "solution",
-                            new string[] { "isvisible", "ismanaged" },
-                            new object[] { true, false },
-                            new ColumnSet("solutionid", "uniquename", "friendlyname", "version"), log);
-                    }
-                    finally
-                    {
-                        log.CloseLog();
-                    }
-                })
-            {
-                PostWorkCallBack =
-                (completedargs) =>
+                    var qry = new QueryByAttribute("solution");
+                    qry.AddAttributeValue("isvisible", true);
+                    qry.AddAttributeValue("ismanaged", false);
+                    qry.ColumnSet = new ColumnSet("solutionid", "uniquename", "friendlyname", "version");
+                    args.Result = Service.RetrieveMultiple(qry);
+                },
+                PostWorkCallBack = (args) =>
                 {
-                    if (completedargs.Error != null)
+                    if (args.Error != null)
                     {
-                        MessageBox.Show(completedargs.Error.Message);
+                        MessageBox.Show(args.Error.Message);
                     }
-                    working = false;
+                    else if (args.Result is EntityCollection solutions)
+                    {
+                        this.solutions = solutions;
+                        callback?.Invoke();
+                    }
+                }
+            });
+        }
+
+        internal void LoadEntities(Action callback)
+        {
+            WorkAsync(new WorkAsyncInfo
+            {
+                Message = "Loading entities",
+                Work = (worker, args) =>
+                {
+                    args.Result = MetadataHelper.LoadEntities(Service, ConnectionDetail.OrganizationMajorVersion);
+                },
+                PostWorkCallBack = (args) =>
+                {
+                    if (args.Error != null)
+                    {
+                        MessageBox.Show(args.Error.Message);
+                    }
+                    else if (args.Result is RetrieveMetadataChangesResponse resp)
+                    {
+                        entities = resp.EntityMetadata.ToList();
+                        callback?.Invoke();
+                    }
+                }
+            });
+        }
+
+        internal void LoadAttributes(string entity, Action callback)
+        {
+            WorkAsync(new WorkAsyncInfo
+            {
+                Message = $"Loading attributes for {entity}",
+                Work = (worker, args) =>
+                {
+                    args.Result = MetadataHelper.LoadEntityDetails(Service, entity);
+                },
+                PostWorkCallBack = (args) =>
+                {
+                    if (args.Error != null)
+                    {
+                        MessageBox.Show(args.Error.Message);
+                    }
+                    else if (args.Result is RetrieveMetadataChangesResponse resp &&
+                        resp.EntityMetadata.Count > 0 &&
+                        resp.EntityMetadata[0] is EntityMetadata entitymeta)
+                    {
+                        if (attributes == null)
+                        {
+                            attributes = new Dictionary<string, List<AttributeMetadata>>();
+                        }
+                        if (attributes.ContainsKey(entity))
+                        {
+                            attributes.Remove(entity);
+                        }
+                        attributes.Add(entity, entitymeta.Attributes.ToList());
+                        callback?.Invoke();
+                    }
                 }
             });
         }
@@ -453,7 +512,6 @@ namespace Innofactor.Crm.Shuffle.Builder
                 }
 
                 UserControl ctrl = null;
-                Control existingControl = panelContainer.Controls.Count > 0 ? panelContainer.Controls[0] : null;
                 if (node != null)
                 {
                     TreeNodeHelper.AddContextMenu(node, this);
@@ -466,7 +524,7 @@ namespace Innofactor.Crm.Shuffle.Builder
                             ctrl = new ShuffleDefinitionControl(collec, this);
                             break;
                         case "DataBlock":
-                            ctrl = new DataBlockControl(collec, this);
+                            ctrl = new DataBlockControl(collec, this, Entities);
                             break;
                         case "SolutionBlock":
                             ctrl = new SolutionBlockControl(collec, this);
@@ -497,15 +555,32 @@ namespace Innofactor.Crm.Shuffle.Builder
                             break;
 
                         case "Attribute":
-                            if (node.Parent != null && node.Parent.Text.StartsWith("Attributes"))
                             {
-                                ctrl = new ExportAttributeControl(collec, this);
+                                if (node.Parent?.Name == "Attributes" &&
+                                    node.Parent?.Parent?.Parent?.Tag is Dictionary<string, string> entityprops &&
+                                    entityprops.ContainsKey("Entity") &&
+                                    entityprops["Entity"] is string entity &&
+                                    !string.IsNullOrWhiteSpace(entity))
+                                {
+                                    ctrl = new ExportAttributeControl(collec, this, entity);
+                                }
+                                else if (node.Parent != null && node.Parent.Text.StartsWith("Match"))
+                                {
+                                    ctrl = new ImportAttributeControl(collec, this);
+                                }
+                                break;
                             }
-                            else if (node.Parent != null && node.Parent.Text.StartsWith("Match"))
+                        case "FetchXML":
                             {
-                                ctrl = new ImportAttributeControl(collec, this);
+                                if (node.Parent.Parent.Tag is Dictionary<string, string> entityprops &&
+                                    entityprops.ContainsKey("Entity") &&
+                                    entityprops["Entity"] is string entity &&
+                                    !string.IsNullOrWhiteSpace(entity))
+                                {
+                                    ctrl = new FetchControl(collec, this, entity);
+                                }
+                                break;
                             }
-                            break;
                         case "Filter":
                             ctrl = new FilterControl(collec, this);
                             break;
@@ -536,6 +611,7 @@ namespace Innofactor.Crm.Shuffle.Builder
                             break;
                     }
                 }
+                var existingControl = panelContainer.Controls.Count > 0 ? panelContainer.Controls[0] : null;
                 if (ctrl != null)
                 {
                     panelContainer.Controls.Add(ctrl);
