@@ -30,8 +30,8 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ShuffleBuilder));
-            CSRichTextBoxSyntaxHighlighting.XMLViewerSettings xmlViewerSettings1 = new CSRichTextBoxSyntaxHighlighting.XMLViewerSettings();
-            CSRichTextBoxSyntaxHighlighting.XMLViewerSettings xmlViewerSettings2 = new CSRichTextBoxSyntaxHighlighting.XMLViewerSettings();
+            CSRichTextBoxSyntaxHighlighting.XMLViewerSettings xmlViewerSettings3 = new CSRichTextBoxSyntaxHighlighting.XMLViewerSettings();
+            CSRichTextBoxSyntaxHighlighting.XMLViewerSettings xmlViewerSettings4 = new CSRichTextBoxSyntaxHighlighting.XMLViewerSettings();
             this.treeviewMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.addRuleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
@@ -59,9 +59,7 @@
             this.gbTree = new System.Windows.Forms.GroupBox();
             this.splitContainerProperties = new System.Windows.Forms.SplitContainer();
             this.gbNodeXML = new System.Windows.Forms.GroupBox();
-            this.txtPropertyXml = new CSRichTextBoxSyntaxHighlighting.XMLViewer();
             this.gbDefinitionXML = new System.Windows.Forms.GroupBox();
-            this.txtXML = new CSRichTextBoxSyntaxHighlighting.XMLViewer();
             this.nodeMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
@@ -74,6 +72,8 @@
             this.cutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.copyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pasteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.txtPropertyXml = new CSRichTextBoxSyntaxHighlighting.XMLViewer();
+            this.txtXML = new CSRichTextBoxSyntaxHighlighting.XMLViewer();
             this.treeviewMenuStrip.SuspendLayout();
             this.toolStripMain.SuspendLayout();
             this.panProperties.SuspendLayout();
@@ -121,7 +121,7 @@
             // 
             // toolStripMain
             // 
-            this.toolStripMain.AutoSize = false;
+            this.toolStripMain.ImageScalingSize = new System.Drawing.Size(24, 24);
             this.toolStripMain.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.tsbCloseThisTab,
             this.toolStripSeparator2,
@@ -134,7 +134,7 @@
             this.toolStripButtonRunit});
             this.toolStripMain.Location = new System.Drawing.Point(0, 0);
             this.toolStripMain.Name = "toolStripMain";
-            this.toolStripMain.Size = new System.Drawing.Size(914, 25);
+            this.toolStripMain.Size = new System.Drawing.Size(928, 31);
             this.toolStripMain.TabIndex = 21;
             this.toolStripMain.Text = "toolStrip1";
             // 
@@ -144,26 +144,26 @@
             this.tsbCloseThisTab.Image = ((System.Drawing.Image)(resources.GetObject("tsbCloseThisTab.Image")));
             this.tsbCloseThisTab.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsbCloseThisTab.Name = "tsbCloseThisTab";
-            this.tsbCloseThisTab.Size = new System.Drawing.Size(23, 22);
+            this.tsbCloseThisTab.Size = new System.Drawing.Size(28, 28);
             this.tsbCloseThisTab.Text = "Close this tab";
             this.tsbCloseThisTab.Click += new System.EventHandler(this.tsbCloseThisTab_Click);
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 25);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 31);
             // 
             // toolStripSeparator3
             // 
             this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(6, 25);
+            this.toolStripSeparator3.Size = new System.Drawing.Size(6, 31);
             // 
             // toolStripButtonNew
             // 
             this.toolStripButtonNew.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButtonNew.Image")));
             this.toolStripButtonNew.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripButtonNew.Name = "toolStripButtonNew";
-            this.toolStripButtonNew.Size = new System.Drawing.Size(51, 22);
+            this.toolStripButtonNew.Size = new System.Drawing.Size(59, 28);
             this.toolStripButtonNew.Text = "New";
             this.toolStripButtonNew.ToolTipText = "New ShuffleDefinition";
             this.toolStripButtonNew.Click += new System.EventHandler(this.toolStripButtonNew_Click);
@@ -173,7 +173,7 @@
             this.toolStripButtonOpen.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButtonOpen.Image")));
             this.toolStripButtonOpen.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripButtonOpen.Name = "toolStripButtonOpen";
-            this.toolStripButtonOpen.Size = new System.Drawing.Size(56, 22);
+            this.toolStripButtonOpen.Size = new System.Drawing.Size(64, 28);
             this.toolStripButtonOpen.Text = "Open";
             this.toolStripButtonOpen.ToolTipText = "Open ShuffleDefinition";
             this.toolStripButtonOpen.Click += new System.EventHandler(this.toolStripButtonOpen_Click);
@@ -181,14 +181,14 @@
             // toolStripSeparator4
             // 
             this.toolStripSeparator4.Name = "toolStripSeparator4";
-            this.toolStripSeparator4.Size = new System.Drawing.Size(6, 25);
+            this.toolStripSeparator4.Size = new System.Drawing.Size(6, 31);
             // 
             // toolStripButtonValidate
             // 
             this.toolStripButtonValidate.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButtonValidate.Image")));
             this.toolStripButtonValidate.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripButtonValidate.Name = "toolStripButtonValidate";
-            this.toolStripButtonValidate.Size = new System.Drawing.Size(68, 22);
+            this.toolStripButtonValidate.Size = new System.Drawing.Size(76, 28);
             this.toolStripButtonValidate.Text = "Validate";
             this.toolStripButtonValidate.Click += new System.EventHandler(this.toolStripButtonValidate_Click);
             // 
@@ -198,7 +198,7 @@
             this.toolStripButtonSave.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButtonSave.Image")));
             this.toolStripButtonSave.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripButtonSave.Name = "toolStripButtonSave";
-            this.toolStripButtonSave.Size = new System.Drawing.Size(51, 22);
+            this.toolStripButtonSave.Size = new System.Drawing.Size(59, 28);
             this.toolStripButtonSave.Text = "Save";
             this.toolStripButtonSave.ToolTipText = "Save ShuffleDefinition";
             this.toolStripButtonSave.Click += new System.EventHandler(this.toolStripButtonSave_Click);
@@ -209,7 +209,7 @@
             this.toolStripButtonRunit.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButtonRunit.Image")));
             this.toolStripButtonRunit.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripButtonRunit.Name = "toolStripButtonRunit";
-            this.toolStripButtonRunit.Size = new System.Drawing.Size(105, 22);
+            this.toolStripButtonRunit.Size = new System.Drawing.Size(113, 28);
             this.toolStripButtonRunit.Text = "Do the Shuffle!";
             this.toolStripButtonRunit.Click += new System.EventHandler(this.toolStripButtonRunit_Click);
             // 
@@ -222,7 +222,7 @@
             this.tvDefinition.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.tvDefinition.Name = "tvDefinition";
             this.tvDefinition.ShowNodeToolTips = true;
-            this.tvDefinition.Size = new System.Drawing.Size(277, 610);
+            this.tvDefinition.Size = new System.Drawing.Size(277, 574);
             this.tvDefinition.TabIndex = 0;
             this.tvDefinition.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.tvDefinition_AfterSelect);
             this.tvDefinition.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.tvDefinitionNodeMouseClick);
@@ -234,7 +234,7 @@
             this.panProperties.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panProperties.Location = new System.Drawing.Point(0, 55);
             this.panProperties.Name = "panProperties";
-            this.panProperties.Size = new System.Drawing.Size(351, 247);
+            this.panProperties.Size = new System.Drawing.Size(365, 303);
             this.panProperties.TabIndex = 36;
             // 
             // gbNodeProperties
@@ -248,7 +248,7 @@
             this.gbNodeProperties.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.gbNodeProperties.Name = "gbNodeProperties";
             this.gbNodeProperties.Padding = new System.Windows.Forms.Padding(2, 3, 2, 3);
-            this.gbNodeProperties.Size = new System.Drawing.Size(353, 241);
+            this.gbNodeProperties.Size = new System.Drawing.Size(367, 297);
             this.gbNodeProperties.TabIndex = 34;
             this.gbNodeProperties.TabStop = false;
             this.gbNodeProperties.Text = "Node Properties";
@@ -260,7 +260,7 @@
             this.panelContainer.Location = new System.Drawing.Point(2, 16);
             this.panelContainer.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.panelContainer.Name = "panelContainer";
-            this.panelContainer.Size = new System.Drawing.Size(349, 222);
+            this.panelContainer.Size = new System.Drawing.Size(363, 278);
             this.panelContainer.TabIndex = 14;
             // 
             // panQuickActions
@@ -271,7 +271,7 @@
             this.panQuickActions.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.panQuickActions.Name = "panQuickActions";
             this.panQuickActions.Padding = new System.Windows.Forms.Padding(0, 8, 0, 4);
-            this.panQuickActions.Size = new System.Drawing.Size(351, 55);
+            this.panQuickActions.Size = new System.Drawing.Size(365, 55);
             this.panQuickActions.TabIndex = 17;
             // 
             // gbNodeQuickActions
@@ -282,7 +282,7 @@
             this.gbNodeQuickActions.Location = new System.Drawing.Point(-1, 8);
             this.gbNodeQuickActions.Name = "gbNodeQuickActions";
             this.gbNodeQuickActions.Padding = new System.Windows.Forms.Padding(8, 6, 3, 3);
-            this.gbNodeQuickActions.Size = new System.Drawing.Size(353, 49);
+            this.gbNodeQuickActions.Size = new System.Drawing.Size(367, 49);
             this.gbNodeQuickActions.TabIndex = 19;
             this.gbNodeQuickActions.TabStop = false;
             this.gbNodeQuickActions.Text = "Quick Actions";
@@ -315,7 +315,8 @@
             // 
             this.splitContainerForm.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.splitContainerForm.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitContainerForm.Location = new System.Drawing.Point(0, 25);
+            this.splitContainerForm.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
+            this.splitContainerForm.Location = new System.Drawing.Point(0, 31);
             this.splitContainerForm.Name = "splitContainerForm";
             // 
             // splitContainerForm.Panel1
@@ -325,8 +326,8 @@
             // splitContainerForm.Panel2
             // 
             this.splitContainerForm.Panel2.Controls.Add(this.gbDefinitionXML);
-            this.splitContainerForm.Size = new System.Drawing.Size(914, 637);
-            this.splitContainerForm.SplitterDistance = 644;
+            this.splitContainerForm.Size = new System.Drawing.Size(928, 601);
+            this.splitContainerForm.SplitterDistance = 658;
             this.splitContainerForm.SplitterWidth = 8;
             this.splitContainerForm.TabIndex = 26;
             // 
@@ -334,6 +335,7 @@
             // 
             this.splitContainerBuilder.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.splitContainerBuilder.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainerBuilder.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
             this.splitContainerBuilder.Location = new System.Drawing.Point(0, 0);
             this.splitContainerBuilder.Name = "splitContainerBuilder";
             // 
@@ -344,7 +346,7 @@
             // splitContainerBuilder.Panel2
             // 
             this.splitContainerBuilder.Panel2.Controls.Add(this.splitContainerProperties);
-            this.splitContainerBuilder.Size = new System.Drawing.Size(644, 637);
+            this.splitContainerBuilder.Size = new System.Drawing.Size(658, 601);
             this.splitContainerBuilder.SplitterDistance = 283;
             this.splitContainerBuilder.SplitterWidth = 8;
             this.splitContainerBuilder.TabIndex = 26;
@@ -357,7 +359,7 @@
             this.gbTree.Controls.Add(this.tvDefinition);
             this.gbTree.Location = new System.Drawing.Point(-1, 8);
             this.gbTree.Name = "gbTree";
-            this.gbTree.Size = new System.Drawing.Size(283, 629);
+            this.gbTree.Size = new System.Drawing.Size(283, 593);
             this.gbTree.TabIndex = 0;
             this.gbTree.TabStop = false;
             this.gbTree.Text = "Shuffle Definition";
@@ -366,6 +368,7 @@
             // 
             this.splitContainerProperties.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.splitContainerProperties.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainerProperties.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
             this.splitContainerProperties.Location = new System.Drawing.Point(0, 0);
             this.splitContainerProperties.Name = "splitContainerProperties";
             this.splitContainerProperties.Orientation = System.Windows.Forms.Orientation.Horizontal;
@@ -378,8 +381,8 @@
             // splitContainerProperties.Panel2
             // 
             this.splitContainerProperties.Panel2.Controls.Add(this.gbNodeXML);
-            this.splitContainerProperties.Size = new System.Drawing.Size(353, 637);
-            this.splitContainerProperties.SplitterDistance = 304;
+            this.splitContainerProperties.Size = new System.Drawing.Size(367, 601);
+            this.splitContainerProperties.SplitterDistance = 360;
             this.splitContainerProperties.SplitterWidth = 8;
             this.splitContainerProperties.TabIndex = 0;
             // 
@@ -394,31 +397,10 @@
             this.gbNodeXML.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.gbNodeXML.Name = "gbNodeXML";
             this.gbNodeXML.Padding = new System.Windows.Forms.Padding(2, 3, 2, 3);
-            this.gbNodeXML.Size = new System.Drawing.Size(353, 308);
+            this.gbNodeXML.Size = new System.Drawing.Size(367, 216);
             this.gbNodeXML.TabIndex = 35;
             this.gbNodeXML.TabStop = false;
             this.gbNodeXML.Text = "Node XML";
-            // 
-            // txtPropertyXml
-            // 
-            this.txtPropertyXml.BackColor = System.Drawing.SystemColors.Window;
-            this.txtPropertyXml.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.txtPropertyXml.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.txtPropertyXml.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtPropertyXml.Location = new System.Drawing.Point(2, 16);
-            this.txtPropertyXml.Name = "txtPropertyXml";
-            this.txtPropertyXml.ReadOnly = true;
-            xmlViewerSettings1.AttributeKey = System.Drawing.Color.Red;
-            xmlViewerSettings1.AttributeValue = System.Drawing.Color.Blue;
-            xmlViewerSettings1.Comment = System.Drawing.Color.Green;
-            xmlViewerSettings1.Element = System.Drawing.Color.DarkRed;
-            xmlViewerSettings1.QuoteCharacter = '\"';
-            xmlViewerSettings1.Tag = System.Drawing.Color.Blue;
-            xmlViewerSettings1.Value = System.Drawing.Color.Black;
-            this.txtPropertyXml.Settings = xmlViewerSettings1;
-            this.txtPropertyXml.Size = new System.Drawing.Size(349, 289);
-            this.txtPropertyXml.TabIndex = 1;
-            this.txtPropertyXml.Text = "";
             // 
             // gbDefinitionXML
             // 
@@ -428,31 +410,10 @@
             this.gbDefinitionXML.Controls.Add(this.txtXML);
             this.gbDefinitionXML.Location = new System.Drawing.Point(-1, 8);
             this.gbDefinitionXML.Name = "gbDefinitionXML";
-            this.gbDefinitionXML.Size = new System.Drawing.Size(254, 628);
+            this.gbDefinitionXML.Size = new System.Drawing.Size(254, 592);
             this.gbDefinitionXML.TabIndex = 1;
             this.gbDefinitionXML.TabStop = false;
             this.gbDefinitionXML.Text = "Shuffle Definition XML";
-            // 
-            // txtXML
-            // 
-            this.txtXML.BackColor = System.Drawing.SystemColors.Window;
-            this.txtXML.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.txtXML.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.txtXML.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtXML.Location = new System.Drawing.Point(3, 16);
-            this.txtXML.Name = "txtXML";
-            this.txtXML.ReadOnly = true;
-            xmlViewerSettings2.AttributeKey = System.Drawing.Color.Red;
-            xmlViewerSettings2.AttributeValue = System.Drawing.Color.Blue;
-            xmlViewerSettings2.Comment = System.Drawing.Color.Green;
-            xmlViewerSettings2.Element = System.Drawing.Color.DarkRed;
-            xmlViewerSettings2.QuoteCharacter = '\"';
-            xmlViewerSettings2.Tag = System.Drawing.Color.Blue;
-            xmlViewerSettings2.Value = System.Drawing.Color.Black;
-            this.txtXML.Settings = xmlViewerSettings2;
-            this.txtXML.Size = new System.Drawing.Size(248, 609);
-            this.txtXML.TabIndex = 0;
-            this.txtXML.Text = "";
             // 
             // nodeMenu
             // 
@@ -470,7 +431,7 @@
             this.copyToolStripMenuItem,
             this.pasteToolStripMenuItem});
             this.nodeMenu.Name = "nodeMenu";
-            this.nodeMenu.Size = new System.Drawing.Size(203, 242);
+            this.nodeMenu.Size = new System.Drawing.Size(203, 220);
             this.nodeMenu.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.NodeMenuItemClicked);
             // 
             // deleteToolStripMenuItem
@@ -553,6 +514,48 @@
             this.pasteToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
             this.pasteToolStripMenuItem.Text = "Paste";
             // 
+            // txtPropertyXml
+            // 
+            this.txtPropertyXml.BackColor = System.Drawing.SystemColors.Window;
+            this.txtPropertyXml.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.txtPropertyXml.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.txtPropertyXml.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtPropertyXml.Location = new System.Drawing.Point(2, 16);
+            this.txtPropertyXml.Name = "txtPropertyXml";
+            this.txtPropertyXml.ReadOnly = true;
+            xmlViewerSettings3.AttributeKey = System.Drawing.Color.Red;
+            xmlViewerSettings3.AttributeValue = System.Drawing.Color.Blue;
+            xmlViewerSettings3.Comment = System.Drawing.Color.Green;
+            xmlViewerSettings3.Element = System.Drawing.Color.DarkRed;
+            xmlViewerSettings3.QuoteCharacter = '\"';
+            xmlViewerSettings3.Tag = System.Drawing.Color.Blue;
+            xmlViewerSettings3.Value = System.Drawing.Color.Black;
+            this.txtPropertyXml.Settings = xmlViewerSettings3;
+            this.txtPropertyXml.Size = new System.Drawing.Size(363, 197);
+            this.txtPropertyXml.TabIndex = 1;
+            this.txtPropertyXml.Text = "";
+            // 
+            // txtXML
+            // 
+            this.txtXML.BackColor = System.Drawing.SystemColors.Window;
+            this.txtXML.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.txtXML.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.txtXML.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtXML.Location = new System.Drawing.Point(3, 16);
+            this.txtXML.Name = "txtXML";
+            this.txtXML.ReadOnly = true;
+            xmlViewerSettings4.AttributeKey = System.Drawing.Color.Red;
+            xmlViewerSettings4.AttributeValue = System.Drawing.Color.Blue;
+            xmlViewerSettings4.Comment = System.Drawing.Color.Green;
+            xmlViewerSettings4.Element = System.Drawing.Color.DarkRed;
+            xmlViewerSettings4.QuoteCharacter = '\"';
+            xmlViewerSettings4.Tag = System.Drawing.Color.Blue;
+            xmlViewerSettings4.Value = System.Drawing.Color.Black;
+            this.txtXML.Settings = xmlViewerSettings4;
+            this.txtXML.Size = new System.Drawing.Size(248, 573);
+            this.txtXML.TabIndex = 0;
+            this.txtXML.Text = "";
+            // 
             // ShuffleBuilder
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -561,7 +564,7 @@
             this.Controls.Add(this.splitContainerForm);
             this.Controls.Add(this.toolStripMain);
             this.Name = "ShuffleBuilder";
-            this.Size = new System.Drawing.Size(914, 662);
+            this.Size = new System.Drawing.Size(928, 632);
             this.TabIcon = ((System.Drawing.Image)(resources.GetObject("$this.TabIcon")));
             this.ConnectionUpdated += new XrmToolBox.Extensibility.PluginControlBase.ConnectionUpdatedHandler(this.ShuffleBuilder_ConnectionUpdated);
             this.treeviewMenuStrip.ResumeLayout(false);
@@ -588,6 +591,7 @@
             this.gbDefinitionXML.ResumeLayout(false);
             this.nodeMenu.ResumeLayout(false);
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
