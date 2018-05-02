@@ -29,9 +29,11 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FetchControl));
+            CSRichTextBoxSyntaxHighlighting.XMLViewerSettings xmlViewerSettings2 = new CSRichTextBoxSyntaxHighlighting.XMLViewerSettings();
             this.label1 = new System.Windows.Forms.Label();
-            this.txtFetchXML = new System.Windows.Forms.TextBox();
             this.btnFXB = new System.Windows.Forms.Button();
+            this.txtFetchXML = new CSRichTextBoxSyntaxHighlighting.XMLViewer();
+            this.btnFormat = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // label1
@@ -42,18 +44,6 @@
             this.label1.Size = new System.Drawing.Size(56, 13);
             this.label1.TabIndex = 0;
             this.label1.Text = "FetchXML";
-            // 
-            // txtFetchXML
-            // 
-            this.txtFetchXML.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtFetchXML.Location = new System.Drawing.Point(213, 4);
-            this.txtFetchXML.Multiline = true;
-            this.txtFetchXML.Name = "txtFetchXML";
-            this.txtFetchXML.Size = new System.Drawing.Size(234, 143);
-            this.txtFetchXML.TabIndex = 1;
-            this.txtFetchXML.Tag = "#text";
             // 
             // btnFXB
             // 
@@ -69,13 +59,47 @@
             this.btnFXB.UseVisualStyleBackColor = true;
             this.btnFXB.Click += new System.EventHandler(this.btnFXB_Click);
             // 
+            // txtFetchXML
+            // 
+            this.txtFetchXML.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtFetchXML.BackColor = System.Drawing.SystemColors.Window;
+            this.txtFetchXML.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.txtFetchXML.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtFetchXML.Location = new System.Drawing.Point(213, 4);
+            this.txtFetchXML.Name = "txtFetchXML";
+            xmlViewerSettings2.AttributeKey = System.Drawing.Color.Red;
+            xmlViewerSettings2.AttributeValue = System.Drawing.Color.Blue;
+            xmlViewerSettings2.Comment = System.Drawing.Color.Green;
+            xmlViewerSettings2.Element = System.Drawing.Color.DarkRed;
+            xmlViewerSettings2.QuoteCharacter = '\"';
+            xmlViewerSettings2.Tag = System.Drawing.Color.Blue;
+            xmlViewerSettings2.Value = System.Drawing.Color.Black;
+            this.txtFetchXML.Settings = xmlViewerSettings2;
+            this.txtFetchXML.Size = new System.Drawing.Size(234, 143);
+            this.txtFetchXML.TabIndex = 3;
+            this.txtFetchXML.Tag = "#text";
+            this.txtFetchXML.Text = "";
+            // 
+            // btnFormat
+            // 
+            this.btnFormat.Location = new System.Drawing.Point(7, 83);
+            this.btnFormat.Name = "btnFormat";
+            this.btnFormat.Size = new System.Drawing.Size(104, 23);
+            this.btnFormat.TabIndex = 4;
+            this.btnFormat.Text = "Format XML";
+            this.btnFormat.UseVisualStyleBackColor = true;
+            this.btnFormat.Click += new System.EventHandler(this.btnFormat_Click);
+            // 
             // FetchControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.btnFormat);
             this.Controls.Add(this.btnFXB);
-            this.Controls.Add(this.txtFetchXML);
             this.Controls.Add(this.label1);
+            this.Controls.Add(this.txtFetchXML);
             this.Name = "FetchControl";
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -85,7 +109,8 @@
         #endregion
 
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.TextBox txtFetchXML;
         private System.Windows.Forms.Button btnFXB;
+        internal CSRichTextBoxSyntaxHighlighting.XMLViewer txtFetchXML;
+        private System.Windows.Forms.Button btnFormat;
     }
 }

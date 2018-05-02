@@ -30,11 +30,17 @@ namespace Innofactor.Crm.Shuffle.Builder.Controls
   <entity name='{entity}' />
 </fetch>";
             }
+            txtFetchXML.Process();
         }
 
         private void btnFXB_Click(object sender, System.EventArgs e)
         {
             shuffleBuilder.CallFXB(txtFetchXML.Text);
+        }
+
+        private void btnFormat_Click(object sender, System.EventArgs e)
+        {
+            txtFetchXML.Process();
         }
     }
 }

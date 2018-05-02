@@ -188,6 +188,10 @@ namespace Innofactor.Crm.Shuffle.Builder.Controls
                 {
                     ((TextBox)control).Text = value;
                 }
+                else if (control is RichTextBox)
+                {
+                    ((RichTextBox)control).Text = value;
+                }
                 else if (control is ComboBox cmb)
                 {
                     object selitem = null;
