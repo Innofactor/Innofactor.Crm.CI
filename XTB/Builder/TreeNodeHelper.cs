@@ -94,9 +94,13 @@ namespace Innofactor.Crm.Shuffle.Builder.AppCode
             }
             var text = node.Name;
             if ((node.Name == "Export" || node.Name == "Import") &&
-                 node.Parent != null && node.Parent.Text.StartsWith("SolutionBlock"))
+                node.Parent?.Name == "SolutionBlock")
             {
                 text += GetAttributeFromNode(node, "Type");
+            }
+            else if (node.Name == "Export" && node.Nodes.ContainsKey("FetchXML"))
+            {
+                text += " FetchXML";
             }
             else if (node.Name == "Filter")
             {

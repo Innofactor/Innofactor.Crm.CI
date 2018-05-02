@@ -42,9 +42,9 @@ namespace Innofactor.Crm.Shuffle.Builder.AppCode
                     {
                         if (!node.Nodes.Cast<TreeNode>().Any(n => n.Name == "FetchXML"))
                         {
-                            ChildTypes.Add(new ChildNodeCapabilities("Attributes", false));
                             ChildTypes.Add(new ChildNodeCapabilities("Filter", true));
                             ChildTypes.Add(new ChildNodeCapabilities("Sort", true));
+                            ChildTypes.Add(new ChildNodeCapabilities("Attributes", false));
                         }
                         if (node.Nodes.Count == 0)
                         {

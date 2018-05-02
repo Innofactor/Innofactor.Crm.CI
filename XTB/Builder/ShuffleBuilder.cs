@@ -420,6 +420,12 @@ namespace Innofactor.Crm.Shuffle.Builder
 
         internal void LoadSolutions(Action callback)
         {
+            if (Service == null)
+            {
+                solutions = new EntityCollection();
+                callback?.Invoke();
+                return;
+            }
             WorkAsync(new WorkAsyncInfo
             {
                 Message = "Loading solutions",
@@ -448,6 +454,12 @@ namespace Innofactor.Crm.Shuffle.Builder
 
         internal void LoadEntities(Action callback)
         {
+            if (Service == null)
+            {
+                entities = new List<EntityMetadata>();
+                callback?.Invoke();
+                return;
+            }
             WorkAsync(new WorkAsyncInfo
             {
                 Message = "Loading entities",
@@ -472,6 +484,20 @@ namespace Innofactor.Crm.Shuffle.Builder
 
         internal void LoadAttributes(string entity, Action callback)
         {
+            if (attributes == null)
+            {
+                attributes = new Dictionary<string, List<AttributeMetadata>>();
+            }
+            if (Service == null)
+            {
+                attributes.Add(entity, new List<AttributeMetadata>());
+                callback?.Invoke();
+                return;
+            }
+            if (attributes.ContainsKey(entity))
+            {
+                attributes.Remove(entity);
+            }
             WorkAsync(new WorkAsyncInfo
             {
                 Message = $"Loading attributes for {entity}",
@@ -489,14 +515,6 @@ namespace Innofactor.Crm.Shuffle.Builder
                         resp.EntityMetadata.Count > 0 &&
                         resp.EntityMetadata[0] is EntityMetadata entitymeta)
                     {
-                        if (attributes == null)
-                        {
-                            attributes = new Dictionary<string, List<AttributeMetadata>>();
-                        }
-                        if (attributes.ContainsKey(entity))
-                        {
-                            attributes.Remove(entity);
-                        }
                         attributes.Add(entity, entitymeta.Attributes.ToList());
                         callback?.Invoke();
                     }
@@ -686,20 +704,31 @@ namespace Innofactor.Crm.Shuffle.Builder
 
         private void HandleNodeMenuClick(string ClickedTag)
         {
-            if (ClickedTag == null || ClickedTag == "Add")
+            var node = tvDefinition.SelectedNode;
+            if (ClickedTag == null || ClickedTag == "Add" || node == null)
+            {
                 return;
+            }
             TreeNode updateNode = null;
             if (ClickedTag == "Delete")
             {
-                DeleteNode();
+                DeleteNode(node);
             }
             else if (ClickedTag == "Comment")
             {
-                CommentNode();
+                CommentNode(node);
             }
             else if (ClickedTag == "Uncomment")
             {
-                UncommentNode();
+                UncommentNode(node);
+            }
+            else if (ClickedTag == "MoveDown")
+            {
+                MoveNodeDown(node);
+            }
+            else if (ClickedTag == "MoveUp")
+            {
+                MoveNodeUp(node);
             }
             else if (ClickedTag == "Cut" || ClickedTag == "Copy" || ClickedTag == "Paste")
             {
@@ -828,74 +857,106 @@ namespace Innofactor.Crm.Shuffle.Builder
             return xml;
         }
 
-        private void DeleteNode()
+        private void MoveNodeDown(TreeNode node)
         {
-            tvDefinition.SelectedNode.Remove();
-        }
-
-        private void CommentNode()
-        {
-            var node = tvDefinition.SelectedNode;
-            if (node != null)
+            TreeNode nextnode = node.NextNode;
+            if (nextnode != null)
             {
-                var doc = new XmlDocument();
-                XmlNode rootNode = doc.CreateElement("root");
-                doc.AppendChild(rootNode);
-                TreeNodeHelper.AddXmlNode(node, rootNode);
-                XDocument xdoc = XDocument.Parse(rootNode.InnerXml);
-                var comment = xdoc.ToString();
-                if (node.Nodes != null && node.Nodes.Count > 0)
+                int idxBegin = node.Index;
+                int idxEnd = nextnode.Index;
+                TreeNode tnmNodeParent = node.Parent;
+                if (tnmNodeParent != null)
                 {
-                    comment = "\r\n" + comment + "\r\n";
+                    node.Remove();
+                    nextnode.Remove();
+                    tnmNodeParent.Nodes.Insert(idxBegin, nextnode);
+                    tnmNodeParent.Nodes.Insert(idxEnd, node);
+                    tvDefinition.SelectedNode = node;
+                    UpdateLiveXML();
                 }
-                if (comment.Contains("--"))
-                {
-                    comment = comment.Replace("--", "~~");
-                }
-                if (comment.EndsWith("-"))
-                {
-                    comment = comment.Substring(0, comment.Length - 1) + "~";
-                }
-                var commentNode = doc.CreateComment(comment);
-                var parent = node.Parent;
-                var index = node.Index;
-                node.Parent.Nodes.Remove(node);
-                tvDefinition.SelectedNode = TreeNodeHelper.AddTreeViewNode(parent, commentNode, this, index);
             }
         }
 
-        private void UncommentNode()
+        private void MoveNodeUp(TreeNode node)
         {
-            var node = tvDefinition.SelectedNode;
-            if (node != null && node.Tag is Dictionary<string, string>)
+            TreeNode prevnode = node.PrevNode;
+            if (prevnode != null)
             {
-                var coll = node.Tag as Dictionary<string, string>;
-                if (coll.ContainsKey("#comment"))
+                int idxBegin = node.Index;
+                int idxEnd = prevnode.Index;
+                TreeNode tnmNodeParent = node.Parent;
+                if (tnmNodeParent != null)
                 {
-                    var comment = coll["#comment"];
-                    if (comment.Contains("~~"))
-                    {
-                        comment = comment.Replace("~~", "--");
-                    }
-                    if (comment.EndsWith("~"))
-                    {
-                        comment = comment.Substring(0, comment.Length - 1) + "-";
-                    }
-                    var doc = new XmlDocument();
-                    try
-                    {
-                        doc.LoadXml(comment);
-                        var parent = node.Parent;
-                        var index = node.Index;
-                        node.Parent.Nodes.Remove(node);
-                        tvDefinition.SelectedNode = TreeNodeHelper.AddTreeViewNode(parent, doc.DocumentElement, this, index);
-                        tvDefinition.SelectedNode.Expand();
-                    }
-                    catch (XmlException ex)
-                    {
-                        var msg = "Comment does contain well formatted xml.\nError description:\n\n" + ex.Message;
-                        MessageBox.Show(msg, "Uncomment", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    }
+                    node.Remove();
+                    prevnode.Remove();
+                    tnmNodeParent.Nodes.Insert(idxEnd, node);
+                    tnmNodeParent.Nodes.Insert(idxBegin, prevnode);
+                    tvDefinition.SelectedNode = node;
+                    UpdateLiveXML();
+                }
+            }
+        }
+
+        private void DeleteNode(TreeNode node)
+        {
+            node.Remove();
+        }
+
+        private void CommentNode(TreeNode node)
+        {
+            var doc = new XmlDocument();
+            XmlNode rootNode = doc.CreateElement("root");
+            doc.AppendChild(rootNode);
+            TreeNodeHelper.AddXmlNode(node, rootNode);
+            XDocument xdoc = XDocument.Parse(rootNode.InnerXml);
+            var comment = xdoc.ToString();
+            if (node.Nodes != null && node.Nodes.Count > 0)
+            {
+                comment = "\r\n" + comment + "\r\n";
+            }
+            if (comment.Contains("--"))
+            {
+                comment = comment.Replace("--", "~~");
+            }
+            if (comment.EndsWith("-"))
+            {
+                comment = comment.Substring(0, comment.Length - 1) + "~";
+            }
+            var commentNode = doc.CreateComment(comment);
+            var parent = node.Parent;
+            var index = node.Index;
+            node.Parent.Nodes.Remove(node);
+            tvDefinition.SelectedNode = TreeNodeHelper.AddTreeViewNode(parent, commentNode, this, index);
+        }
+
+        private void UncommentNode(TreeNode node)
+        {
+            var coll = node.Tag as Dictionary<string, string>;
+            if (coll.ContainsKey("#comment"))
+            {
+                var comment = coll["#comment"];
+                if (comment.Contains("~~"))
+                {
+                    comment = comment.Replace("~~", "--");
+                }
+                if (comment.EndsWith("~"))
+                {
+                    comment = comment.Substring(0, comment.Length - 1) + "-";
+                }
+                var doc = new XmlDocument();
+                try
+                {
+                    doc.LoadXml(comment);
+                    var parent = node.Parent;
+                    var index = node.Index;
+                    node.Parent.Nodes.Remove(node);
+                    tvDefinition.SelectedNode = TreeNodeHelper.AddTreeViewNode(parent, doc.DocumentElement, this, index);
+                    tvDefinition.SelectedNode.Expand();
+                }
+                catch (XmlException ex)
+                {
+                    var msg = "Comment does contain well formatted xml.\nError description:\n\n" + ex.Message;
+                    MessageBox.Show(msg, "Uncomment", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
             }
         }
