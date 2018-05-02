@@ -1,8 +1,6 @@
-﻿using Cinteros.Crm.Utils.Common;
-using Cinteros.Crm.Utils.Shuffle;
+﻿using Cinteros.Crm.Utils.Shuffle;
 using Innofactor.Crm.Shuffle.Builder.AppCode;
 using Innofactor.Crm.Shuffle.Builder.Controls;
-using Innofactor.Crm.Shuffle.Builder.Forms;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Metadata;
@@ -28,6 +26,7 @@ namespace Innofactor.Crm.Shuffle.Builder
 
         private bool working = false;
         private bool buttonsEnabled = true;
+
         private List<EntityMetadata> entities = null;
         private Dictionary<string, List<AttributeMetadata>> attributes = null;
         private EntityCollection solutions = null;
@@ -150,7 +149,7 @@ namespace Innofactor.Crm.Shuffle.Builder
 
         private void toolStripButtonRunit_Click(object sender, EventArgs e)
         {
-            var args = new MessageBusEventArgs("Shuffle Runner")
+            var args = new MessageBusEventArgs("Shuffle Runner", false)
             {
                 TargetArgument = fileName
             };
@@ -162,6 +161,15 @@ namespace Innofactor.Crm.Shuffle.Builder
             {
                 MessageBox.Show("Calliung Shuffle Runner failed:\n" + ex.Message);
             }
+        }
+
+        internal void CallFXB(string text)
+        {
+            var args = new MessageBusEventArgs("FetchXML Builder", false)
+            {
+                TargetArgument = text
+            };
+            OnOutgoingMessage(this, args);
         }
 
         private void tvDefinition_KeyDown(object sender, KeyEventArgs e)
@@ -498,7 +506,23 @@ namespace Innofactor.Crm.Shuffle.Builder
 
         public void OnIncomingMessage(MessageBusEventArgs message)
         {
-            throw new NotImplementedException("Shuffle Builder cannot accept calls from other plugins in this version");
+            if (message.SourcePlugin == "FetchXML Builder" &&
+                message.TargetArgument is string fetchxml)
+            {
+                if (tvDefinition.SelectedNode?.Name == "FetchXML" &&
+                    tvDefinition.SelectedNode?.Tag is Dictionary<string, string> collec)
+                {
+                    if (collec.ContainsKey("#text"))
+                    {
+                        collec["#text"] = fetchxml;
+                    }
+                    else
+                    {
+                        collec.Add("#text", fetchxml);
+                    }
+                    HandleNodeSelection(tvDefinition.SelectedNode);
+                }
+            }
         }
 
         private void HandleNodeSelection(TreeNode node)

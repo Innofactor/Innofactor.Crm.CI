@@ -28,8 +28,10 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FetchControl));
             this.label1 = new System.Windows.Forms.Label();
             this.txtFetchXML = new System.Windows.Forms.TextBox();
+            this.btnFXB = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // label1
@@ -53,10 +55,25 @@
             this.txtFetchXML.TabIndex = 1;
             this.txtFetchXML.Tag = "#text";
             // 
+            // btnFXB
+            // 
+            this.btnFXB.Image = ((System.Drawing.Image)(resources.GetObject("btnFXB.Image")));
+            this.btnFXB.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnFXB.Location = new System.Drawing.Point(7, 36);
+            this.btnFXB.Name = "btnFXB";
+            this.btnFXB.Padding = new System.Windows.Forms.Padding(5);
+            this.btnFXB.Size = new System.Drawing.Size(104, 41);
+            this.btnFXB.TabIndex = 2;
+            this.btnFXB.Text = "Use FXB";
+            this.btnFXB.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.btnFXB.UseVisualStyleBackColor = true;
+            this.btnFXB.Click += new System.EventHandler(this.btnFXB_Click);
+            // 
             // FetchControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.btnFXB);
             this.Controls.Add(this.txtFetchXML);
             this.Controls.Add(this.label1);
             this.Name = "FetchControl";
@@ -69,5 +86,6 @@
 
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox txtFetchXML;
+        private System.Windows.Forms.Button btnFXB;
     }
 }

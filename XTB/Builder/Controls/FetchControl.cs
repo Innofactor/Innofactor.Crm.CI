@@ -31,5 +31,10 @@ namespace Innofactor.Crm.Shuffle.Builder.Controls
 </fetch>";
             }
         }
+
+        private void btnFXB_Click(object sender, System.EventArgs e)
+        {
+            shuffleBuilder.CallFXB(txtFetchXML.Text);
+        }
     }
 }
