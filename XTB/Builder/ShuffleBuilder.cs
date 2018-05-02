@@ -211,6 +211,10 @@ namespace Innofactor.Crm.Shuffle.Builder
                     tvDefinition.Nodes[0].Nodes[0].Expand();
                 }
                 UpdateLiveXML();
+                if (tvDefinition.Nodes.Count > 0)
+                {
+                    tvDefinition.SelectedNode = tvDefinition.Nodes[0];
+                }
             };
 
             if (tvDefinition.InvokeRequired)
@@ -545,123 +549,120 @@ namespace Innofactor.Crm.Shuffle.Builder
 
         private void HandleNodeSelection(TreeNode node)
         {
-            if (!working)
+            if (tvDefinition.SelectedNode != node)
             {
-                if (tvDefinition.SelectedNode != node)
-                {
-                    tvDefinition.SelectedNode = node;
-                    return;
-                }
-
-                UserControl ctrl = null;
-                if (node != null)
-                {
-                    TreeNodeHelper.AddContextMenu(node, this);
-                    this.deleteToolStripMenuItem.Text = "Delete " + node.Name;
-                    var collec = (Dictionary<string, string>)node.Tag;
-
-                    switch (node.Name)
-                    {
-                        case "ShuffleDefinition":
-                            ctrl = new ShuffleDefinitionControl(collec, this);
-                            break;
-                        case "DataBlock":
-                            ctrl = new DataBlockControl(collec, this, Entities);
-                            break;
-                        case "SolutionBlock":
-                            ctrl = new SolutionBlockControl(collec, this);
-                            break;
-                        case "Export":
-                            if (node.Parent != null && node.Parent.Text.StartsWith("DataBlock"))
-                            {
-                                ctrl = new DataBlockExportControl(collec, this);
-                            }
-                            else if (node.Parent != null && node.Parent.Text.StartsWith("SolutionBlock"))
-                            {
-                                ctrl = new SolutionBlockExportControl(collec, this);
-                            }
-                            break;
-                        case "Import":
-                            if (node.Parent != null && node.Parent.Text.StartsWith("DataBlock"))
-                            {
-                                ctrl = new DataBlockImportControl(collec, this);
-                            }
-                            else if (node.Parent != null && node.Parent.Text.StartsWith("SolutionBlock"))
-                            {
-                                ctrl = new SolutionBlockImportControl(collec, this);
-                            }
-                            break;
-
-                        case "Relation":
-                            ctrl = new RelationControl(collec, node, this);
-                            break;
-
-                        case "Attribute":
-                            {
-                                if (node.Parent?.Name == "Attributes" &&
-                                    node.Parent?.Parent?.Parent?.Tag is Dictionary<string, string> entityprops &&
-                                    entityprops.ContainsKey("Entity") &&
-                                    entityprops["Entity"] is string entity &&
-                                    !string.IsNullOrWhiteSpace(entity))
-                                {
-                                    ctrl = new ExportAttributeControl(collec, this, entity);
-                                }
-                                else if (node.Parent != null && node.Parent.Text.StartsWith("Match"))
-                                {
-                                    ctrl = new ImportAttributeControl(collec, this);
-                                }
-                                break;
-                            }
-                        case "FetchXML":
-                            {
-                                if (node.Parent.Parent.Tag is Dictionary<string, string> entityprops &&
-                                    entityprops.ContainsKey("Entity") &&
-                                    entityprops["Entity"] is string entity &&
-                                    !string.IsNullOrWhiteSpace(entity))
-                                {
-                                    ctrl = new FetchControl(collec, this, entity);
-                                }
-                                break;
-                            }
-                        case "Filter":
-                            ctrl = new FilterControl(collec, this);
-                            break;
-
-                        case "Sort":
-                            ctrl = new SortControl(collec, this);
-                            break;
-
-                        case "Match":
-                            ctrl = new ImportMatchControl(collec, this);
-                            break;
-
-                        case "Settings":
-                            ctrl = new SettingsControl(collec, this);
-                            break;
-
-                        case "Solution":
-                            if (node.Parent != null && node.Parent.Text.StartsWith("PreRequisites"))
-                            {
-                                ctrl = new PreReqSolutionControl(collec, this);
-                            }
-                            break;
-
-                        default:
-                            {
-                                panelContainer.Controls.Clear();
-                            }
-                            break;
-                    }
-                }
-                var existingControl = panelContainer.Controls.Count > 0 ? panelContainer.Controls[0] : null;
-                if (ctrl != null)
-                {
-                    panelContainer.Controls.Add(ctrl);
-                    ctrl.BringToFront();
-                    ctrl.Dock = DockStyle.Fill;
-                }
-                if (existingControl != null) panelContainer.Controls.Remove(existingControl);
+                tvDefinition.SelectedNode = node;
+                return;
             }
+
+            UserControl ctrl = null;
+            if (node != null)
+            {
+                TreeNodeHelper.AddContextMenu(node, this);
+                this.deleteToolStripMenuItem.Text = "Delete " + node.Name;
+                var collec = (Dictionary<string, string>)node.Tag;
+
+                switch (node.Name)
+                {
+                    case "ShuffleDefinition":
+                        ctrl = new ShuffleDefinitionControl(collec, this);
+                        break;
+                    case "DataBlock":
+                        ctrl = new DataBlockControl(collec, this, Entities);
+                        break;
+                    case "SolutionBlock":
+                        ctrl = new SolutionBlockControl(collec, this);
+                        break;
+                    case "Export":
+                        if (node.Parent != null && node.Parent.Text.StartsWith("DataBlock"))
+                        {
+                            ctrl = new DataBlockExportControl(collec, this);
+                        }
+                        else if (node.Parent != null && node.Parent.Text.StartsWith("SolutionBlock"))
+                        {
+                            ctrl = new SolutionBlockExportControl(collec, this);
+                        }
+                        break;
+                    case "Import":
+                        if (node.Parent != null && node.Parent.Text.StartsWith("DataBlock"))
+                        {
+                            ctrl = new DataBlockImportControl(collec, this);
+                        }
+                        else if (node.Parent != null && node.Parent.Text.StartsWith("SolutionBlock"))
+                        {
+                            ctrl = new SolutionBlockImportControl(collec, this);
+                        }
+                        break;
+
+                    case "Relation":
+                        ctrl = new RelationControl(collec, node, this);
+                        break;
+
+                    case "Attribute":
+                        {
+                            if (node.Parent?.Name == "Attributes" &&
+                                node.Parent?.Parent?.Parent?.Tag is Dictionary<string, string> entityprops &&
+                                entityprops.ContainsKey("Entity") &&
+                                entityprops["Entity"] is string entity &&
+                                !string.IsNullOrWhiteSpace(entity))
+                            {
+                                ctrl = new ExportAttributeControl(collec, this, entity);
+                            }
+                            else if (node.Parent != null && node.Parent.Text.StartsWith("Match"))
+                            {
+                                ctrl = new ImportAttributeControl(collec, this);
+                            }
+                            break;
+                        }
+                    case "FetchXML":
+                        {
+                            if (node.Parent.Parent.Tag is Dictionary<string, string> entityprops &&
+                                entityprops.ContainsKey("Entity") &&
+                                entityprops["Entity"] is string entity &&
+                                !string.IsNullOrWhiteSpace(entity))
+                            {
+                                ctrl = new FetchControl(collec, this, entity);
+                            }
+                            break;
+                        }
+                    case "Filter":
+                        ctrl = new FilterControl(collec, this);
+                        break;
+
+                    case "Sort":
+                        ctrl = new SortControl(collec, this);
+                        break;
+
+                    case "Match":
+                        ctrl = new ImportMatchControl(collec, this);
+                        break;
+
+                    case "Settings":
+                        ctrl = new SettingsControl(collec, this);
+                        break;
+
+                    case "Solution":
+                        if (node.Parent != null && node.Parent.Text.StartsWith("PreRequisites"))
+                        {
+                            ctrl = new PreReqSolutionControl(collec, this);
+                        }
+                        break;
+
+                    default:
+                        {
+                            panelContainer.Controls.Clear();
+                        }
+                        break;
+                }
+            }
+            var existingControl = panelContainer.Controls.Count > 0 ? panelContainer.Controls[0] : null;
+            if (ctrl != null)
+            {
+                panelContainer.Controls.Add(ctrl);
+                ctrl.BringToFront();
+                ctrl.Dock = DockStyle.Fill;
+            }
+            if (existingControl != null) panelContainer.Controls.Remove(existingControl);
             ManageMenuDisplay();
             ShowNodeXml(node);
         }
@@ -750,57 +751,6 @@ namespace Innofactor.Crm.Shuffle.Builder
                 TreeNodeHelper.SetNodeTooltip(updateNode);
             }
             UpdateLiveXML();
-
-            return;
-
-            {
-                string nodeText = ClickedTag;
-                nodeText = nodeText.Substring(0, nodeText.IndexOf("ToolStripMenuItem"));
-
-                var newNode = new TreeNode(nodeText);
-                newNode.Tag = new Dictionary<string, string>();
-                newNode.Name = newNode.Text.Replace(" ", "");
-                var e2 = new TreeNodeMouseClickEventArgs(newNode, MouseButtons.Left, 1, 0, 0);
-
-                if (newNode.Text == "Export" && tvDefinition.SelectedNode.Text.StartsWith("DataBlock"))
-                {
-                    var attributesNode = AddChildNode(newNode, "Attributes");
-                    var firstAttributeNode = AddChildNode(attributesNode, "Attribute");
-                }
-                else if (newNode.Text == "Import" && tvDefinition.SelectedNode.Text.StartsWith("DataBlock"))
-                {
-                    var matchNode = AddChildNode(newNode, "Match");
-                    var firstAttributeNode = AddChildNode(matchNode, "Attribute");
-                }
-
-                if (nodeText == "Filter")
-                {
-                    int i = 0;
-                    while (i < tvDefinition.SelectedNode.Nodes.Count &&
-                        tvDefinition.SelectedNode.Nodes[i].Text.StartsWith("Filter"))
-                    {
-                        i++;
-                    }
-                    tvDefinition.SelectedNode.Nodes.Insert(i, newNode);
-                }
-                else if (nodeText == "Sort")
-                {
-                    int i = 0;
-                    while (i < tvDefinition.SelectedNode.Nodes.Count &&
-                        (tvDefinition.SelectedNode.Nodes[i].Text.StartsWith("Filter") ||
-                         tvDefinition.SelectedNode.Nodes[i].Text.StartsWith("Sort")))
-                    {
-                        i++;
-                    }
-                    tvDefinition.SelectedNode.Nodes.Insert(i, newNode);
-                }
-                else
-                {
-                    tvDefinition.SelectedNode.Nodes.Add(newNode);
-                }
-                tvDefinitionNodeMouseClick(tvDefinition, e2);
-            }
-
         }
 
         internal void UpdateLiveXML()

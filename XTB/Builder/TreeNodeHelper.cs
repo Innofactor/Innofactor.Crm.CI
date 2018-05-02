@@ -307,6 +307,10 @@ namespace Innofactor.Crm.Shuffle.Builder.AppCode
 
         internal static string GetNodeXml(TreeNode node)
         {
+            if (node == null)
+            {
+                return string.Empty;
+            }
             var doc = new XmlDocument();
             XmlNode rootNode = doc.CreateElement("root");
             doc.AppendChild(rootNode);
@@ -321,50 +325,50 @@ namespace Innofactor.Crm.Shuffle.Builder.AppCode
             {
                 tooltip = rootNode.InnerXml;
             }
-
             return tooltip;
         }
 
         internal static void AddXmlNode(TreeNode currentNode, XmlNode parentXmlNode)
         {
-            var collec = (Dictionary<string, string>)currentNode.Tag;
-            XmlNode newNode;
-            if (currentNode.Name == "#comment")
+            if (currentNode?.Tag is Dictionary<string, string> collec)
             {
-                newNode = parentXmlNode.OwnerDocument.CreateComment(collec.ContainsKey("#comment") ? collec["#comment"] : "");
-            }
-            else
-            {
-                newNode = parentXmlNode.OwnerDocument.CreateElement(currentNode.Name);
-                foreach (string key in collec.Keys)
+                XmlNode newNode;
+                if (currentNode.Name == "#comment")
                 {
-                    if (key == "#text")
+                    newNode = parentXmlNode.OwnerDocument.CreateComment(collec.ContainsKey("#comment") ? collec["#comment"] : "");
+                }
+                else
+                {
+                    newNode = parentXmlNode.OwnerDocument.CreateElement(currentNode.Name);
+                    foreach (string key in collec.Keys)
                     {
-                        XmlText newText = parentXmlNode.OwnerDocument.CreateTextNode(collec[key]);
-                        newNode.AppendChild(newText);
+                        if (key == "#text")
+                        {
+                            XmlText newText = parentXmlNode.OwnerDocument.CreateTextNode(collec[key]);
+                            newNode.AppendChild(newText);
+                        }
+                        else
+                        {
+                            XmlAttribute attr = parentXmlNode.OwnerDocument.CreateAttribute(key);
+                            attr.Value = collec[key];
+                            newNode.Attributes.Append(attr);
+                        }
                     }
-                    else
+
+                    var others = new List<TreeNode>();
+
+                    foreach (TreeNode childNode in currentNode.Nodes)
                     {
-                        XmlAttribute attr = parentXmlNode.OwnerDocument.CreateAttribute(key);
-                        attr.Value = collec[key];
-                        newNode.Attributes.Append(attr);
+                        others.Add(childNode);
+                    }
+
+                    foreach (TreeNode otherNode in others)
+                    {
+                        AddXmlNode(otherNode, newNode);
                     }
                 }
-
-                var others = new List<TreeNode>();
-
-                foreach (TreeNode childNode in currentNode.Nodes)
-                {
-                    others.Add(childNode);
-                }
-
-                foreach (TreeNode otherNode in others)
-                {
-                    AddXmlNode(otherNode, newNode);
-                }
+                parentXmlNode.AppendChild(newNode);
             }
-
-            parentXmlNode.AppendChild(newNode);
         }
 
         internal static string GetAttributeFromNode(TreeNode treeNode, string attribute)
