@@ -181,16 +181,11 @@ namespace Cinteros.Crm.Utils.Shuffle.Types {
     public partial class DataBlockExport {
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Filter")]
-        public DataBlockExportFilter[] Filter;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Sort")]
-        public DataBlockExportSort[] Sort;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlArrayItemAttribute("Attribute", IsNullable=false)]
-        public DataBlockExportAttribute[] Attributes;
+        [System.Xml.Serialization.XmlElementAttribute("Attributes", typeof(DataBlockExportAttributes))]
+        [System.Xml.Serialization.XmlElementAttribute("FetchXML", typeof(string))]
+        [System.Xml.Serialization.XmlElementAttribute("Filter", typeof(DataBlockExportFilter))]
+        [System.Xml.Serialization.XmlElementAttribute("Sort", typeof(DataBlockExportSort))]
+        public object[] Items;
         
         /// <remarks/>
         [System.Xml.Serialization.XmlAttributeAttribute()]
@@ -199,6 +194,41 @@ namespace Cinteros.Crm.Utils.Shuffle.Types {
         
         public DataBlockExport() {
             this.ActiveOnly = false;
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.0.30319.33440")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType=true)]
+    public partial class DataBlockExportAttributes {
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("Attribute")]
+        public DataBlockExportAttributesAttribute[] Attribute;
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.0.30319.33440")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType=true)]
+    public partial class DataBlockExportAttributesAttribute {
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string Name;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        [System.ComponentModel.DefaultValueAttribute(false)]
+        public bool IncludeNull;
+        
+        public DataBlockExportAttributesAttribute() {
+            this.IncludeNull = false;
         }
     }
     
@@ -435,28 +465,6 @@ namespace Cinteros.Crm.Utils.Shuffle.Types {
         
         /// <remarks/>
         Desc,
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.0.30319.33440")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType=true)]
-    public partial class DataBlockExportAttribute {
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
-        public string Name;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
-        [System.ComponentModel.DefaultValueAttribute(false)]
-        public bool IncludeNull;
-        
-        public DataBlockExportAttribute() {
-            this.IncludeNull = false;
-        }
     }
     
     /// <remarks/>

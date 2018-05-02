@@ -270,17 +270,13 @@ namespace Cinteros.Crm.Utils.Shuffle
                     {
                         def.Schemas.Add(null, XmlReader.Create(stream));
                         def.Validate(null);
-                        log.Log("ShuffleDefinition validated");
+                        log?.Log("ShuffleDefinition validated");
                     }
                 }
             }
             catch (XmlSchemaValidationException ex)
             {
-                if (log != null)
-                {
-                    log.Log(ex);
-                }
-
+                log?.Log(ex);
                 throw;
             }
             return result;

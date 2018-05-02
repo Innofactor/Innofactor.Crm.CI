@@ -154,34 +154,37 @@
   </xs:complexType>
 
   <xs:complexType name="DataBlockExport">
-    <xs:sequence>
-      <xs:element minOccurs="0" maxOccurs="unbounded" name="Filter">
-        <xs:complexType>
-          <xs:attribute name="Attribute" type="xs:string" use="required" />
-          <xs:attribute name="Operator" type="ConditionOperator" use="required" />
-          <xs:attribute name="Type" type="FilterTypes" use="optional" />
-          <xs:attribute name="Value" type="xs:string" use="optional" />
-        </xs:complexType>
-      </xs:element>
-      <xs:element minOccurs="0" maxOccurs="unbounded" name="Sort">
-        <xs:complexType>
-          <xs:attribute name="Attribute" type="xs:string" use="required" />
-          <xs:attribute name="Type" type="SortTypes" use="optional" default="Asc" />
-        </xs:complexType>
-      </xs:element>
-      <xs:element name="Attributes">
-        <xs:complexType>
-          <xs:sequence>
-            <xs:element maxOccurs="unbounded" name="Attribute">
-              <xs:complexType>
-                <xs:attribute name="Name" type="xs:string" use="required" />
-                <xs:attribute name="IncludeNull" type="xs:boolean" default="false" use="optional" />
-              </xs:complexType>
-            </xs:element>
-          </xs:sequence>
-        </xs:complexType>
-      </xs:element>
-    </xs:sequence>
+    <xs:choice minOccurs="1" maxOccurs="1">
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" name="Filter">
+          <xs:complexType>
+            <xs:attribute name="Attribute" type="xs:string" use="required" />
+            <xs:attribute name="Operator" type="ConditionOperator" use="required" />
+            <xs:attribute name="Type" type="FilterTypes" use="optional" />
+            <xs:attribute name="Value" type="xs:string" use="optional" />
+          </xs:complexType>
+        </xs:element>
+        <xs:element minOccurs="0" maxOccurs="unbounded" name="Sort">
+          <xs:complexType>
+            <xs:attribute name="Attribute" type="xs:string" use="required" />
+            <xs:attribute name="Type" type="SortTypes" use="optional" default="Asc" />
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Attributes">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element maxOccurs="unbounded" name="Attribute">
+                <xs:complexType>
+                  <xs:attribute name="Name" type="xs:string" use="required" />
+                  <xs:attribute name="IncludeNull" type="xs:boolean" default="false" use="optional" />
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:element name="FetchXML" type="xs:string" />
+    </xs:choice>
     <xs:attribute name="ActiveOnly" type="xs:boolean" use="optional" default="false" />
   </xs:complexType>
 

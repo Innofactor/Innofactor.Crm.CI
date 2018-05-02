@@ -257,7 +257,9 @@ namespace Cinteros.Crm.Utils.Shuffle
             if (xExport != null)
             {
                 if (string.IsNullOrEmpty(entity))
+                {
                     entity = CintXML.GetAttribute(xExport, "Entity");
+                }
 
                 #region Define attributes
 
@@ -299,7 +301,18 @@ namespace Cinteros.Crm.Utils.Shuffle
 
                 #endregion Define attributes
 
-                if (type == "Entity" || string.IsNullOrEmpty(type))
+                if (CintXML.FindChild(xExport, "FetchXML") is XmlNode xFetchXML &&
+                    CintXML.FindChild(xFetchXML, "#text") is XmlText xFetchXMLText)
+                {
+                    log.StartSection("Export entity using FetchXML");
+                    var fetchxml = xFetchXMLText.Value;
+#if DEBUG
+                    log.Log("FetchXML:\n{0}", fetchxml);
+#endif
+                    cExportEntities = CintDynEntity.RetrieveMultiple(crmsvc, new FetchExpression(fetchxml), log);
+                    log.EndSection();
+                }
+                else if (type == "Entity" || string.IsNullOrEmpty(type))
                 {
                     #region QueryExpression Entity
 
