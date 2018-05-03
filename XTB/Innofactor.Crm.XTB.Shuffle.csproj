@@ -131,6 +131,12 @@
     <Compile Include="Builder\Controls\ControlBase.Designer.cs">
       <DependentUpon>ControlBase.cs</DependentUpon>
     </Compile>
+    <Compile Include="Builder\Controls\ErrorControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Builder\Controls\ErrorControl.Designer.cs">
+      <DependentUpon>ErrorControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="Builder\Controls\FetchControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -280,6 +286,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Builder\Controls\DataBlockImportControl.resx">
       <DependentUpon>DataBlockImportControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Builder\Controls\ErrorControl.resx">
+      <DependentUpon>ErrorControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Builder\Controls\ExportAttributeControl.resx">
       <DependentUpon>ExportAttributeControl.cs</DependentUpon>

@@ -597,23 +597,31 @@ namespace Innofactor.Crm.Shuffle.Builder
                         ctrl = new SolutionBlockControl(collec, this);
                         break;
                     case "Export":
-                        if (node.Parent != null && node.Parent.Text.StartsWith("DataBlock"))
+                        if (node.Parent?.Name == "DataBlock")
                         {
                             ctrl = new DataBlockExportControl(collec, this);
                         }
-                        else if (node.Parent != null && node.Parent.Text.StartsWith("SolutionBlock"))
+                        else if (node.Parent?.Name == "SolutionBlock")
                         {
                             ctrl = new SolutionBlockExportControl(collec, this);
                         }
+                        else
+                        {
+                            ctrl = new ErrorControl("Invalid parent", "Parent node is neither DataBlock nor SolutionBlock.");
+                        }
                         break;
                     case "Import":
-                        if (node.Parent != null && node.Parent.Text.StartsWith("DataBlock"))
+                        if (node.Parent?.Name == "DataBlock")
                         {
                             ctrl = new DataBlockImportControl(collec, this);
                         }
-                        else if (node.Parent != null && node.Parent.Text.StartsWith("SolutionBlock"))
+                        else if (node.Parent?.Name == "SolutionBlock")
                         {
                             ctrl = new SolutionBlockImportControl(collec, this);
+                        }
+                        else
+                        {
+                            ctrl = new ErrorControl("Invalid parent", "Parent node is neither DataBlock nor SolutionBlock.");
                         }
                         break;
 
@@ -623,28 +631,56 @@ namespace Innofactor.Crm.Shuffle.Builder
 
                     case "Attribute":
                         {
-                            if (node.Parent?.Name == "Attributes" &&
-                                node.Parent?.Parent?.Parent?.Tag is Dictionary<string, string> entityprops &&
-                                entityprops.ContainsKey("Entity") &&
-                                entityprops["Entity"] is string entity &&
-                                !string.IsNullOrWhiteSpace(entity))
+                            if (node.Parent?.Name == "Attributes")
                             {
-                                ctrl = new ExportAttributeControl(collec, this, entity);
+                                if (node.Parent?.Parent?.Parent?.Name == "DataBlock" &&
+                                    node.Parent?.Parent?.Parent?.Tag is Dictionary<string, string> entityprops)
+                                {
+                                    if (entityprops.ContainsKey("Entity") &&
+                                        entityprops["Entity"] is string entity &&
+                                        !string.IsNullOrWhiteSpace(entity))
+                                    {
+                                        ctrl = new ExportAttributeControl(collec, this, entity);
+                                    }
+                                    else
+                                    {
+                                        ctrl = new ErrorControl("Invalid entity", "Entity not defined on parent block node.");
+                                    }
+                                }
+                                else
+                                {
+                                    ctrl = new ErrorControl("Invalid block", "This is not a valid DataBlock.");
+                                }
                             }
-                            else if (node.Parent != null && node.Parent.Text.StartsWith("Match"))
+                            else if (node.Parent?.Name == "Match")
                             {
                                 ctrl = new ImportAttributeControl(collec, this);
+                            }
+                            else
+                            {
+                                ctrl = new ErrorControl("Invalid parent", "Parent node is neither Attributes nor Match.");
                             }
                             break;
                         }
                     case "FetchXML":
                         {
-                            if (node.Parent.Parent.Tag is Dictionary<string, string> entityprops &&
-                                entityprops.ContainsKey("Entity") &&
-                                entityprops["Entity"] is string entity &&
-                                !string.IsNullOrWhiteSpace(entity))
+                            if (node.Parent?.Parent?.Name == "DataBlock" &&
+                                  node.Parent?.Parent?.Tag is Dictionary<string, string> entityprops)
                             {
-                                ctrl = new FetchControl(collec, this, entity);
+                                if (entityprops.ContainsKey("Entity") &&
+                                    entityprops["Entity"] is string entity &&
+                                    !string.IsNullOrWhiteSpace(entity))
+                                {
+                                    ctrl = new FetchControl(collec, this, entity);
+                                }
+                                else
+                                {
+                                    ctrl = new ErrorControl("Invalid entity", "Entity not defined on parent block node.");
+                                }
+                            }
+                            else
+                            {
+                                ctrl = new ErrorControl("Invalid block", "This is not a valid DataBlock.");
                             }
                             break;
                         }
@@ -665,9 +701,13 @@ namespace Innofactor.Crm.Shuffle.Builder
                         break;
 
                     case "Solution":
-                        if (node.Parent != null && node.Parent.Text.StartsWith("PreRequisites"))
+                        if (node.Parent?.Name == "PreRequisites")
                         {
                             ctrl = new PreReqSolutionControl(collec, this);
+                        }
+                        else
+                        {
+                            ctrl = new ErrorControl("Invalid node", "This is only valid under PreRequisites.");
                         }
                         break;
 
