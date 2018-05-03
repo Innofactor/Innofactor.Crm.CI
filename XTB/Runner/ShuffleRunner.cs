@@ -142,15 +142,18 @@ namespace Innofactor.Crm.Shuffle.Runner
 
         private void txtFile_TextChanged(object sender, EventArgs e)
         {
-            ExtractShufflePlaceholders();
-            datafilerequired = ShuffleHelper.DataFileRequired(txtFile.Text);
-            if (datafilerequired)
+            if (File.Exists(txtFile.Text))
             {
-                txtData.Text = Path.ChangeExtension(txtFile.Text, ".data.xml");
-            }
-            else
-            {
-                txtData.Text = "";
+                ExtractShufflePlaceholders();
+                datafilerequired = ShuffleHelper.DataFileRequired(txtFile.Text);
+                if (datafilerequired)
+                {
+                    txtData.Text = Path.ChangeExtension(txtFile.Text, ".data.xml");
+                }
+                else
+                {
+                    txtData.Text = "";
+                }
             }
             EnableShuffle();
         }
