@@ -535,27 +535,32 @@ namespace Innofactor.Crm.Shuffle.Builder
 
         public void OnIncomingMessage(MessageBusEventArgs message)
         {
-            if (message.SourcePlugin == "FetchXML Builder" &&
-                message.TargetArgument is string fetchxml)
+            if (message.SourcePlugin != "FetchXML Builder" ||
+                !(message.TargetArgument is string fetchxml))
             {
-                if (tvDefinition.SelectedNode?.Name == "FetchXML" &&
-                    tvDefinition.SelectedNode?.Tag is Dictionary<string, string> collec)
-                {
-                    if (collec.ContainsKey("#text"))
-                    {
-                        collec["#text"] = fetchxml;
-                    }
-                    else
-                    {
-                        collec.Add("#text", fetchxml);
-                    }
-                    HandleNodeSelection(tvDefinition.SelectedNode);
-                }
+                MessageBox.Show($"Not sure what to do with a {message.TargetArgument.GetType()} message from {message.SourcePlugin}", "Incoming Message", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            if (tvDefinition.SelectedNode == null)
+            {
+                MessageBox.Show($"No node selected to handle value returned from {message.SourcePlugin}.\nMake sure a FetchXML node is selected when returning.", "Incoming Message", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            if (tvDefinition.SelectedNode.Name != "FetchXML" ||
+                !(tvDefinition.SelectedNode.Tag is Dictionary<string, string> collec))
+            {
+                MessageBox.Show($"Current node '{tvDefinition.SelectedNode.Name}' cannot handle value returned from {message.SourcePlugin}.\nMake sure a FetchXML node is selected when returning.", "Incoming Message", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            if (collec.ContainsKey("#text"))
+            {
+                collec["#text"] = fetchxml;
             }
             else
             {
-                MessageBox.Show($"Not sure what to do with a {message.TargetArgument.GetType()} message from {message.SourcePlugin}", "Incoming Message", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                collec.Add("#text", fetchxml);
             }
+            HandleNodeSelection(tvDefinition.SelectedNode);
         }
 
         private void HandleNodeSelection(TreeNode node)

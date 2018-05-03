@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FetchControl));
-            CSRichTextBoxSyntaxHighlighting.XMLViewerSettings xmlViewerSettings2 = new CSRichTextBoxSyntaxHighlighting.XMLViewerSettings();
+            CSRichTextBoxSyntaxHighlighting.XMLViewerSettings xmlViewerSettings1 = new CSRichTextBoxSyntaxHighlighting.XMLViewerSettings();
             this.label1 = new System.Windows.Forms.Label();
             this.btnFXB = new System.Windows.Forms.Button();
             this.txtFetchXML = new CSRichTextBoxSyntaxHighlighting.XMLViewer();
@@ -47,14 +47,15 @@
             // 
             // btnFXB
             // 
+            this.btnFXB.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnFXB.Image = ((System.Drawing.Image)(resources.GetObject("btnFXB.Image")));
             this.btnFXB.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnFXB.Location = new System.Drawing.Point(7, 36);
+            this.btnFXB.Location = new System.Drawing.Point(307, 7);
             this.btnFXB.Name = "btnFXB";
             this.btnFXB.Padding = new System.Windows.Forms.Padding(5);
-            this.btnFXB.Size = new System.Drawing.Size(104, 41);
+            this.btnFXB.Size = new System.Drawing.Size(140, 31);
             this.btnFXB.TabIndex = 2;
-            this.btnFXB.Text = "Use FXB";
+            this.btnFXB.Text = "FetchXML Builder";
             this.btnFXB.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.btnFXB.UseVisualStyleBackColor = true;
             this.btnFXB.Click += new System.EventHandler(this.btnFXB_Click);
@@ -67,26 +68,27 @@
             this.txtFetchXML.BackColor = System.Drawing.SystemColors.Window;
             this.txtFetchXML.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txtFetchXML.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtFetchXML.Location = new System.Drawing.Point(213, 4);
+            this.txtFetchXML.Location = new System.Drawing.Point(7, 44);
             this.txtFetchXML.Name = "txtFetchXML";
-            xmlViewerSettings2.AttributeKey = System.Drawing.Color.Red;
-            xmlViewerSettings2.AttributeValue = System.Drawing.Color.Blue;
-            xmlViewerSettings2.Comment = System.Drawing.Color.Green;
-            xmlViewerSettings2.Element = System.Drawing.Color.DarkRed;
-            xmlViewerSettings2.QuoteCharacter = '\"';
-            xmlViewerSettings2.Tag = System.Drawing.Color.Blue;
-            xmlViewerSettings2.Value = System.Drawing.Color.Black;
-            this.txtFetchXML.Settings = xmlViewerSettings2;
-            this.txtFetchXML.Size = new System.Drawing.Size(234, 143);
+            xmlViewerSettings1.AttributeKey = System.Drawing.Color.Red;
+            xmlViewerSettings1.AttributeValue = System.Drawing.Color.Blue;
+            xmlViewerSettings1.Comment = System.Drawing.Color.Green;
+            xmlViewerSettings1.Element = System.Drawing.Color.DarkRed;
+            xmlViewerSettings1.QuoteCharacter = '\"';
+            xmlViewerSettings1.Tag = System.Drawing.Color.Blue;
+            xmlViewerSettings1.Value = System.Drawing.Color.Black;
+            this.txtFetchXML.Settings = xmlViewerSettings1;
+            this.txtFetchXML.Size = new System.Drawing.Size(440, 103);
             this.txtFetchXML.TabIndex = 3;
             this.txtFetchXML.Tag = "#text";
             this.txtFetchXML.Text = "";
             // 
             // btnFormat
             // 
-            this.btnFormat.Location = new System.Drawing.Point(7, 83);
+            this.btnFormat.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnFormat.Location = new System.Drawing.Point(197, 7);
             this.btnFormat.Name = "btnFormat";
-            this.btnFormat.Size = new System.Drawing.Size(104, 23);
+            this.btnFormat.Size = new System.Drawing.Size(104, 31);
             this.btnFormat.TabIndex = 4;
             this.btnFormat.Text = "Format XML";
             this.btnFormat.UseVisualStyleBackColor = true;

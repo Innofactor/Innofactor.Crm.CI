@@ -236,7 +236,10 @@ namespace Innofactor.Crm.Shuffle.Builder.Controls
 
         private void LayoutControls()
         {
-            foreach (Control control in GetControls().Cast<Control>().Where(y => y.Tag != null).OrderBy(y => y.TabIndex))
+            foreach (Control control in GetControls()
+                .Cast<Control>()
+                .Where(y => y.Tag != null && y.Left > 50)
+                .OrderBy(y => y.TabIndex))
             {
                 var rightmargin = control.Parent.Width - control.Left - control.Width;
                 control.Left = controlposition;
