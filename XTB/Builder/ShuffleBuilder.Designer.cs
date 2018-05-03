@@ -30,8 +30,8 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ShuffleBuilder));
-            CSRichTextBoxSyntaxHighlighting.XMLViewerSettings xmlViewerSettings3 = new CSRichTextBoxSyntaxHighlighting.XMLViewerSettings();
-            CSRichTextBoxSyntaxHighlighting.XMLViewerSettings xmlViewerSettings4 = new CSRichTextBoxSyntaxHighlighting.XMLViewerSettings();
+            CSRichTextBoxSyntaxHighlighting.XMLViewerSettings xmlViewerSettings1 = new CSRichTextBoxSyntaxHighlighting.XMLViewerSettings();
+            CSRichTextBoxSyntaxHighlighting.XMLViewerSettings xmlViewerSettings2 = new CSRichTextBoxSyntaxHighlighting.XMLViewerSettings();
             this.treeviewMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.addRuleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
@@ -59,7 +59,9 @@
             this.gbTree = new System.Windows.Forms.GroupBox();
             this.splitContainerProperties = new System.Windows.Forms.SplitContainer();
             this.gbNodeXML = new System.Windows.Forms.GroupBox();
+            this.txtPropertyXml = new CSRichTextBoxSyntaxHighlighting.XMLViewer();
             this.gbDefinitionXML = new System.Windows.Forms.GroupBox();
+            this.txtXML = new CSRichTextBoxSyntaxHighlighting.XMLViewer();
             this.nodeMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.deleteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
@@ -72,8 +74,6 @@
             this.cutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.copyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pasteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.txtPropertyXml = new CSRichTextBoxSyntaxHighlighting.XMLViewer();
-            this.txtXML = new CSRichTextBoxSyntaxHighlighting.XMLViewer();
             this.treeviewMenuStrip.SuspendLayout();
             this.toolStripMain.SuspendLayout();
             this.panProperties.SuspendLayout();
@@ -397,10 +397,32 @@
             this.gbNodeXML.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.gbNodeXML.Name = "gbNodeXML";
             this.gbNodeXML.Padding = new System.Windows.Forms.Padding(2, 3, 2, 3);
-            this.gbNodeXML.Size = new System.Drawing.Size(367, 216);
+            this.gbNodeXML.Size = new System.Drawing.Size(367, 212);
             this.gbNodeXML.TabIndex = 35;
             this.gbNodeXML.TabStop = false;
             this.gbNodeXML.Text = "Node XML";
+            // 
+            // txtPropertyXml
+            // 
+            this.txtPropertyXml.BackColor = System.Drawing.SystemColors.Window;
+            this.txtPropertyXml.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.txtPropertyXml.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.txtPropertyXml.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtPropertyXml.Location = new System.Drawing.Point(2, 16);
+            this.txtPropertyXml.Name = "txtPropertyXml";
+            this.txtPropertyXml.ReadOnly = true;
+            xmlViewerSettings1.AttributeKey = System.Drawing.Color.Red;
+            xmlViewerSettings1.AttributeValue = System.Drawing.Color.Blue;
+            xmlViewerSettings1.Comment = System.Drawing.Color.Green;
+            xmlViewerSettings1.Element = System.Drawing.Color.DarkRed;
+            xmlViewerSettings1.QuoteCharacter = '\"';
+            xmlViewerSettings1.Tag = System.Drawing.Color.Blue;
+            xmlViewerSettings1.Value = System.Drawing.Color.Black;
+            this.txtPropertyXml.Settings = xmlViewerSettings1;
+            this.txtPropertyXml.Size = new System.Drawing.Size(363, 193);
+            this.txtPropertyXml.TabIndex = 1;
+            this.txtPropertyXml.Text = "";
+            this.txtPropertyXml.WordWrap = false;
             // 
             // gbDefinitionXML
             // 
@@ -410,10 +432,32 @@
             this.gbDefinitionXML.Controls.Add(this.txtXML);
             this.gbDefinitionXML.Location = new System.Drawing.Point(-1, 8);
             this.gbDefinitionXML.Name = "gbDefinitionXML";
-            this.gbDefinitionXML.Size = new System.Drawing.Size(254, 592);
+            this.gbDefinitionXML.Size = new System.Drawing.Size(250, 592);
             this.gbDefinitionXML.TabIndex = 1;
             this.gbDefinitionXML.TabStop = false;
             this.gbDefinitionXML.Text = "Shuffle Definition XML";
+            // 
+            // txtXML
+            // 
+            this.txtXML.BackColor = System.Drawing.SystemColors.Window;
+            this.txtXML.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.txtXML.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.txtXML.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtXML.Location = new System.Drawing.Point(3, 16);
+            this.txtXML.Name = "txtXML";
+            this.txtXML.ReadOnly = true;
+            xmlViewerSettings2.AttributeKey = System.Drawing.Color.Red;
+            xmlViewerSettings2.AttributeValue = System.Drawing.Color.Blue;
+            xmlViewerSettings2.Comment = System.Drawing.Color.Green;
+            xmlViewerSettings2.Element = System.Drawing.Color.DarkRed;
+            xmlViewerSettings2.QuoteCharacter = '\"';
+            xmlViewerSettings2.Tag = System.Drawing.Color.Blue;
+            xmlViewerSettings2.Value = System.Drawing.Color.Black;
+            this.txtXML.Settings = xmlViewerSettings2;
+            this.txtXML.Size = new System.Drawing.Size(244, 573);
+            this.txtXML.TabIndex = 0;
+            this.txtXML.Text = "";
+            this.txtXML.WordWrap = false;
             // 
             // nodeMenu
             // 
@@ -513,48 +557,6 @@
             this.pasteToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.V)));
             this.pasteToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
             this.pasteToolStripMenuItem.Text = "Paste";
-            // 
-            // txtPropertyXml
-            // 
-            this.txtPropertyXml.BackColor = System.Drawing.SystemColors.Window;
-            this.txtPropertyXml.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.txtPropertyXml.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.txtPropertyXml.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtPropertyXml.Location = new System.Drawing.Point(2, 16);
-            this.txtPropertyXml.Name = "txtPropertyXml";
-            this.txtPropertyXml.ReadOnly = true;
-            xmlViewerSettings3.AttributeKey = System.Drawing.Color.Red;
-            xmlViewerSettings3.AttributeValue = System.Drawing.Color.Blue;
-            xmlViewerSettings3.Comment = System.Drawing.Color.Green;
-            xmlViewerSettings3.Element = System.Drawing.Color.DarkRed;
-            xmlViewerSettings3.QuoteCharacter = '\"';
-            xmlViewerSettings3.Tag = System.Drawing.Color.Blue;
-            xmlViewerSettings3.Value = System.Drawing.Color.Black;
-            this.txtPropertyXml.Settings = xmlViewerSettings3;
-            this.txtPropertyXml.Size = new System.Drawing.Size(363, 197);
-            this.txtPropertyXml.TabIndex = 1;
-            this.txtPropertyXml.Text = "";
-            // 
-            // txtXML
-            // 
-            this.txtXML.BackColor = System.Drawing.SystemColors.Window;
-            this.txtXML.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.txtXML.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.txtXML.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtXML.Location = new System.Drawing.Point(3, 16);
-            this.txtXML.Name = "txtXML";
-            this.txtXML.ReadOnly = true;
-            xmlViewerSettings4.AttributeKey = System.Drawing.Color.Red;
-            xmlViewerSettings4.AttributeValue = System.Drawing.Color.Blue;
-            xmlViewerSettings4.Comment = System.Drawing.Color.Green;
-            xmlViewerSettings4.Element = System.Drawing.Color.DarkRed;
-            xmlViewerSettings4.QuoteCharacter = '\"';
-            xmlViewerSettings4.Tag = System.Drawing.Color.Blue;
-            xmlViewerSettings4.Value = System.Drawing.Color.Black;
-            this.txtXML.Settings = xmlViewerSettings4;
-            this.txtXML.Size = new System.Drawing.Size(248, 573);
-            this.txtXML.TabIndex = 0;
-            this.txtXML.Text = "";
             // 
             // ShuffleBuilder
             // 

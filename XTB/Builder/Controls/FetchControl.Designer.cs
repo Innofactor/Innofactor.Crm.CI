@@ -34,6 +34,7 @@
             this.btnFXB = new System.Windows.Forms.Button();
             this.txtFetchXML = new CSRichTextBoxSyntaxHighlighting.XMLViewer();
             this.btnFormat = new System.Windows.Forms.Button();
+            this.gbFetchXML = new System.Windows.Forms.GroupBox();
             this.SuspendLayout();
             // 
             // label1
@@ -66,9 +67,9 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtFetchXML.BackColor = System.Drawing.SystemColors.Window;
-            this.txtFetchXML.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.txtFetchXML.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.txtFetchXML.Font = new System.Drawing.Font("Consolas", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtFetchXML.Location = new System.Drawing.Point(7, 44);
+            this.txtFetchXML.Location = new System.Drawing.Point(3, 58);
             this.txtFetchXML.Name = "txtFetchXML";
             xmlViewerSettings1.AttributeKey = System.Drawing.Color.Red;
             xmlViewerSettings1.AttributeValue = System.Drawing.Color.Blue;
@@ -78,7 +79,7 @@
             xmlViewerSettings1.Tag = System.Drawing.Color.Blue;
             xmlViewerSettings1.Value = System.Drawing.Color.Black;
             this.txtFetchXML.Settings = xmlViewerSettings1;
-            this.txtFetchXML.Size = new System.Drawing.Size(440, 103);
+            this.txtFetchXML.Size = new System.Drawing.Size(444, 89);
             this.txtFetchXML.TabIndex = 3;
             this.txtFetchXML.Tag = "#text";
             this.txtFetchXML.Text = "";
@@ -94,14 +95,26 @@
             this.btnFormat.UseVisualStyleBackColor = true;
             this.btnFormat.Click += new System.EventHandler(this.btnFormat_Click);
             // 
+            // gbFetchXML
+            // 
+            this.gbFetchXML.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.gbFetchXML.Location = new System.Drawing.Point(-1, 44);
+            this.gbFetchXML.Name = "gbFetchXML";
+            this.gbFetchXML.Size = new System.Drawing.Size(452, 8);
+            this.gbFetchXML.TabIndex = 5;
+            this.gbFetchXML.TabStop = false;
+            // 
             // FetchControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.txtFetchXML);
+            this.Controls.Add(this.gbFetchXML);
             this.Controls.Add(this.btnFormat);
             this.Controls.Add(this.btnFXB);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.txtFetchXML);
             this.Name = "FetchControl";
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -114,5 +127,6 @@
         private System.Windows.Forms.Button btnFXB;
         internal CSRichTextBoxSyntaxHighlighting.XMLViewer txtFetchXML;
         private System.Windows.Forms.Button btnFormat;
+        private System.Windows.Forms.GroupBox gbFetchXML;
     }
 }
