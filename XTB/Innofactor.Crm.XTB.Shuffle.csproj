@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Innofactor.Crm.XTB.Shuffle</RootNamespace>
-    <AssemblyName>Innofactor.Crm.XTB.Shuffle</AssemblyName>
+    <AssemblyName>Innofactor.Crm.XTB.Shuffle.Unmerged</AssemblyName>
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -36,6 +36,9 @@
     </Reference>
     <Reference Include="Cinteros.Crm.Utils.Misc, Version=9.0.1804.9, Culture=neutral, PublicKeyToken=0b6cd78ab2e51f2b, processorArchitecture=MSIL">
       <HintPath>..\packages\Innofactor.Xrm.DevUtils.Common.9.0.1804.9\lib\net452\Cinteros.Crm.Utils.Misc.dll</HintPath>
+    </Reference>
+    <Reference Include="ILMerge">
+      <HintPath>..\packages\ILMerge.2.14.1208\tools\ILMerge.exe</HintPath>
     </Reference>
     <Reference Include="McTools.Xrm.Connection, Version=1.2018.4.16, Culture=neutral, PublicKeyToken=96037217801d9658, processorArchitecture=MSIL">
       <HintPath>..\packages\MscrmTools.Xrm.Connection.1.2018.4.16\lib\net462\McTools.Xrm.Connection.dll</HintPath>
@@ -336,12 +339,11 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>IF NOT EXIST Plugins mkdir Plugins
-move /Y Cinteros.*.dll Plugins
-move /Y Cinteros.*.pdb Plugins
-move /Y Innofactor.*.dll Plugins
-move /Y Innofactor.*.pdb Plugins
-move /Y Ionic*.dll Plugins
+    <PostBuildEvent>ilmerge.exe /target:library /targetplatform:v4,"C:\Windows\Microsoft.NET\Framework\v4.0.30319" "/out:Innofactor.Crm.XTB.Shuffle.dll" "$(TargetFileName)" "Cinteros.Crm.Utils.Misc.dll" "Cinteros.Crm.Utils.Common.dll" "Innofactor.Crm.Shuffle.dll" "Ionic.Zip.dll"
+
+
+IF NOT EXIST Plugins mkdir Plugins
+move /Y Innofactor.Crm.XTB.Shuffle.dll Plugins
 
 </PostBuildEvent>
   </PropertyGroup>
