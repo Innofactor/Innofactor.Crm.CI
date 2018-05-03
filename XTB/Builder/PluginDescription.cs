@@ -13,7 +13,7 @@
         ExportMetadata("BackgroundColor", XTBConst.BGColor),
         ExportMetadata("PrimaryFontColor", XTBConst.PFColor),
         ExportMetadata("SecondaryFontColor", XTBConst.SFColor)]
-    public class AutoDeployTool : PluginBase
+    public class PluginDescription : PluginBase
     {
         #region Public Methods
 
