@@ -149,6 +149,13 @@ namespace Innofactor.Crm.Shuffle.Builder
         private void toolStripButtonRunit_Click(object sender, EventArgs e)
         {
             CommitLastChange();
+            var xtbver = new Version(TopLevelControl.ProductVersion);
+            if (xtbver > new Version("1.2018") &&
+                xtbver < new Version("1.2018.5"))
+            {   // Bug introduced with docking layout in XTB
+                MessageBox.Show($"Unfortunately current version ({xtbver}) of XrmToolBox cannot connect properly to Shuffle Runner.\nPlease start Shuffle Runner from the Plugin List instead.", "Shuffle Runner", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
             var args = new MessageBusEventArgs("Shuffle Runner", false)
             {
                 TargetArgument = fileName
