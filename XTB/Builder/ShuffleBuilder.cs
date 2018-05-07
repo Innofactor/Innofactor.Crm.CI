@@ -654,7 +654,24 @@ namespace Innofactor.Crm.Shuffle.Builder
                             }
                             else if (node.Parent?.Name == "Match")
                             {
-                                ctrl = new ImportAttributeControl(collec, this);
+                                if (node.Parent?.Parent?.Parent?.Name == "DataBlock" &&
+                                    node.Parent?.Parent?.Parent?.Tag is Dictionary<string, string> entityprops)
+                                {
+                                    if (entityprops.ContainsKey("Entity") &&
+                                        entityprops["Entity"] is string entity &&
+                                        !string.IsNullOrWhiteSpace(entity))
+                                    {
+                                        ctrl = new ImportAttributeControl(collec, this, entity);
+                                    }
+                                    else
+                                    {
+                                        ctrl = new ErrorControl("Invalid entity", "Entity not defined on parent block node.");
+                                    }
+                                }
+                                else
+                                {
+                                    ctrl = new ErrorControl("Invalid block", "This is not a valid DataBlock.");
+                                }
                             }
                             else
                             {
@@ -685,9 +702,27 @@ namespace Innofactor.Crm.Shuffle.Builder
                             break;
                         }
                     case "Filter":
-                        ctrl = new FilterControl(collec, this);
-                        break;
-
+                        {
+                            if (node.Parent?.Parent?.Name == "DataBlock" &&
+                                node.Parent?.Parent?.Tag is Dictionary<string, string> entityprops)
+                            {
+                                if (entityprops.ContainsKey("Entity") &&
+                                    entityprops["Entity"] is string entity &&
+                                    !string.IsNullOrWhiteSpace(entity))
+                                {
+                                    ctrl = new FilterControl(collec, this, entity);
+                                }
+                                else
+                                {
+                                    ctrl = new ErrorControl("Invalid entity", "Entity not defined on parent block node.");
+                                }
+                            }
+                            else
+                            {
+                                ctrl = new ErrorControl("Invalid block", "This is not a valid DataBlock.");
+                            }
+                            break;
+                        }
                     case "Sort":
                         ctrl = new SortControl(collec, this);
                         break;
