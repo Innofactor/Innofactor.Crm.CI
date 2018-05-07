@@ -9,6 +9,7 @@ using Microsoft.Xrm.Tooling.Connector;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
@@ -295,7 +296,7 @@ namespace Cinteros.Crm.Utils.Shuffle
             }
             ShuffleBlocks blocks = new ShuffleBlocks();
             ExistingSolutionVersions = null;
-            if (ShuffleDefinition.Blocks?.Items?.Length > 0)
+            if (ShuffleDefinition.Blocks.Items.Any(b => (b is DataBlock data && data.Export != null) || b is SolutionBlock sol && sol.Export != null))
             {
                 stoponerror = ShuffleDefinition.StopOnError;
                 timeout = ShuffleDefinition.TimeoutSpecified ? ShuffleDefinition.Timeout : -1;
@@ -366,54 +367,47 @@ namespace Cinteros.Crm.Utils.Shuffle
             int failed = 0;
             EntityReferenceCollection references = new EntityReferenceCollection();
 
-            XmlNode xRoot = CintXML.FindChild(definition, "ShuffleDefinition");
-            XmlNode xBlocks = CintXML.FindChild(xRoot, "Blocks");
-            if (xBlocks != null)
+            if (ShuffleDefinition.Blocks.Items.Any(b => (b is DataBlock data && data.Import != null) || b is SolutionBlock sol && sol.Import != null))
             {
                 guidmap = new Dictionary<Guid, Guid>();
-                stoponerror = CintXML.GetBoolAttribute(xRoot, "StopOnError", false);
-                timeout = CintXML.GetIntAttribute(xRoot, "Timeout", -1);
+                stoponerror = ShuffleDefinition.StopOnError;
+                timeout = ShuffleDefinition.TimeoutSpecified ? ShuffleDefinition.Timeout : -1;
                 double savedtimeout = -1;
                 if (timeout > -1)
                 {
                     savedtimeout = SetTimeout();
                 }
 
-                int totalBlocks = xBlocks.ChildNodes.Count;
+                int totalBlocks = ShuffleDefinition.Blocks.Items.Length;
                 int currentBlock = 0;
-                foreach (XmlNode xBlock in xBlocks.ChildNodes)
+                foreach (var block in ShuffleDefinition.Blocks.Items)
                 {
                     currentBlock++;
                     SendStatus(totalBlocks, currentBlock, -1, -1);
-                    if (xBlock.NodeType == XmlNodeType.Element)
+                    if (block is DataBlock datablock)
                     {
-                        switch (xBlock.Name)
+                        var name = datablock.Name;
+                        if (!blocks.ContainsKey(name))
                         {
-                            case "DataBlock":
-                                string name = CintXML.GetAttribute(xBlock, "Name");
-                                if (!blocks.ContainsKey(name))
-                                {
-                                    blocks.Add(name, new CintDynEntityCollection());
-                                }
-                                Tuple<int, int, int, int, int, EntityReferenceCollection> dataresult = ImportDataBlock(xBlock, blocks[name]);
-                                created += dataresult.Item1;
-                                updated += dataresult.Item2;
-                                skipped += dataresult.Item3;
-                                deleted += dataresult.Item4;
-                                failed += dataresult.Item5;
-                                references.AddRange(dataresult.Item6);
-                                break;
-
-                            case "SolutionBlock":
-                                var solutionresult = ImportSolutionBlock(xBlock);
-                                switch (solutionresult)
-                                {
-                                    case ItemImportResult.Created: created++; break;
-                                    case ItemImportResult.Updated: updated++; break;
-                                    case ItemImportResult.Skipped: skipped++; break;
-                                    case ItemImportResult.Failed: failed++; break;
-                                }
-                                break;
+                            blocks.Add(name, new CintDynEntityCollection());
+                        }
+                        Tuple<int, int, int, int, int, EntityReferenceCollection> dataresult = ImportDataBlock(datablock, blocks[name]);
+                        created += dataresult.Item1;
+                        updated += dataresult.Item2;
+                        skipped += dataresult.Item3;
+                        deleted += dataresult.Item4;
+                        failed += dataresult.Item5;
+                        references.AddRange(dataresult.Item6);
+                    }
+                    else if (block is SolutionBlock solutionblock)
+                    {
+                        var solutionresult = ImportSolutionBlock(solutionblock);
+                        switch (solutionresult)
+                        {
+                            case ItemImportResult.Created: created++; break;
+                            case ItemImportResult.Updated: updated++; break;
+                            case ItemImportResult.Skipped: skipped++; break;
+                            case ItemImportResult.Failed: failed++; break;
                         }
                     }
                 }
