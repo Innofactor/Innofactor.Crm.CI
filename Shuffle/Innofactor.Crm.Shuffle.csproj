@@ -134,6 +134,7 @@
     <None Include="Resources\parameterxml.xsd">
       <SubType>Designer</SubType>
     </None>
+    <None Include="Resources\XSD ShuffleDefinition.cs.cmd" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
