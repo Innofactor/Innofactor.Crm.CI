@@ -19,14 +19,14 @@ namespace Cinteros.Crm.Utils.Shuffle
     {
         #region Private Methods
 
-        private static void AddRelationFilter(ShuffleBlocks blocks, XmlNode xRelation, XmlNode xEntity, ILoggable log)
+        private static void AddRelationFilter(ShuffleBlocks blocks, DataBlockRelation relation, XmlNode xEntity, ILoggable log)
         {
             if (blocks != null && blocks.Count > 0)
             {
-                var block = CintXML.GetAttribute(xRelation, "Block");
-                var attribute = CintXML.GetAttribute(xRelation, "Attribute");
-                var pkattribute = CintXML.GetAttribute(xRelation, "PK-Attribute");
-                var includenull = CintXML.GetBoolAttribute(xRelation, "IncludeNull", false);
+                var block = relation.Block;
+                var attribute = relation.Attribute;
+                var pkattribute = relation.PKAttribute;
+                var includenull = relation.IncludeNull;
                 List<string> ids = new List<string>();
                 CintDynEntityCollection parentcoll = blocks.ContainsKey(block) ? blocks[block] : null;
                 if (parentcoll != null && parentcoll.Count > 0)
@@ -124,14 +124,14 @@ namespace Cinteros.Crm.Utils.Shuffle
             }
         }
 
-        private void AddFilter(QueryExpression qExport, XmlNode xExpProp)
+        private void AddFilter(QueryExpression qExport, DataBlockExportFilter filter)
         {
-            string valuestring = CintXML.GetAttribute(xExpProp, "Value");
+            var valuestring = filter.Value;
             if (valuestring.Contains("{0}"))
             {
                 throw new ArgumentOutOfRangeException("Name", "Filter", "Parameterized Filters not supported in embedded Shuffle Utils");
             }
-            string operstr = CintXML.GetAttribute(xExpProp, "Operator");
+            string operstr = filter.Operator.ToString();
             if (string.IsNullOrEmpty(operstr))
             {
                 operstr = "Equal";
@@ -153,47 +153,49 @@ namespace Cinteros.Crm.Utils.Shuffle
                 oper != Microsoft.Xrm.Sdk.Query.ConditionOperator.Tomorrow &&
                 oper != Microsoft.Xrm.Sdk.Query.ConditionOperator.Yesterday)
             {
-                switch (CintXML.GetAttribute(xExpProp, "Type").ToUpperInvariant())
+                if (filter.TypeSpecified)
                 {
-                    case "STRING":
-                        value = valuestring;
-                        break;
+                    switch (filter.Type)
+                    {
+                        case FilterTypes.@string:
+                            value = valuestring;
+                            break;
 
-                    case "INT":
-                        value = int.Parse(valuestring);
-                        break;
+                        case FilterTypes.@int:
+                            value = int.Parse(valuestring);
+                            break;
 
-                    case "BOOL":
-                        value = bool.Parse(valuestring);
-                        break;
+                        case FilterTypes.@bool:
+                            value = bool.Parse(valuestring);
+                            break;
 
-                    case "DATETIME":
-                        value = DateTime.Parse(valuestring);
-                        break;
+                        case FilterTypes.datetime:
+                            value = DateTime.Parse(valuestring);
+                            break;
 
-                    case "GUID":
-                        value = new Guid(valuestring);
-                        break;
+                        case FilterTypes.guid:
+                            value = new Guid(valuestring);
+                            break;
 
-                    default:
-                        throw new ArgumentOutOfRangeException("Type", CintXML.GetAttribute(xExpProp, "Type"), "Invalid filter attribute type");
+                        default:
+                            throw new ArgumentOutOfRangeException("Type", filter.Type, "Invalid filter attribute type");
+                    }
                 }
             }
-            string attribute = CintXML.GetAttribute(xExpProp, "Attribute");
+            string attribute = filter.Attribute;
             log.Log("Adding filter: {0} {1} {2}", attribute, oper, value);
             CintQryExp.AppendCondition(qExport.Criteria, LogicalOperator.And, attribute, oper, value);
         }
 
-        private void AddRelationFilter(ShuffleBlocks blocks, XmlNode xRelation, FilterExpression filter, ILoggable log)
+        private void AddRelationFilter(ShuffleBlocks blocks, string entityName, DataBlockRelation relation, FilterExpression filter, ILoggable log)
         {
             log.StartSection(MethodBase.GetCurrentMethod().Name);
             if (blocks != null && blocks.Count > 0)
             {
-                var block = CintXML.GetAttribute(xRelation, "Block");
-                var attribute = CintXML.GetAttribute(xRelation, "Attribute");
-                var pkattribute = CintXML.GetAttribute(xRelation, "PK-Attribute");
-                var includenull = CintXML.GetBoolAttribute(xRelation, "IncludeNull", false);
-                var entityName = xRelation.ParentNode.Attributes["Entity"].Value;
+                var block = relation.Block;
+                var attribute = relation.Attribute;
+                var pkattribute = relation.PKAttribute;
+                var includenull = relation.IncludeNull;
 
                 var type = GetAttributeType(attribute, entityName);
 
@@ -240,54 +242,37 @@ namespace Cinteros.Crm.Utils.Shuffle
             log.EndSection();
         }
 
-        private CintDynEntityCollection ExportDataBlock(ShuffleBlocks blocks, XmlNode xBlock)
+        private CintDynEntityCollection ExportDataBlock(ShuffleBlocks blocks, DataBlock block)
         {
             log.StartSection("ExportDataBlock");
-            string name = CintXML.GetAttribute(xBlock, "Name");
-            log.Log("Block: {0}", name);
+            log.Log("Block: {0}", block.Name);
             CintDynEntityCollection cExportEntities = null;
 
-            if (xBlock.Name != "DataBlock")
+            if (block.Export != null)
             {
-                throw new ArgumentOutOfRangeException("Type", xBlock.Name, "Invalid Block type");
-            }
-            string entity = CintXML.GetAttribute(xBlock, "Entity");
-            string type = CintXML.GetAttribute(xBlock, "Type");
-            XmlNode xExport = CintXML.FindChild(xBlock, "Export");
-            if (xExport != null)
-            {
-                if (string.IsNullOrEmpty(entity))
-                {
-                    entity = CintXML.GetAttribute(xExport, "Entity");
-                }
-
                 #region Define attributes
 
-                XmlNode xAttributes = CintXML.FindChild(xExport, "Attributes");
+                var attributes = block.Export.Items.Where(i => i is DataBlockExportAttributes).FirstOrDefault() as DataBlockExportAttributes;
                 bool allcolumns = false;
                 List<string> lAttributes = new List<string>();
                 List<string> lNullAttributes = new List<string>();
-                if (xAttributes != null)
+                if (attributes != null)
                 {
-                    foreach (XmlNode xAttr in xAttributes.ChildNodes)
+                    foreach (var attribute in attributes.Attribute)
                     {
-                        if (xAttr.Name == "Attribute")
+                        string attr = attribute.Name;
+                        log.Log("Adding column: {0}", attr);
+                        lAttributes.Add(attr.Replace("*", "%"));
+                        if (attr.Contains("*"))
                         {
-                            string attr = CintXML.GetAttribute(xAttr, "Name");
-                            log.Log("Adding column: {0}", attr);
-                            lAttributes.Add(attr.Replace("*", "%"));
-                            if (attr.Contains("*"))
+                            allcolumns = true;
+                            log.Log("Found wildcard");
+                        }
+                        else
+                        {
+                            if (attribute.IncludeNull)
                             {
-                                allcolumns = true;
-                                log.Log("Found wildcard");
-                            }
-                            else
-                            {
-                                bool includenull = CintXML.GetBoolAttribute(xAttr, "IncludeNull", false);
-                                if (includenull)
-                                {
-                                    lNullAttributes.Add(attr);
-                                }
+                                lNullAttributes.Add(attr);
                             }
                         }
                     }
@@ -301,57 +286,41 @@ namespace Cinteros.Crm.Utils.Shuffle
 
                 #endregion Define attributes
 
-                if (CintXML.FindChild(xExport, "FetchXML") is XmlNode xFetchXML &&
-                    CintXML.FindChild(xFetchXML, "#text") is XmlText xFetchXMLText)
+                var fetchxml = block.Export.Items.Where(i => i is string).FirstOrDefault() as string;
+                if (!string.IsNullOrWhiteSpace(fetchxml))
                 {
                     log.StartSection("Export entity using FetchXML");
-                    var fetchxml = xFetchXMLText.Value;
 #if DEBUG
                     log.Log("FetchXML:\n{0}", fetchxml);
 #endif
                     cExportEntities = CintDynEntity.RetrieveMultiple(crmsvc, new FetchExpression(fetchxml), log);
                     log.EndSection();
                 }
-                else if (type == "Entity" || string.IsNullOrEmpty(type))
+                else if (!block.TypeSpecified || block.Type == EntityTypes.Entity)
                 {
                     #region QueryExpression Entity
 
-                    log.StartSection("Export entity " + entity);
-                    QueryExpression qExport = new QueryExpression(entity);
-                    if (CintXML.GetBoolAttribute(xExport, "ActiveOnly", true))
-                        CintQryExp.AppendConditionActive(qExport.Criteria);
-
-                    foreach (var xBlockChild in xBlock.ChildNodes.Cast<XmlNode>())
+                    log.StartSection("Export entity " + block.Entity);
+                    QueryExpression qExport = new QueryExpression(block.Entity);
+                    if (block.Export.ActiveOnly)
                     {
-                        if (xBlockChild.Name == "Relation")
+                        CintQryExp.AppendConditionActive(qExport.Criteria);
+                    }
+
+                    if (block.Relation != null)
+                    {
+                        foreach (var relation in block.Relation)
                         {
-                            AddRelationFilter(blocks, xBlockChild, qExport.Criteria, log);
+                            AddRelationFilter(blocks, block.Entity, relation, qExport.Criteria, log);
                         }
                     }
-                    foreach (XmlNode xExpProp in xExport.ChildNodes)
+                    foreach (var filter in block.Export.Items.Where(i => i is DataBlockExportFilter).Cast<DataBlockExportFilter>())
                     {
-                        if (xExport.NodeType == XmlNodeType.Element)
-                        {
-                            switch (xExpProp.Name)
-                            {
-                                case "#comment":
-                                case "Attributes":
-                                    break;
-
-                                case "Filter":
-                                    AddFilter(qExport, xExpProp);
-                                    break;
-
-                                case "Sort":
-                                    qExport.AddOrder(
-                                        CintXML.GetAttribute(xExpProp, "Attribute"),
-                                        CintXML.GetAttribute(xExpProp, "Type") == "Desc" ? OrderType.Descending : OrderType.Ascending);
-                                    break;
-
-                                default:
-                                    throw new ArgumentOutOfRangeException("Name", xExpProp.Name, "Invalid subitem to export block " + name);
-                            }
-                        }
+                        AddFilter(qExport, filter);
+                    }
+                    foreach (var sort in block.Export.Items.Where(i => i is DataBlockExportSort).Cast<DataBlockExportSort>())
+                    {
+                        qExport.AddOrder(sort.Attribute, sort.Type == SortTypes.Desc ? OrderType.Descending : OrderType.Ascending);
                     }
                     if (allcolumns)
                     {
@@ -360,14 +329,16 @@ namespace Cinteros.Crm.Utils.Shuffle
                     else
                     {
                         foreach (string attr in lAttributes)
+                        {
                             qExport.ColumnSet.AddColumn(attr);
+                        }
                     }
 #if DEBUG
                     log.Log("Converting to FetchXML");
                     try
                     {
                         var fetch = CintQryExp.ConvertToFetchXml(qExport, crmsvc);
-                        log.Log("Exporting {0}:\n{1}", entity, fetch);
+                        log.Log("Exporting {0}:\n{1}", block.Entity, fetch);
                     }
                     catch (Exception ex)
                     {
@@ -380,32 +351,29 @@ namespace Cinteros.Crm.Utils.Shuffle
                     {
                         SelectAttributes(cExportEntities, lAttributes, lNullAttributes);
                     }
-                    SendLine("Block {0} - {1} records", name, cExportEntities.Count);
+                    SendLine("Block {0} - {1} records", block.Name, cExportEntities.Count);
                     log.EndSection();
 
                     #endregion QueryExpression Entity
                 }
-                else if (type == "Intersect")
+                else if (block.Type == EntityTypes.Intersect)
                 {
                     #region FetchXML Intersect
 
-                    log.StartSection("Export intersect " + entity);
+                    log.StartSection("Export intersect " + block.Entity);
                     XmlDocument xDoc = new XmlDocument();
-                    XmlNode xEntity = CintFetchXML.Create(xDoc, entity);
+                    XmlNode xEntity = CintFetchXML.Create(xDoc, block.Entity);
                     CintFetchXML.AddAttribute(xEntity, lAttributes.ToArray());
 
-                    foreach (var xBlockChild in xBlock.ChildNodes.Cast<XmlNode>())
+                    foreach (var relation in block.Relation)
                     {
-                        if (xBlockChild.Name == "Relation")
-                        {
-                            AddRelationFilter(blocks, xBlockChild, xEntity, log);
-                        }
+                        AddRelationFilter(blocks, relation, xEntity, log);
                     }
 
                     var fetch = xDoc.OuterXml;
                     fetch = fetch.Replace("<fetch ", "<fetch {0} {1} ");    // Detta för att se till att CrmServiceProxy.RetrieveMultiple kan hantera paging
 #if DEBUG
-                    log.Log("Exporting intersect entity {0}\n{1}", entity, fetch);
+                    log.Log("Exporting intersect entity {0}\n{1}", block.Entity, fetch);
 #endif
                     var qExport = new FetchExpression(fetch);
                     cExportEntities = CintDynEntity.RetrieveMultiple(crmsvc, qExport, log);

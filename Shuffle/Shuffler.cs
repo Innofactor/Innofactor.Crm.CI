@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Xml;
+using System.Xml.Serialization;
 
 /// <summary>Common namespace for Cinteros Shuffle functionality</summary>
 namespace Cinteros.Crm.Utils.Shuffle
@@ -32,6 +33,7 @@ namespace Cinteros.Crm.Utils.Shuffle
         private readonly IServicable crmsvc;
         private readonly ILoggable log;
         private XmlDocument definition;
+        private ShuffleDefinition shuffledefinition;
         private string definitionpath;
         private Dictionary<Guid, Guid> guidmap = null;
         private bool stoponerror = false;
@@ -80,6 +82,22 @@ namespace Cinteros.Crm.Utils.Shuffle
                     SendLine(result);
                 }
                 definition = value;
+            }
+        }
+
+        public ShuffleDefinition ShuffleDefinition
+        {
+            get
+            {
+                if (shuffledefinition == null && definition != null)
+                {
+                    var serializer = new XmlSerializer(typeof(ShuffleDefinition));
+                    using (TextReader reader = new StringReader(definition.OuterXml))
+                    {
+                        shuffledefinition = serializer.Deserialize(reader) as ShuffleDefinition;
+                    }
+                }
+                return shuffledefinition;
             }
         }
 
@@ -277,52 +295,45 @@ namespace Cinteros.Crm.Utils.Shuffle
             }
             ShuffleBlocks blocks = new ShuffleBlocks();
             ExistingSolutionVersions = null;
-            XmlNode xRoot = CintXML.FindChild(definition, "ShuffleDefinition");
-            XmlNode xBlocks = CintXML.FindChild(xRoot, "Blocks");
-            if (xBlocks != null)
+            if (ShuffleDefinition.Blocks?.Items?.Length > 0)
             {
-                stoponerror = CintXML.GetBoolAttribute(xRoot, "StopOnError", false);
-                timeout = CintXML.GetIntAttribute(xRoot, "Timeout", -1);
+                stoponerror = ShuffleDefinition.StopOnError;
+                timeout = ShuffleDefinition.TimeoutSpecified ? ShuffleDefinition.Timeout : -1;
                 double savedtimeout = -1;
                 if (timeout > -1)
                 {
                     savedtimeout = SetTimeout();
                 }
 
-                int totalBlocks = xBlocks.ChildNodes.Count;
+                int totalBlocks = ShuffleDefinition.Blocks.Items.Length;
                 int currentBlock = 0;
-                foreach (XmlNode xBlock in xBlocks.ChildNodes)
+                foreach (var block in ShuffleDefinition.Blocks.Items)
                 {
                     currentBlock++;
                     SendStatus(totalBlocks, currentBlock, -1, -1);
-                    if (xBlock.NodeType == XmlNodeType.Element)
+                    if (block is DataBlock datablock)
                     {
-                        switch (xBlock.Name)
+                        var cExported = ExportDataBlock(blocks, datablock);
+                        var name = datablock.Name;
+                        if (cExported != null)
                         {
-                            case "DataBlock":
-                                CintDynEntityCollection cExported = ExportDataBlock(blocks, xBlock);
-                                string name = CintXML.GetAttribute(xBlock, "Name");
-                                if (cExported != null)
-                                {
-                                    if (blocks.ContainsKey(name))
-                                    {
-                                        SendLine("Block already added: {0}", name);
-                                    }
-                                    else
-                                    {
-                                        blocks.Add(name, cExported);
-                                    }
-                                }
-                                break;
-
-                            case "SolutionBlock":
-                                if (ExistingSolutionVersions == null)
-                                {
-                                    GetCurrentVersions();
-                                }
-                                ExportSolutionBlock(xBlock);
-                                break;
+                            if (blocks.ContainsKey(name))
+                            {
+                                SendLine("Block already added: {0}", name);
+                            }
+                            else
+                            {
+                                blocks.Add(name, cExported);
+                            }
                         }
+                    }
+                    else if (block is SolutionBlock solutionblock)
+                    {
+                        if (ExistingSolutionVersions == null)
+                        {
+                            GetCurrentVersions();
+                        }
+                        ExportSolutionBlock(solutionblock);
                     }
                 }
                 SendStatus(0, 0, 0, 0);
