@@ -1,19 +1,19 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
-    <id>Cinteros.DevUtils.Shuffle.8</id>
-    <title>Innofactor DevUtils Shuffle for CRM 2016</title>
-    <authors>Innofactor Sweden</authors>
+    <id>Innofactor.Xrm.DevUtils.Shuffle</id>
+    <title>Innofactor DevUtils for Microsoft Dynamics 365 Shuffle features</title>
+    <authors>Innofactor AB</authors>
     <owners>InnofactorSE, rappen</owners>
-    <version>1.0.0.0</version>
-    <iconUrl>http://rappen.net/Cinteros/cinteros.ico</iconUrl>
+    <version>$version$</version>
+    <iconUrl>http://rappen.net/Cinteros/innofactor.png</iconUrl>
     <projectUrl>https://github.com/Innofactor/Innofactor.Crm.CI</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>Shuffle Utilities for CRM 2016 projects.</description>
+    <description>Shuffle Utilities for Microsoft Dynamics 365.</description>
     <copyright>Innofactor Sweden</copyright>
     <language>en-US</language>
     <dependencies>
-      <dependency id="Cinteros.DevUtils.8" version="8.0.0.0"/>
+      <dependency id="Innofactor.Xrm.DevUtils.Common" version="9.*"/>
     </dependencies>
   </metadata>
 </package>
