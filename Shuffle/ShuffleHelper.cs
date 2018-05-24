@@ -17,6 +17,39 @@ namespace Cinteros.Crm.Utils.Shuffle
     /// <summary>Generic helper methods for Cinteros Shuffle</summary>
     public static class ShuffleHelper
     {
+        private static XmlSchemaSet schemas = null;
+
+        public static XmlSchemaSet Schemas
+        {
+            get
+            {
+                if (schemas == null)
+                {
+                    LoadDefinitionSchemas();
+                }
+                return schemas;
+            }
+        }
+
+        private static void LoadDefinitionSchemas()
+        {
+            schemas = new XmlSchemaSet();
+            Assembly assembly = Assembly.GetExecutingAssembly();
+            var shufdefresource = assembly.GetManifestResourceNames().Where(n => n.ToLowerInvariant().EndsWith("shuffledefinition.xsd")).FirstOrDefault();
+            var qryexpresource = assembly.GetManifestResourceNames().Where(n => n.ToLowerInvariant().EndsWith("queryexpression.xsd")).FirstOrDefault();
+
+            Stream stream = assembly.GetManifestResourceStream(shufdefresource);
+            if (stream != null)
+            {
+                schemas.Add(null, XmlReader.Create(stream));
+            }
+            stream = assembly.GetManifestResourceStream(qryexpresource);
+            if (stream != null)
+            {
+                schemas.Add(null, XmlReader.Create(stream));
+            }
+        }
+
         /// <summary>
         /// Extracts delimeted text block from XML document format
         /// </summary>
@@ -241,37 +274,25 @@ namespace Cinteros.Crm.Utils.Shuffle
 
         /// <summary>Validates given ShuffleDefinition with XSD.</summary>
         /// <param name="def"></param>
+        /// <returns></returns>
+        public static void ValidateDefinitionXml(XmlDocument def)
+        {
+            ValidateDefinitionXml(def, null);
+        }
+
+        /// <summary>Validates given ShuffleDefinition with XSD.</summary>
+        /// <param name="def"></param>
         /// <param name="log"></param>
         /// <returns></returns>
-        public static string ValidateDefinitionXml(XmlDocument def, ILoggable log)
+        public static void ValidateDefinitionXml(XmlDocument def, ILoggable log)
         {
-            var result = "";
             try
             {
-                Assembly assembly = Assembly.GetExecutingAssembly();
-                var shufdefresource = assembly.GetManifestResourceNames().Where(n => n.ToLowerInvariant().EndsWith("shuffledefinition.xsd")).FirstOrDefault();
-                var qryexpresource = assembly.GetManifestResourceNames().Where(n => n.ToLowerInvariant().EndsWith("queryexpression.xsd")).FirstOrDefault();
-
-                Stream stream = assembly.GetManifestResourceStream(shufdefresource);
-                if (stream == null)
+                def.Schemas = Schemas;
+                if (def.Schemas.Count >= 2)
                 {
-                    result = "Cannot find resource " + shufdefresource;
-                }
-                else
-                {
-                    def.Schemas = new XmlSchemaSet();
-                    def.Schemas.Add(null, XmlReader.Create(stream));
-                    stream = assembly.GetManifestResourceStream(qryexpresource);
-                    if (stream == null)
-                    {
-                        result = "Cannot find resource " + qryexpresource;
-                    }
-                    else
-                    {
-                        def.Schemas.Add(null, XmlReader.Create(stream));
-                        def.Validate(null);
-                        log.Log("ShuffleDefinition validated");
-                    }
+                    def.Validate(null);
+                    log.Log("ShuffleDefinition validated");
                 }
             }
             catch (XmlSchemaValidationException ex)
@@ -280,8 +301,34 @@ namespace Cinteros.Crm.Utils.Shuffle
                 {
                     log.Log(ex);
                 }
-
                 throw;
+            }
+        }
+
+        public static string GetNodeDocumentation(string elementname)
+        {
+            var result = string.Empty;
+            foreach (XmlSchema schema in Schemas.Schemas())
+            {
+                var element = schema.SchemaTypes.Values
+                    .Cast<XmlSchemaType>()
+                    .FirstOrDefault(i => i.Name == elementname);
+
+                var markups = element?.Annotation?.Items
+                    .Cast<XmlSchemaObject>()
+                    .Where(a => a is XmlSchemaDocumentation)
+                    .Select(a => (a as XmlSchemaDocumentation).Markup
+                    .FirstOrDefault(m => m is XmlText) as XmlText)
+                    .Where(m => m != null && m.Value != null)
+                    .Select(m => m.Value);
+                if (markups != null)
+                {
+                    result = string.Join("\r\n", markups);
+                }
+                if (!string.IsNullOrEmpty(result))
+                {
+                    break;
+                }
             }
             return result;
         }

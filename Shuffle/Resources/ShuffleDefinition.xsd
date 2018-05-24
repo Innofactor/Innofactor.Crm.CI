@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema" xml:lang="en">
   <xs:include schemaLocation="parameterxml.xsd" />
   <xs:include schemaLocation="QueryExpression.xsd" />
   <xs:simpleType name="EntityTypes">
@@ -135,6 +135,9 @@
   </xs:complexType>
 
   <xs:complexType name="DataBlock">
+    <xs:annotation>
+      <xs:documentation>A DataBlock defines export and import behavior.</xs:documentation>
+    </xs:annotation>
     <xs:sequence minOccurs="1">
       <xs:element minOccurs="0" maxOccurs="1" name="Export" type="DataBlockExport" />
       <xs:element minOccurs="0" maxOccurs="1" name="Import" type="DataBlockImport" />
