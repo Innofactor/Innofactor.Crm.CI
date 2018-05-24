@@ -292,15 +292,12 @@ namespace Cinteros.Crm.Utils.Shuffle
                 if (def.Schemas.Count >= 2)
                 {
                     def.Validate(null);
-                    log.Log("ShuffleDefinition validated");
+                    log?.Log("ShuffleDefinition validated");
                 }
             }
             catch (XmlSchemaValidationException ex)
             {
-                if (log != null)
-                {
-                    log.Log(ex);
-                }
+                log?.Log(ex);
                 throw;
             }
         }
