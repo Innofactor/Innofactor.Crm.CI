@@ -77,11 +77,7 @@ namespace Cinteros.Crm.Utils.Shuffle
             get { return definition; }
             set
             {
-                var result = ShuffleHelper.ValidateDefinitionXml(value, log);
-                if (!string.IsNullOrEmpty(result))
-                {
-                    SendLine(result);
-                }
+                ShuffleHelper.ValidateDefinitionXml(value, log);
                 definition = value;
             }
         }
