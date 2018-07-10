@@ -28,7 +28,7 @@
         [Parameter(
             Mandatory = false,
             HelpMessage = "Level of obfuscation"
-        ), Alias("Level", "L")]
+        ), Alias("Obfuscation", "L")]
         public int ObfuscationLevel { get; set; }
 
         #endregion Public Properties

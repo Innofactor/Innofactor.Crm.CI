@@ -1,0 +1,52 @@
+{
+  "id": "10403308-4cac-4f89-ad9b-a09f88df3a75",
+  "name": "ObfuscateAssembly",
+  "friendlyName": "Innofactor DevOps: Obfuscate Assembly",
+  "description": "Replaces assembly with its obfuscated version",
+  "author": "Innofactor Sweden",
+  "helpMarkDown": "",
+  "category": "Build",
+  "visibility": [
+    "Build",
+    "Release"
+  ],
+  "demands": [],
+  "version": {
+    "Major": "9",
+    "Minor": "0",
+    "Patch": "1"
+  },
+  "minimumAgentVersion": "1.95.0",
+  "groups": [
+    {
+      "name": "advanced",
+      "displayName": "Advanced",
+      "isExpanded": false
+    }
+  ],
+  "instanceNameFormat": "Obfuscate Assembly",
+  "inputs": [
+    {
+      "name": "assembly",
+      "type": "filePath",
+      "label": "Assembly",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "Local assembly file to obfuscate"
+    },
+    {
+      "name": "updateManaged",
+      "type": "boolean",
+      "label": "Update Managed",
+      "defaultValue": "false",
+      "required": false,
+      "helpMarkDown": "Check this to allow update of assemblies that are managed in target CRM environment.",
+      "groupName": "advanced"
+    }
+  ],
+  "execution": {
+    "PowerShell3": {
+      "target": "ObfuscateAssembly.ps1"
+    }
+  }
+}

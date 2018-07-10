@@ -19,35 +19,32 @@
         [Parameter(
             Position = 2,
             HelpMessage = "File/folder include/exclude pattern"
-        )]
-        [Alias("P")]
+        ), Alias("P")]
         public string Pattern { get; set; }
 
         [Parameter(
             Position = 2,
             HelpMessage = "File path for include/exclude patterns"
-        )]
-        [Alias("PF")]
+        ), Alias("PF")]
         public string PatternFile { get; set; }
 
         [Parameter(
             Mandatory = true,
             Position = 1,
             HelpMessage = "Publisher prefix to add to the webresource path"
-        )]
-        [Alias("Pre")]
+        ), Alias("Pre")]
         public string Prefix { get; set; }
 
         [Parameter(
                                     Mandatory = true,
             Position = 0,
             HelpMessage = "Path to folder with wwebresources"
-        )]
-        [Alias("R")]
+        ), Alias("R")]
         public string RootFolder { get; set; }
 
-        [Parameter(HelpMessage = "Set this to allow updating managed webresources")]
-        [Alias("UM")]
+        [Parameter(
+            HelpMessage = "Set this to allow updating managed webresources"
+        ), Alias("UM")]
         public bool UpdateManaged { get; set; } = false;
 
         #endregion Public Properties

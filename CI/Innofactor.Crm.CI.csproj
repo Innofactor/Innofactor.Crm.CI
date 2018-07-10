@@ -144,6 +144,7 @@
     <Content Include="Extension\WhoAmI\icon.png" />
     <None Include="app.config" />
     <None Include="Extension\ObfuscateAssembly\ObfuscateAssembly.ps1" />
+    <None Include="Extension\ObfuscateAssembly\task.json" />
     <None Include="Extension\overview.md" />
     <None Include="Extension\WebResourcePatternSample.txt" />
     <Content Include="Extension\ApplyVersionToAssemblies\ApplyVersionToAssemblies.ps1" />

@@ -30,12 +30,12 @@
             Mandatory = true,
             Position = 0,
             HelpMessage = "Path to assembly file"
-        )]
-        [Alias("DLL", "D")]
+        ), Alias("DLL", "D")]
         public string AssemblyFile { get; set; }
 
-        [Parameter(HelpMessage = "Set this to allow updating managed assembly")]
-        [Alias("UM")]
+        [Parameter(
+            HelpMessage = "Set this to allow updating managed assembly"
+        ), Alias("UM")]
         public bool UpdateManaged { get; set; } = false;
 
         #endregion Public Properties

@@ -23,23 +23,20 @@
                     Mandatory = true,
             Position = 0,
             HelpMessage = "Provide a valid Shuffle definition, as an XMLDocument"
-        )]
-        [Alias("Def", "D")]
+        ), Alias("Def", "D")]
         public XmlDocument Definition { get; set; }
 
         [Parameter(
             Mandatory = false,
             HelpMessage = "Working folder for relative paths, solution zips etc."
-        )]
-        [Alias("F")]
+        ), Alias("F")]
         public string Folder { get; set; }
 
         [Parameter(
                     Mandatory = true,
             Position = 1,
             HelpMessage = "Provide the type of Shuffle export: Full, Simple, SimpleWithValue, SimpleNoId, Explicit or Text"
-        )]
-        [Alias("T")]
+        ), Alias("T")]
         public SerializationType Type { get; set; }
 
         #endregion Public Properties
