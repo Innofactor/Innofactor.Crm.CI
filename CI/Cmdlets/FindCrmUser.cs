@@ -1,17 +1,14 @@
-﻿using Microsoft.Crm.Sdk.Messages;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Management.Automation;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Cinteros.Crm.Utils.CI.Cmdlets
+﻿namespace Cinteros.Crm.Utils.CI.Cmdlets
 {
-    [Cmdlet(VerbsCommon.Select, "WhoAmI")]
+    using Microsoft.Crm.Sdk.Messages;
+    using System.Management.Automation;
+
+    [Cmdlet(VerbsCommon.Find, "CrmUser")]
     [OutputType(typeof(WhoAmIResponse))]
-    public class WhoAmICmdlet : XrmCommandBase
+    public class FindCrmUser : XrmCommandBase
     {
+        #region Protected Methods
+
         protected override void ProcessRecord()
         {
             base.ProcessRecord();
@@ -27,5 +24,6 @@ namespace Cinteros.Crm.Utils.CI.Cmdlets
             WriteVerbose(string.Format("UserId: {0}", response.UserId));
         }
 
+        #endregion Protected Methods
     }
 }

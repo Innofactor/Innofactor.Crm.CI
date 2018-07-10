@@ -96,14 +96,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Cmdlets\CrmAssemblyUpdate.cs" />
+    <Compile Include="Cmdlets\UpdateCrmAssembly.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Cmdlets\CrmShuffleExport.cs" />
-    <Compile Include="Cmdlets\CrmShuffleImport.cs" />
+    <Compile Include="Cmdlets\ExportCrmShuffle.cs" />
+    <Compile Include="Cmdlets\ImportCrmShuffle.cs" />
     <Compile Include="WebResources\SolutionComponentType.cs" />
-    <Compile Include="Cmdlets\CrmResoucesUpdate.cs" />
+    <Compile Include="Cmdlets\UpdateCrmResouces.cs" />
     <Compile Include="WebResources\WebResourceManager.cs" />
-    <Compile Include="WhoAmICmdlet.cs" />
+    <Compile Include="Cmdlets\FindCrmUser.cs" />
     <Compile Include="XrmCommandBase.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -8,7 +8,7 @@
 
     [Cmdlet(VerbsData.Export, "CrmShuffle")]
     [OutputType(typeof(XmlDocument))]
-    public class CrmShuffleExport : XrmCommandBase
+    public class ExportCrmShuffle : XrmCommandBase
     {
         #region Private Fields
 

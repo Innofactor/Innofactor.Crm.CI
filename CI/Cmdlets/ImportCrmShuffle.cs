@@ -7,7 +7,7 @@
 
     [Cmdlet(VerbsData.Import, "CrmShuffle")]
     [OutputType(typeof(ShuffleImportResult))]
-    public class CrmShuffleImport : XrmCommandBase
+    public class ImportCrmShuffle : XrmCommandBase
     {
         #region Private Fields
 

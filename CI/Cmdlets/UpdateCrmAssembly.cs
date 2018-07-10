@@ -9,7 +9,7 @@
     using System.Reflection;
 
     [Cmdlet(VerbsData.Update, "CrmAssembly")]
-    public class CrmAssemblyUpdate : XrmCommandBase
+    public class UpdateCrmAssembly : XrmCommandBase
     {
         #region Private Fields
 

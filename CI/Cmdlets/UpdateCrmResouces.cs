@@ -11,7 +11,7 @@
 
     [Cmdlet(VerbsData.Update, "CrmResources")]
     [OutputType(typeof(XmlDocument))]
-    public class CrmResoucesUpdate : XrmCommandBase
+    public class UpdateCrmResouces : XrmCommandBase
     {
         #region Public Properties
 
