@@ -27,7 +27,7 @@
         #region Public Properties
 
         [Parameter(
-                                            Mandatory = true,
+            Mandatory = true,
             Position = 0,
             HelpMessage = "Path to assembly file"
         )]
