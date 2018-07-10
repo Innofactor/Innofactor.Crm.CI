@@ -96,12 +96,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Commands\CrmAssemblyUpdate.cs" />
+    <Compile Include="Cmdlets\CrmAssemblyUpdate.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Shuffle\ExportCrmShuffleCmdlet.cs" />
     <Compile Include="Shuffle\ImportCrmShuffleCmdlet.cs" />
     <Compile Include="WebResources\SolutionComponentType.cs" />
-    <Compile Include="WebResources\UpdateCrmWebResoucesCmdlet.cs" />
+    <Compile Include="Cmdlets\CrmResoucesUpdate.cs" />
     <Compile Include="WebResources\WebResourceManager.cs" />
     <Compile Include="WhoAmICmdlet.cs" />
     <Compile Include="XrmCommandBase.cs" />
@@ -177,9 +177,7 @@
     <Content Include="Extension\UpdateWebResources\UpdateWebResources.ps1" />
     <Content Include="Extension\UpdateAssembly\UpdateAssembly.ps1" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Plugins\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>"$(ProjectDir)Extension\CopyLibToTasks.cmd" "$(TargetDir)" "$(ProjectDir)"</PostBuildEvent>

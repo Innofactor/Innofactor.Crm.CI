@@ -1,34 +1,19 @@
-﻿using Cinteros.Crm.Utils.CI.Cmdlets.WebResources;
-using Cinteros.Crm.Utils.Common;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Management.Automation;
-using System.Xml;
-
-namespace Cinteros.Crm.Utils.CI.Cmdlets
+﻿namespace Cinteros.Crm.Utils.CI.Cmdlets
 {
-    [Cmdlet(VerbsData.Update, "CrmWebResources")]
-    [OutputType(typeof(XmlDocument))]
-    public class UpdateCrmWebResoucesCmdlet : XrmCommandBase
-    {
-        #region Parameters
-        [Parameter(
-            Mandatory = true,
-            Position = 0,
-            HelpMessage = "Path to folder with wwebresources"
-        )]
-        [Alias("R")]
-        public string RootFolder { get; set; }
+    using Cinteros.Crm.Utils.CI.Cmdlets.WebResources;
+    using Cinteros.Crm.Utils.Common;
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Management.Automation;
+    using System.Xml;
 
-        [Parameter(
-            Mandatory = true,
-            Position = 1,
-            HelpMessage = "Publisher prefix to add to the webresource path"
-        )]
-        [Alias("Pre")]
-        public string Prefix { get; set; }
+    [Cmdlet(VerbsData.Update, "CrmResources")]
+    [OutputType(typeof(XmlDocument))]
+    public class CrmResoucesUpdate : XrmCommandBase
+    {
+        #region Public Properties
 
         [Parameter(
             Position = 2,
@@ -44,15 +29,66 @@ namespace Cinteros.Crm.Utils.CI.Cmdlets
         [Alias("PF")]
         public string PatternFile { get; set; }
 
+        [Parameter(
+            Mandatory = true,
+            Position = 1,
+            HelpMessage = "Publisher prefix to add to the webresource path"
+        )]
+        [Alias("Pre")]
+        public string Prefix { get; set; }
+
+        [Parameter(
+                                    Mandatory = true,
+            Position = 0,
+            HelpMessage = "Path to folder with wwebresources"
+        )]
+        [Alias("R")]
+        public string RootFolder { get; set; }
+
         [Parameter(HelpMessage = "Set this to allow updating managed webresources")]
         [Alias("UM")]
         public bool UpdateManaged { get; set; } = false;
-        #endregion Parameters
+
+        #endregion Public Properties
+
+        #region Protected Methods
 
         protected override void ProcessRecord()
         {
             var files = GetWebResourcesFromDisk();
             UpdateWebResources(files, Container);
+        }
+
+        #endregion Protected Methods
+
+        #region Private Methods
+
+        private static void ExtractFilePatterns(List<string> includepatterns, List<string> excludepatterns, string patterns)
+        {
+            var patternparts = patterns.Contains(";") ? patterns.Split(';').Select(p => p.Trim()) : patterns.Split('\n').Select(p => p.Trim());
+            foreach (var patternpart in patternparts)
+            {
+                if (patternpart.StartsWith("!"))
+                {
+                    excludepatterns.Add(patternpart.Substring(1));
+                }
+                else
+                {
+                    includepatterns.Add(patternpart);
+                }
+            }
+        }
+
+        private string GetCrmPath(string localfile)
+        {
+            if (!localfile.StartsWith(RootFolder, StringComparison.OrdinalIgnoreCase))
+            {
+                throw new FileLoadException("File not under root folder", localfile);
+            }
+
+            var crmpath = Prefix + (Prefix.EndsWith("_") ? "" : "_") + "/";
+            crmpath += localfile.Replace(RootFolder.EndsWith("\\") ? RootFolder : RootFolder + "\\", "").Replace("\\", "/");
+            return crmpath;
         }
 
         private List<string> GetWebResourcesFromDisk()
@@ -120,22 +156,6 @@ namespace Cinteros.Crm.Utils.CI.Cmdlets
             return resourcefiles;
         }
 
-        private static void ExtractFilePatterns(List<string> includepatterns, List<string> excludepatterns, string patterns)
-        {
-            var patternparts = patterns.Contains(";") ? patterns.Split(';').Select(p => p.Trim()) : patterns.Split('\n').Select(p => p.Trim());
-            foreach (var patternpart in patternparts)
-            {
-                if (patternpart.StartsWith("!"))
-                {
-                    excludepatterns.Add(patternpart.Substring(1));
-                }
-                else
-                {
-                    includepatterns.Add(patternpart);
-                }
-            }
-        }
-
         private void UpdateWebResources(List<string> files, CintContainer container)
         {
             WriteObject(string.Format("Updating {0} webresources", files.Count));
@@ -189,16 +209,6 @@ namespace Cinteros.Crm.Utils.CI.Cmdlets
             WriteObject($"Successfully updated {updatecount} webresources.");
         }
 
-        private string GetCrmPath(string localfile)
-        {
-            if (!localfile.StartsWith(RootFolder, StringComparison.OrdinalIgnoreCase))
-            {
-                throw new FileLoadException("File not under root folder", localfile);
-            }
-
-            var crmpath = Prefix + (Prefix.EndsWith("_") ? "" : "_") + "/";
-            crmpath += localfile.Replace(RootFolder.EndsWith("\\") ? RootFolder : RootFolder + "\\", "").Replace("\\", "/");
-            return crmpath;
-        }
+        #endregion Private Methods
     }
 }
