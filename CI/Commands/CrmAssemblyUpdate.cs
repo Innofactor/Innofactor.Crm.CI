@@ -1,19 +1,32 @@
-﻿using Cinteros.Crm.Utils.Common;
-using Microsoft.Xrm.Sdk.Query;
-using System;
-using System.IO;
-using System.Linq;
-using System.Management.Automation;
-using System.Reflection;
-using System.Xml;
-
-namespace Cinteros.Crm.Utils.CI.Cmdlets
+﻿namespace Cinteros.Crm.Utils.CI.Cmdlets
 {
+    using Cinteros.Crm.Utils.Common;
+    using Microsoft.Xrm.Sdk.Query;
+    using System;
+    using System.IO;
+    using System.Linq;
+    using System.Management.Automation;
+    using System.Reflection;
+
     [Cmdlet(VerbsData.Update, "CrmAssembly")]
-    public class UpdateCrmAssemblyCmdlet : XrmCommandBase
+    public class CrmAssemblyUpdate : XrmCommandBase
     {
+        #region Private Fields
+
+        private string fileculture;
+
+        private string filename;
+
+        private string filetoken;
+
+        private Version fileversion;
+
+        #endregion Private Fields
+
+        #region Public Properties
+
         [Parameter(
-            Mandatory = true,
+                                            Mandatory = true,
             Position = 0,
             HelpMessage = "Path to assembly file"
         )]
@@ -24,10 +37,9 @@ namespace Cinteros.Crm.Utils.CI.Cmdlets
         [Alias("UM")]
         public bool UpdateManaged { get; set; } = false;
 
-        private string filename;
-        private Version fileversion;
-        private string fileculture;
-        private string filetoken;
+        #endregion Public Properties
+
+        #region Protected Methods
 
         protected override void ProcessRecord()
         {
@@ -37,6 +49,10 @@ namespace Cinteros.Crm.Utils.CI.Cmdlets
                 UpdateAssembly(assembly);
             }
         }
+
+        #endregion Protected Methods
+
+        #region Private Methods
 
         private CintDynEntity GetAssembly(CintContainer container)
         {
@@ -107,5 +123,7 @@ namespace Cinteros.Crm.Utils.CI.Cmdlets
             WriteObject("Saving updated assembly record");
             updateplugin.Save();
         }
+
+        #endregion Private Methods
     }
 }
