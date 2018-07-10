@@ -1,31 +1,30 @@
-﻿using Cinteros.Crm.Utils.Common;
-using Cinteros.Crm.Utils.Shuffle;
-using Cinteros.Crm.Utils.Shuffle.Types;
-using System;
-using System.Management.Automation;
-using System.Xml;
-
-namespace Cinteros.Crm.Utils.CI.Cmdlets
+﻿namespace Cinteros.Crm.Utils.CI.Cmdlets
 {
+    using Cinteros.Crm.Utils.Shuffle;
+    using Cinteros.Crm.Utils.Shuffle.Types;
+    using System;
+    using System.Management.Automation;
+    using System.Xml;
+
     [Cmdlet(VerbsData.Export, "CrmShuffle")]
     [OutputType(typeof(XmlDocument))]
-    public class ExportCrmShuffleCmdlet : XrmCommandBase
+    public class CrmShuffleExport : XrmCommandBase
     {
+        #region Private Fields
+
+        private readonly ProgressRecord progress = new ProgressRecord(0, "Shuffle", "Idle");
+
+        #endregion Private Fields
+
+        #region Public Properties
+
         [Parameter(
-            Mandatory = true,
+                    Mandatory = true,
             Position = 0,
             HelpMessage = "Provide a valid Shuffle definition, as an XMLDocument"
         )]
         [Alias("Def", "D")]
         public XmlDocument Definition { get; set; }
-
-        [Parameter(
-            Mandatory = true,
-            Position = 1,
-            HelpMessage = "Provide the type of Shuffle export: Full, Simple, SimpleWithValue, SimpleNoId, Explicit or Text"
-        )]
-        [Alias("T")]
-        public SerializationType Type { get; set; }
 
         [Parameter(
             Mandatory = false,
@@ -34,7 +33,17 @@ namespace Cinteros.Crm.Utils.CI.Cmdlets
         [Alias("F")]
         public string Folder { get; set; }
 
-        private readonly ProgressRecord progress = new ProgressRecord(0, "Shuffle", "Idle");
+        [Parameter(
+                    Mandatory = true,
+            Position = 1,
+            HelpMessage = "Provide the type of Shuffle export: Full, Simple, SimpleWithValue, SimpleNoId, Explicit or Text"
+        )]
+        [Alias("T")]
+        public SerializationType Type { get; set; }
+
+        #endregion Public Properties
+
+        #region Protected Methods
 
         protected override void ProcessRecord()
         {
@@ -49,6 +58,10 @@ namespace Cinteros.Crm.Utils.CI.Cmdlets
                 WriteError(new ErrorRecord(ex, "QuickExport", ErrorCategory.ReadError, Definition));
             }
         }
+
+        #endregion Protected Methods
+
+        #region Private Methods
 
         private void ShuffleListener(object sender, ShuffleEventArgs e)
         {
@@ -70,5 +83,7 @@ namespace Cinteros.Crm.Utils.CI.Cmdlets
                 WriteVerbose(e.Message);
             }
         }
+
+        #endregion Private Methods
     }
 }
