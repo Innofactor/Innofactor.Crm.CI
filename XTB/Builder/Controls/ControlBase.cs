@@ -1,7 +1,10 @@
-﻿using Innofactor.Crm.Shuffle.Builder.AppCode;
+﻿using Cinteros.Crm.Utils.Shuffle;
+using Innofactor.Crm.Shuffle.Builder.AppCode;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Windows.Forms;
 
 namespace Innofactor.Crm.Shuffle.Builder.Controls
@@ -30,6 +33,9 @@ namespace Innofactor.Crm.Shuffle.Builder.Controls
         }
 
         public ControlBase(Dictionary<string, string> collection, ShuffleBuilder shuffleBuilder)
+            : this(string.Empty, collection, shuffleBuilder) { }
+
+        public ControlBase(string nodename, Dictionary<string, string> collection, ShuffleBuilder shuffleBuilder)
             : this()
         {
             this.shuffleBuilder = shuffleBuilder;
@@ -42,7 +48,39 @@ namespace Innofactor.Crm.Shuffle.Builder.Controls
                 attributeCollection = new Dictionary<string, string>();
             }
             Saved += shuffleBuilder.CtrlSaved;
+            if (string.IsNullOrEmpty(nodename))
+            {
+                nodename = GetCallingNodeName();
+            }
+            txtInfo.Text = ShuffleHelper.GetNodeDocumentation(nodename);
+            gbInfo.Visible = !string.IsNullOrEmpty(txtInfo.Text);
             LayoutControls();
+        }
+
+        private string GetCallingNodeName()
+        {
+            var nodename = Tag?.ToString();
+            if (string.IsNullOrEmpty(nodename))
+            {
+                StackFrame[] stackFrames = new StackTrace(true).GetFrames();
+                MethodBase mb = null;
+                foreach (StackFrame stackFrame in stackFrames)
+                {
+                    var tmpmb = stackFrame.GetMethod();
+                    if (!tmpmb.ReflectedType.FullName.ToLowerInvariant().EndsWith("controlbase"))
+                    {
+                        mb = tmpmb;
+                        break;
+                    }
+                }
+                if (mb != null)
+                {
+                    nodename = mb.ReflectedType.FullName;
+                    nodename = nodename.Split('.').LastOrDefault();
+                    nodename = nodename.Replace("Control", string.Empty);
+                }
+            }
+            return nodename;
         }
 
         #endregion Public Constructors
@@ -60,6 +98,11 @@ namespace Innofactor.Crm.Shuffle.Builder.Controls
         #endregion Public Events
 
         #region Public Methods
+
+        public bool InitializationNeeded(ControlCollection ntrols)
+        {
+            return Controls == null || Controls.Count == 0 || !Controls.Cast<Control>().Any(c => c != gbInfo);
+        }
 
         public virtual ControlCollection GetControls()
         {

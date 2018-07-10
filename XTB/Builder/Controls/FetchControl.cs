@@ -14,7 +14,7 @@ namespace Innofactor.Crm.Shuffle.Builder.Controls
 
         public override ControlCollection GetControls()
         {
-            if (Controls?.Count == 0)
+            if (InitializationNeeded(Controls))
             {
                 InitializeComponent();
             }

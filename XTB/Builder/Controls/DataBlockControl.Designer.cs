@@ -139,6 +139,15 @@
             this.Controls.Add(this.txtName);
             this.Controls.Add(this.lblTimeout);
             this.Name = "DataBlockControl";
+            this.Size = new System.Drawing.Size(450, 236);
+            this.Controls.SetChildIndex(this.lblTimeout, 0);
+            this.Controls.SetChildIndex(this.txtName, 0);
+            this.Controls.SetChildIndex(this.lblEntity, 0);
+            this.Controls.SetChildIndex(this.lblType, 0);
+            this.Controls.SetChildIndex(this.cmbType, 0);
+            this.Controls.SetChildIndex(this.lblIntersect, 0);
+            this.Controls.SetChildIndex(this.txtIntersect, 0);
+            this.Controls.SetChildIndex(this.cmbEntity, 0);
             this.ResumeLayout(false);
             this.PerformLayout();
 
