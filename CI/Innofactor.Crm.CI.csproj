@@ -177,9 +177,7 @@
     <Content Include="Extension\UpdateWebResources\UpdateWebResources.ps1" />
     <Content Include="Extension\UpdateAssembly\UpdateAssembly.ps1" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Shuffle\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>"$(ProjectDir)Extension\CopyLibToTasks.cmd" "$(TargetDir)" "$(ProjectDir)"</PostBuildEvent>

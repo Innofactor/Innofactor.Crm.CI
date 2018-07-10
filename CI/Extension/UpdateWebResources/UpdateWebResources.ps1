@@ -21,4 +21,4 @@ Write-Verbose "Importing DevUtils.CI: $DevUtilsCI"
 Import-Module $DevUtilsCI
 Write-Verbose "Imported DevUtils.CI"
 
-Update-CrmWebResources -R $RootPath -PF $PatternFile -Pre $Prefix -ConnectionString $ConnectionString -UM $UpdateManaged
+Update-CrmResources -R $RootPath -PF $PatternFile -Pre $Prefix -ConnectionString $ConnectionString -UM $UpdateManaged

@@ -13,7 +13,7 @@ Write-Verbose "Importing DevUtils.CI: $DevUtilsCI"
 Import-Module $DevUtilsCI
 Write-Verbose "Imported DevUtils.CI"
 
-$executingUser = Select-WhoAmI -ConnectionString $ConnectionString -Verbose
+$executingUser = Find-CrmUser -ConnectionString $ConnectionString -Verbose
 
 if($executingUser)
 { 
