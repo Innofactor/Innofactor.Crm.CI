@@ -307,11 +307,23 @@ namespace Cinteros.Crm.Utils.Shuffle
             var result = string.Empty;
             foreach (XmlSchema schema in Schemas.Schemas())
             {
-                var element = schema.SchemaTypes.Values
-                    .Cast<XmlSchemaType>()
-                    .FirstOrDefault(i => i.Name == elementname);
+                var particlename = string.Empty;
+                if (elementname == "Relation")
+                {
+                    particlename = elementname;
+                    elementname = "DataBlock";
+                }
+                var annotatedobject = GetAnnotatedObject(elementname, schema);
+                if (!string.IsNullOrEmpty(particlename)
+                    && annotatedobject is XmlSchemaComplexType particleparent
+                    && particleparent.Particle is XmlSchemaSequence particlesequence)
+                {
+                    annotatedobject = particlesequence.Items
+                        .Cast<XmlSchemaElement>()
+                        .FirstOrDefault(i => i.Name == particlename);
+                }
 
-                var markups = element?.Annotation?.Items
+                var markups = annotatedobject?.Annotation?.Items
                     .Cast<XmlSchemaObject>()
                     .Where(a => a is XmlSchemaDocumentation)
                     .Select(a => (a as XmlSchemaDocumentation).Markup
@@ -328,6 +340,22 @@ namespace Cinteros.Crm.Utils.Shuffle
                 }
             }
             return result;
+        }
+
+        private static XmlSchemaAnnotated GetAnnotatedObject(string elementname, XmlSchema schema)
+        {
+            XmlSchemaAnnotated annotatedobject = schema.Elements.Values
+                .Cast<XmlSchemaElement>()
+                .FirstOrDefault(i => i.Name == elementname);
+
+            if (annotatedobject == null)
+            {
+                annotatedobject = schema.SchemaTypes.Values
+                    .Cast<XmlSchemaType>()
+                    .FirstOrDefault(i => i.Name == elementname);
+            }
+
+            return annotatedobject;
         }
 
         /// <summary>Verifies that no {ShuffleVar:xxx} exist in the definition</summary>
