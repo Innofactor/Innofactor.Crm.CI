@@ -100,11 +100,11 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Cmdlets\ExportCrmShuffle.cs" />
     <Compile Include="Cmdlets\ImportCrmShuffle.cs" />
-    <Compile Include="WebResources\SolutionComponentType.cs" />
+    <Compile Include="Cmdlets\Vendor\SolutionComponentType.cs" />
     <Compile Include="Cmdlets\UpdateCrmResouces.cs" />
-    <Compile Include="WebResources\WebResourceManager.cs" />
+    <Compile Include="Cmdlets\Vendor\WebResourceManager.cs" />
     <Compile Include="Cmdlets\FindCrmUser.cs" />
-    <Compile Include="XrmCommandBase.cs" />
+    <Compile Include="Cmdlets\Structure\XrmCommandBase.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Shuffle\Innofactor.Crm.Shuffle.csproj">

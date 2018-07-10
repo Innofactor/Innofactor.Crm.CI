@@ -1,6 +1,7 @@
 ﻿namespace Cinteros.Crm.Utils.CI.Cmdlets
 {
-    using Cinteros.Crm.Utils.CI.Cmdlets.WebResources;
+    using Cinteros.Crm.Utils.CI.Cmdlets.Structure;
+    using Cinteros.Crm.Utils.CI.Cmdlets.Vendor;
     using Cinteros.Crm.Utils.Common;
     using System;
     using System.Collections.Generic;

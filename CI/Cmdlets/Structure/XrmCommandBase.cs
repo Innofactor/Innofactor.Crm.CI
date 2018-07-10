@@ -1,19 +1,30 @@
 ﻿// Heavily inspired by Wael Hamze xrm-ci-framework
 // https://github.com/WaelHamze/xrm-ci-framework/blob/master/CRM365/Xrm.Framework.CI/Xrm.Framework.CI.PowerShell.Cmdlets/XrmCommandBase.cs
 
-
 using Cinteros.Crm.Utils.Common;
-using Microsoft.Xrm.Tooling.Connector;
-using System.Management.Automation;
-using System.Net;
 
-namespace Cinteros.Crm.Utils.CI.Cmdlets
+namespace Cinteros.Crm.Utils.CI.Cmdlets.Structure
 {
+    using Microsoft.Xrm.Tooling.Connector;
+    using System.Management.Automation;
+    using System.Net;
+
     public abstract class XrmCommandBase : Cmdlet
     {
+        #region Protected Fields
+
         protected CintContainer Container;
-        private CrmServiceClient ServiceClient;
+
+        #endregion Protected Fields
+
+        #region Private Fields
+
         private int DefaultTime = 120;
+        private CrmServiceClient ServiceClient;
+
+        #endregion Private Fields
+
+        #region Public Properties
 
         /// <summary>
         /// <para type="description">The connectionstring to the crm organization (see https://msdn.microsoft.com/en-us/library/mt608573.aspx ).</para>
@@ -26,6 +37,10 @@ namespace Cinteros.Crm.Utils.CI.Cmdlets
         /// </summary>
         [Parameter(Mandatory = false)]
         public int Timeout { get; set; }
+
+        #endregion Public Properties
+
+        #region Protected Methods
 
         protected override void BeginProcessing()
         {
@@ -53,6 +68,24 @@ namespace Cinteros.Crm.Utils.CI.Cmdlets
             Container = new CintContainer(new CrmServiceProxy(ServiceClient.OrganizationServiceProxy), CommandRuntime.ToString(), true);
         }
 
+        protected override void EndProcessing()
+        {
+            base.EndProcessing();
+
+            if (ServiceClient != null)
+            {
+                ServiceClient.Dispose();
+            }
+            if (Container != null)
+            {
+                Container.Dispose();
+            }
+        }
+
+        #endregion Protected Methods
+
+        #region Private Methods
+
         private void SetSecurityProtocol()
         {
             WriteVerbose(string.Format("Current Security Protocol: {0}", ServicePointManager.SecurityProtocol));
@@ -67,18 +100,6 @@ namespace Cinteros.Crm.Utils.CI.Cmdlets
             WriteVerbose(string.Format("Modified Security Protocol: {0}", ServicePointManager.SecurityProtocol));
         }
 
-        protected override void EndProcessing()
-        {
-            base.EndProcessing();
-
-            if (ServiceClient != null)
-            {
-                ServiceClient.Dispose();
-            }
-            if (Container != null)
-            {
-                Container.Dispose();
-            }
-        }
+        #endregion Private Methods
     }
 }

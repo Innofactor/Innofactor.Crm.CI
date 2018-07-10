@@ -10,7 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Cinteros.Crm.Utils.CI.Cmdlets.WebResources
+namespace Cinteros.Crm.Utils.CI.Cmdlets.Vendor
 {
     /// <summary>
     /// Class that manages action on web resources

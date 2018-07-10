@@ -1,5 +1,6 @@
 ﻿namespace Cinteros.Crm.Utils.CI.Cmdlets
 {
+    using Cinteros.Crm.Utils.CI.Cmdlets.Structure;
     using Microsoft.Crm.Sdk.Messages;
     using System.Management.Automation;
 
