@@ -275,25 +275,22 @@ namespace Innofactor.Crm.Shuffle.Builder
 
         private bool BuildAndValidateXml(bool validate = true)
         {
-            var result = string.Empty;
+            var result = true;
             if (tvDefinition.Nodes.Count > 0 && validate)
             {
                 // Build the Xml from TreeView
                 var def = GetDefinitionDocument();
                 try
                 {
-                    result = ShuffleHelper.ValidateDefinitionXml(def, null);
+                    ShuffleHelper.ValidateDefinitionXml(def, null);
                 }
                 catch (Exception ex)
                 {
-                    if (string.IsNullOrEmpty(result))
-                    {
-                        result = ex.Message;
-                    }
+                    result = false;
                     MessageBox.Show(ex.Message);
                 }
             }
-            return string.IsNullOrEmpty(result);
+            return result;
         }
 
         private XmlDocument GetDefinitionDocument()

@@ -397,7 +397,7 @@
             this.gbNodeXML.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
             this.gbNodeXML.Name = "gbNodeXML";
             this.gbNodeXML.Padding = new System.Windows.Forms.Padding(2, 3, 2, 3);
-            this.gbNodeXML.Size = new System.Drawing.Size(367, 212);
+            this.gbNodeXML.Size = new System.Drawing.Size(367, 208);
             this.gbNodeXML.TabIndex = 35;
             this.gbNodeXML.TabStop = false;
             this.gbNodeXML.Text = "Node XML";
@@ -419,7 +419,7 @@
             xmlViewerSettings1.Tag = System.Drawing.Color.Blue;
             xmlViewerSettings1.Value = System.Drawing.Color.Black;
             this.txtPropertyXml.Settings = xmlViewerSettings1;
-            this.txtPropertyXml.Size = new System.Drawing.Size(363, 193);
+            this.txtPropertyXml.Size = new System.Drawing.Size(363, 189);
             this.txtPropertyXml.TabIndex = 1;
             this.txtPropertyXml.Text = "";
             this.txtPropertyXml.WordWrap = false;
@@ -432,7 +432,7 @@
             this.gbDefinitionXML.Controls.Add(this.txtXML);
             this.gbDefinitionXML.Location = new System.Drawing.Point(-1, 8);
             this.gbDefinitionXML.Name = "gbDefinitionXML";
-            this.gbDefinitionXML.Size = new System.Drawing.Size(250, 592);
+            this.gbDefinitionXML.Size = new System.Drawing.Size(246, 592);
             this.gbDefinitionXML.TabIndex = 1;
             this.gbDefinitionXML.TabStop = false;
             this.gbDefinitionXML.Text = "Shuffle Definition XML";
@@ -454,7 +454,7 @@
             xmlViewerSettings2.Tag = System.Drawing.Color.Blue;
             xmlViewerSettings2.Value = System.Drawing.Color.Black;
             this.txtXML.Settings = xmlViewerSettings2;
-            this.txtXML.Size = new System.Drawing.Size(244, 573);
+            this.txtXML.Size = new System.Drawing.Size(240, 573);
             this.txtXML.TabIndex = 0;
             this.txtXML.Text = "";
             this.txtXML.WordWrap = false;
