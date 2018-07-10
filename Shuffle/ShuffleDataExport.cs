@@ -34,9 +34,13 @@ namespace Cinteros.Crm.Utils.Shuffle
                     foreach (CintDynEntity parent in parentcoll)
                     {
                         if (string.IsNullOrEmpty(pkattribute))
+                        {
                             ids.Add(parent.Id.ToString());
+                        }
                         else
+                        {
                             ids.Add(parent.Property<EntityReference>(pkattribute, new EntityReference()).Id.ToString());
+                        }
                     }
                 }
                 else
@@ -208,14 +212,24 @@ namespace Cinteros.Crm.Utils.Shuffle
                     foreach (CintDynEntity parent in parentcoll)
                     {
                         if (string.IsNullOrEmpty(pkattribute))
+                        {
                             if (type == AttributeTypeCode.String)
+                            {
                                 ids.Add(parent.Id.ToString());
+                            }
                             else
+                            {
                                 ids.Add(parent.Id);
+                            }
+                        }
                         else if (type == AttributeTypeCode.String)
+                        {
                             ids.Add(parent.Property<EntityReference>(pkattribute, new EntityReference()).Id.ToString());
+                        }
                         else
+                        {
                             ids.Add(parent.Property<EntityReference>(pkattribute, new EntityReference()).Id);
+                        }
                     }
                 }
                 else
@@ -257,7 +271,9 @@ namespace Cinteros.Crm.Utils.Shuffle
             if (xExport != null)
             {
                 if (string.IsNullOrEmpty(entity))
+                {
                     entity = CintXML.GetAttribute(xExport, "Entity");
+                }
 
                 #region Define attributes
 
@@ -306,7 +322,9 @@ namespace Cinteros.Crm.Utils.Shuffle
                     log.StartSection("Export entity " + entity);
                     QueryExpression qExport = new QueryExpression(entity);
                     if (CintXML.GetBoolAttribute(xExport, "ActiveOnly", true))
+                    {
                         CintQryExp.AppendConditionActive(qExport.Criteria);
+                    }
 
                     foreach (var xBlockChild in xBlock.ChildNodes.Cast<XmlNode>())
                     {
@@ -347,7 +365,9 @@ namespace Cinteros.Crm.Utils.Shuffle
                     else
                     {
                         foreach (string attr in lAttributes)
+                        {
                             qExport.ColumnSet.AddColumn(attr);
+                        }
                     }
 #if DEBUG
                     log.Log("Converting to FetchXML");

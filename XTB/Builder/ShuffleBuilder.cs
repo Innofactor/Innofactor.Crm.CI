@@ -166,11 +166,15 @@ namespace Innofactor.Crm.Shuffle.Builder
             if (nodeAttributesCollection.ContainsKey("Id"))
             {
                 if (tvDefinition.SelectedNode.Text.Split(' ').Length == 1)
+                {
                     tvDefinition.SelectedNode.Text += " (" +
                                                    ((Dictionary<string, string>)tvDefinition.SelectedNode.Tag)["Id"] + ")";
+                }
                 else
+                {
                     tvDefinition.SelectedNode.Text = tvDefinition.SelectedNode.Text.Split(' ')[0] + " (" +
                                                   ((Dictionary<string, string>)tvDefinition.SelectedNode.Tag)["Id"] + ")";
+                }
 
                 tvDefinition.SelectedNode.Name = tvDefinition.SelectedNode.Text.Replace(" ", "");
             }
@@ -275,7 +279,11 @@ namespace Innofactor.Crm.Shuffle.Builder
             {
                 panelContainer.Controls.Add(ctrl);
                 ctrl.BringToFront();
-                if (existingControl != null) panelContainer.Controls.Remove(existingControl);
+                if (existingControl != null)
+                {
+                    panelContainer.Controls.Remove(existingControl);
+                }
+
                 tsbItemSave.Visible = true;
             }
 
@@ -298,11 +306,17 @@ namespace Innofactor.Crm.Shuffle.Builder
             else if (e.ClickedItem.Text == "Cut" || e.ClickedItem.Text == "Copy" || e.ClickedItem.Text == "Paste")
             {
                 if (e.ClickedItem.Text == "Cut")
+                {
                     clipboard.Cut(tvDefinition.SelectedNode);
+                }
                 else if (e.ClickedItem.Text == "Copy")
+                {
                     clipboard.Copy(tvDefinition.SelectedNode);
+                }
                 else
+                {
                     clipboard.Paste(tvDefinition.SelectedNode);
+                }
             }
             else
             {
@@ -451,9 +465,13 @@ namespace Innofactor.Crm.Shuffle.Builder
             MethodInvoker miReadDefinition = delegate { definitionXmlNode = definitionDoc.DocumentElement; };
 
             if (InvokeRequired)
+            {
                 Invoke(miReadDefinition);
+            }
             else
+            {
                 miReadDefinition();
+            }
 
             MethodInvoker miFillTreeView = delegate
             {

@@ -32,7 +32,9 @@ namespace Innofactor.Crm.Shuffle.Builder.Controls
             : this()
         {
             if (collection != null)
+            {
                 collec = collection;
+            }
 
             FillOptions(selectedNode);
             FillControls();

@@ -32,7 +32,10 @@ namespace Innofactor.Crm.Shuffle.Builder.Controls
             : this()
         {
             if (collection != null)
+            {
                 collec = collection;
+            }
+
             cmbName.Items.Clear();
             if (shuffleBuilder.Solutions != null && shuffleBuilder.Solutions.Count > 0)
             {

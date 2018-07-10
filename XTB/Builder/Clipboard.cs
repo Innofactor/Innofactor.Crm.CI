@@ -127,7 +127,9 @@ namespace Innofactor.Crm.Shuffle.Builder.AppCode
         internal void Paste(TreeNode targetNode)
         {
             if (_tempTreeNode == null)
+            {
                 return;
+            }
 
             if (IsValidForPaste(targetNode))
             {
@@ -171,9 +173,11 @@ namespace Innofactor.Crm.Shuffle.Builder.AppCode
         {
             var attributes = (Dictionary<string, string>)node.Tag;
             if (attributes.ContainsKey("Id"))
+            {
                 attributes["Id"] = string.Format("{0}_{1}",
                                                  attributes["Id"],
                                                  idPart);
+            }
 
             node.Tag = attributes;
 
