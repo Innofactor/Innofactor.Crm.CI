@@ -6,7 +6,6 @@
     using System;
     using System.IO;
     using System.Management.Automation;
-    using System.Reflection;
 
     [Cmdlet(VerbsData.Out, "ObfuscatedAssembly")]
     public class OutObfuscatedAssembly : Cmdlet
@@ -42,42 +41,54 @@
             {
                 var parameters = new ConfuserParameters
                 {
-                    Logger = new ProxyLogger(this),
+                    Logger = new ConsoleLogger(),
                     Project = new ConfuserProject()
                 };
 
-                var rule = new Rule(preset: ProtectionPreset.Normal)
-                {
-                    new SettingItem<Protection>("rename", SettingItemAction.Add)
-                    {
-                        { "mode", "sequential" }
-                    }
-                };
-
-                var module = new ProjectModule
-                {
-                    Path = AssemblyFile,
-                    SNKeyPath = KeyFile
-                };
-
-                WriteVerbose(module.Path);
-                WriteVerbose(module.SNKeyPath);
-
                 parameters.Project.BaseDirectory = Path.GetDirectoryName(AssemblyFile);
-                parameters.Project.OutputDirectory = Path.Combine(parameters.Project.BaseDirectory, "result");
-
-                WriteVerbose(parameters.Project.BaseDirectory);
-                WriteVerbose(parameters.Project.OutputDirectory);
+                parameters.Project.OutputDirectory = Path.GetDirectoryName(AssemblyFile);
 
                 if (!Directory.Exists(parameters.Project.OutputDirectory))
                 {
                     Directory.CreateDirectory(parameters.Project.OutputDirectory);
                 }
 
-                parameters.Project.Add(module);
-                parameters.Project.Rules.Add(rule);
+                var module = new ProjectModule
+                {
+                    Path = AssemblyFile
+                };
 
-                WriteVerbose(ObfuscationLevel.ToString());
+                if (!string.IsNullOrEmpty(KeyFile))
+                {
+                    module.SNKeyPath = KeyFile;
+                }
+
+                parameters.Project.Add(module);
+
+                // Having no protection doesn't make any sense, so recommended settings will be used
+                var rule = ((ProtectionPreset)ObfuscationLevel == ProtectionPreset.None) ?
+                    new Rule
+                    {
+                        new SettingItem<Protection>("rename", SettingItemAction.Add)
+                        {
+                            { "mode", "sequential" },
+                            { "forceRen", "true" }
+                        },
+
+                        new SettingItem<Protection>("ctrl flow", SettingItemAction.Add)
+                        {
+                            { "intensity", "30" }
+                        },
+
+                        new SettingItem<Protection>("constants", SettingItemAction.Add)
+                        {
+                            { "decoderCount", "10" },
+                            { "elements", "SNPI" }
+                        }
+                    }
+                    : new Rule(preset: (ProtectionPreset)ObfuscationLevel);
+
+                parameters.Project.Rules.Add(rule);
 
                 ConfuserEngine.Run(parameters).Wait();
             }

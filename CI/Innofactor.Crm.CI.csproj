@@ -38,8 +38,21 @@
     <Reference Include="Cinteros.Crm.Utils.Misc, Version=9.0.1804.11, Culture=neutral, PublicKeyToken=0b6cd78ab2e51f2b, processorArchitecture=MSIL">
       <HintPath>..\packages\Innofactor.Xrm.DevUtils.Common.9.0.1804.11\lib\net452\Cinteros.Crm.Utils.Misc.dll</HintPath>
     </Reference>
-    <Reference Include="Confuser.Core">
+    <Reference Include="Confuser.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5fbc98a9d8494c64, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\ConfuserEx.Final.1.0.0\tools\Confuser.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Confuser.DynCipher">
+      <HintPath>..\packages\ConfuserEx.Final.1.0.0\tools\Confuser.DynCipher.dll</HintPath>
+    </Reference>
+    <Reference Include="Confuser.Protections">
+      <HintPath>..\packages\ConfuserEx.Final.1.0.0\tools\Confuser.Protections.dll</HintPath>
+    </Reference>
+    <Reference Include="Confuser.Renamer">
+      <HintPath>..\packages\ConfuserEx.Final.1.0.0\tools\Confuser.Renamer.dll</HintPath>
+    </Reference>
+    <Reference Include="Confuser.Runtime">
+      <HintPath>..\packages\ConfuserEx.Final.1.0.0\tools\Confuser.Runtime.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Crm.Sdk.Proxy, Version=9.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.CrmSdk.CoreAssemblies.9.0.2.4\lib\net452\Microsoft.Crm.Sdk.Proxy.dll</HintPath>
@@ -183,7 +196,9 @@
     <Content Include="Extension\UpdateWebResources\UpdateWebResources.ps1" />
     <Content Include="Extension\UpdateAssembly\UpdateAssembly.ps1" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>"$(ProjectDir)Extension\CopyLibToTasks.cmd" "$(TargetDir)" "$(ProjectDir)"</PostBuildEvent>
