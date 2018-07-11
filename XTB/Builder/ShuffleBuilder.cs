@@ -1,45 +1,39 @@
-﻿using Cinteros.Crm.Utils.Common;
-using Cinteros.Crm.Utils.Shuffle;
+﻿using Cinteros.Crm.Utils.Shuffle;
 using Innofactor.Crm.Shuffle.Builder.AppCode;
 using Innofactor.Crm.Shuffle.Builder.Controls;
-using Innofactor.Crm.Shuffle.Builder.Forms;
+using Microsoft.Xrm.Sdk;
+using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Metadata;
 using Microsoft.Xrm.Sdk.Query;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
 using System.Xml;
+using System.Xml.Linq;
 using XrmToolBox.Extensibility;
+using XrmToolBox.Extensibility.Args;
 using XrmToolBox.Extensibility.Interfaces;
 using Clipboard = Innofactor.Crm.Shuffle.Builder.AppCode.Clipboard;
 
 namespace Innofactor.Crm.Shuffle.Builder
 {
-    public partial class ShuffleBuilder : PluginControlBase, IMessageBusHost, IGitHubPlugin
+    public partial class ShuffleBuilder : PluginControlBase, IMessageBusHost, IGitHubPlugin, IStatusBarMessenger
     {
         internal Clipboard clipboard = new Clipboard();
-        private XmlDocument definitionDoc;
         private string fileName;
         private static string definitionTemplate = "<ShuffleDefinition><Blocks></Blocks></ShuffleDefinition>";
-        private CintDynEntityCollection solutionsUnmanaged = null;
-        private List<EntityMetadata> entities = null;
-        private bool working = false;
 
-        public List<EntityMetadata> Entities
-        {
-            get
-            {
-                return entities;
-            }
-        }
+        private bool buttonsEnabled = true;
 
-        public CintDynEntityCollection Solutions
-        {
-            get
-            {
-                return solutionsUnmanaged;
-            }
-        }
+        public event EventHandler<MessageBusEventArgs> OnOutgoingMessage;
+        public event EventHandler<StatusBarMessageEventArgs> SendMessageToStatusBar;
+
+        public List<EntityMetadata> Entities { get; private set; } = null;
+
+        public Dictionary<string, List<AttributeMetadata>> Attributes { get; private set; } = null;
+
+        public EntityCollection Solutions { get; private set; } = null;
 
         public string RepositoryName => "Innofactor.Crm.CI";
 
@@ -52,16 +46,17 @@ namespace Innofactor.Crm.Shuffle.Builder
 
         private void ShuffleBuilder_ConnectionUpdated(object sender, ConnectionUpdatedEventArgs e)
         {
-            GetSolutions();
+            Solutions = null;
+            Entities = null;
         }
 
         #region Event handlers
 
         private void toolStripButtonNew_Click(object sender, EventArgs e)
         {
-            definitionDoc = new XmlDocument();
-            definitionDoc.LoadXml(definitionTemplate);
-            DisplayDefinition();
+            var doc = new XmlDocument();
+            doc.LoadXml(definitionTemplate);
+            DisplayDefinition(doc);
         }
 
         private void toolStripButtonOpen_Click(object sender, EventArgs e)
@@ -76,12 +71,12 @@ namespace Innofactor.Crm.Shuffle.Builder
             {
                 EnableControls(false);
 
-                definitionDoc = new XmlDocument();
-                definitionDoc.Load(ofd.FileName);
+                var doc = new XmlDocument();
+                doc.Load(ofd.FileName);
 
-                if (definitionDoc.DocumentElement.Name != "ShuffleDefinition" ||
-                    definitionDoc.DocumentElement.ChildNodes.Count > 0 &&
-                    definitionDoc.DocumentElement.ChildNodes[0].Name == "ShuffleDefinition")
+                if (doc.DocumentElement.Name != "ShuffleDefinition" ||
+                    doc.DocumentElement.ChildNodes.Count > 0 &&
+                    doc.DocumentElement.ChildNodes[0].Name == "ShuffleDefinition")
                 {
                     MessageBox.Show(this, "Invalid Xml: Definition XML root must be ShuffleDefinition!", "Error",
                                     MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -91,7 +86,7 @@ namespace Innofactor.Crm.Shuffle.Builder
                 else
                 {
                     fileName = ofd.FileName;
-                    DisplayDefinition();
+                    DisplayDefinition(doc);
                     EnableControls(true);
                 }
             }
@@ -99,6 +94,7 @@ namespace Innofactor.Crm.Shuffle.Builder
 
         private void toolStripButtonValidate_Click(object sender, EventArgs e)
         {
+            CommitLastChange();
             if (BuildAndValidateXml())
             {
                 MessageBox.Show("ShuffleDefinition validated ok!");
@@ -107,6 +103,13 @@ namespace Innofactor.Crm.Shuffle.Builder
 
         private void toolStripButtonSave_Click(object sender, EventArgs e)
         {
+            CommitLastChange();
+            if (!BuildAndValidateXml() &&
+                MessageBox.Show("Save anyway?", "Shuffle Builder", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+            {
+                return;
+            }
+
             var sfd = new SaveFileDialog
             {
                 Title = "Select a location to save the SiteMap as a Xml file",
@@ -118,339 +121,78 @@ namespace Innofactor.Crm.Shuffle.Builder
             {
                 fileName = sfd.FileName;
                 EnableControls(false);
-
-                if (BuildAndValidateXml())
-                {
-                    definitionDoc.Save(fileName);
-                    MessageBox.Show(this, "ShuffleDefinition saved!", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
-                else if (MessageBox.Show("Save anyway?", "Shuffle Builder", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
-                {
-                    definitionDoc.Save(fileName);
-                }
+                var doc = GetDefinitionDocument();
+                doc.Save(fileName);
+                MessageBox.Show(this, "ShuffleDefinition saved!", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 EnableControls(true);
-            }
-        }
-
-        private bool BuildAndValidateXml()
-        {
-            // Build the Xml from TreeView
-            var doc = new XmlDocument();
-            XmlNode rootNode = doc.CreateElement("root");
-            doc.AppendChild(rootNode);
-
-            AddXmlNode(tvDefinition.Nodes[0], rootNode);
-            definitionDoc = new XmlDocument();
-            definitionDoc.LoadXml(doc.SelectSingleNode("root/ShuffleDefinition").OuterXml);
-
-            var result = false;
-            try
-            {
-                ShuffleHelper.ValidateDefinitionXml(definitionDoc, null);
-                result = true;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-
-            return result;
-        }
-
-        private void tsbItemSave_Click(object sender, EventArgs e)
-        {
-            ((IDefinitionSavable)panelContainer.Controls[0]).Save();
-
-            var nodeAttributesCollection = (Dictionary<string, string>)tvDefinition.SelectedNode.Tag;
-
-            if (nodeAttributesCollection.ContainsKey("Id"))
-            {
-                if (tvDefinition.SelectedNode.Text.Split(' ').Length == 1)
-                {
-                    tvDefinition.SelectedNode.Text += " (" +
-                                                   ((Dictionary<string, string>)tvDefinition.SelectedNode.Tag)["Id"] + ")";
-                }
-                else
-                {
-                    tvDefinition.SelectedNode.Text = tvDefinition.SelectedNode.Text.Split(' ')[0] + " (" +
-                                                  ((Dictionary<string, string>)tvDefinition.SelectedNode.Tag)["Id"] + ")";
-                }
-
-                tvDefinition.SelectedNode.Name = tvDefinition.SelectedNode.Text.Replace(" ", "");
-            }
-
-            if (nodeAttributesCollection.ContainsKey("LCID"))
-            {
-                tvDefinition.SelectedNode.Text = tvDefinition.SelectedNode.Text.Split(' ')[0] + " (" +
-                                              ((Dictionary<string, string>)tvDefinition.SelectedNode.Tag)["LCID"] + ")";
-
-                tvDefinition.SelectedNode.Name = tvDefinition.SelectedNode.Text.Replace(" ", "");
             }
         }
 
         private void tvDefinitionNodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
         {
-            TreeNode selectedNode = e.Node;
-            selectedNode.TreeView.SelectedNode = selectedNode;
-            var collec = (Dictionary<string, string>)selectedNode.Tag;
-
-            TreeNodeHelper.AddContextMenu(e.Node, this);
-            Control existingControl = panelContainer.Controls.Count > 0 ? panelContainer.Controls[0] : null;
-            this.deleteToolStripMenuItem.Text = "Delete " + selectedNode.Text;
-
-            UserControl ctrl = null;
-            switch (selectedNode.Text.Split(' ')[0])
+            if (e.Button == MouseButtons.Right)
             {
-                case "ShuffleDefinition":
-                    ctrl = new ShuffleDefinitionControl(collec, this);
-                    break;
-                case "DataBlock":
-                    ctrl = new DataBlockControl(collec, this);
-                    break;
-                case "SolutionBlock":
-                    ctrl = new SolutionBlockControl(collec, this);
-                    break;
-                case "Export":
-                    if (selectedNode.Parent != null && selectedNode.Parent.Text.StartsWith("DataBlock"))
-                    {
-                        ctrl = new DataBlockExportControl(collec, this);
-                    }
-                    else if (selectedNode.Parent != null && selectedNode.Parent.Text.StartsWith("SolutionBlock"))
-                    {
-                        ctrl = new SolutionBlockExportControl(collec, this);
-                    }
-                    break;
-                case "Import":
-                    if (selectedNode.Parent != null && selectedNode.Parent.Text.StartsWith("DataBlock"))
-                    {
-                        ctrl = new DataBlockImportControl(collec, this);
-                    }
-                    else if (selectedNode.Parent != null && selectedNode.Parent.Text.StartsWith("SolutionBlock"))
-                    {
-                        ctrl = new SolutionBlockImportControl(collec, this);
-                    }
-                    break;
-
-                case "Relation":
-                    ctrl = new RelationControl(collec, selectedNode, this);
-                    break;
-
-                case "Attribute":
-                    if (selectedNode.Parent != null && selectedNode.Parent.Text.StartsWith("Attributes"))
-                    {
-                        ctrl = new ExportAttributeControl(collec, this);
-                    }
-                    else if (selectedNode.Parent != null && selectedNode.Parent.Text.StartsWith("Match"))
-                    {
-                        ctrl = new ImportAttributeControl(collec, this);
-                    }
-                    break;
-                case "Filter":
-                    ctrl = new FilterControl(collec, this);
-                    break;
-
-                case "Sort":
-                    ctrl = new SortControl(collec, this);
-                    break;
-
-                case "Match":
-                    ctrl = new ImportMatchControl(collec, this);
-                    break;
-
-                case "Settings":
-                    ctrl = new SettingsControl(collec, this);
-                    break;
-
-                case "Solution":
-                    if (selectedNode.Parent != null && selectedNode.Parent.Text.StartsWith("PreRequisites"))
-                    {
-                        ctrl = new PreReqSolutionControl(collec, this);
-                    }
-                    break;
-
-                default:
-                    {
-                        panelContainer.Controls.Clear();
-                        tsbItemSave.Visible = false;
-                    }
-                    break;
+                HandleNodeSelection(e.Node);
             }
-            if (ctrl != null)
-            {
-                panelContainer.Controls.Add(ctrl);
-                ctrl.BringToFront();
-                if (existingControl != null)
-                {
-                    panelContainer.Controls.Remove(existingControl);
-                }
-
-                tsbItemSave.Visible = true;
-            }
-
-            ManageMenuDisplay();
         }
 
         private void tvDefinition_AfterSelect(object sender, TreeViewEventArgs e)
         {
-            var e2 = new TreeNodeMouseClickEventArgs(e.Node, MouseButtons.Left, 1, 0, 0);
-
-            tvDefinitionNodeMouseClick(tvDefinition, e2);
+            HandleNodeSelection(e.Node);
         }
 
         private void NodeMenuItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
-            if (e.ClickedItem.Text.StartsWith("Delete"))
-            {
-                tvDefinition.SelectedNode.Remove();
+            HandleNodeMenuClick(e.ClickedItem.Tag?.ToString() ?? e.ClickedItem.Text);
+        }
+
+        private void toolStripButtonRunit_Click(object sender, EventArgs e)
+        {
+            CommitLastChange();
+            var xtbver = new Version(TopLevelControl.ProductVersion);
+            if (xtbver > new Version("1.2018") &&
+                xtbver < new Version("1.2018.5"))
+            {   // Bug introduced with docking layout in XTB
+                MessageBox.Show($"Unfortunately current version ({xtbver}) of XrmToolBox cannot connect properly to Shuffle Runner.\nPlease start Shuffle Runner from the Plugin List instead.", "Shuffle Runner", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
             }
-            else if (e.ClickedItem.Text == "Cut" || e.ClickedItem.Text == "Copy" || e.ClickedItem.Text == "Paste")
+            var args = new MessageBusEventArgs("Shuffle Runner", false)
             {
-                if (e.ClickedItem.Text == "Cut")
-                {
-                    clipboard.Cut(tvDefinition.SelectedNode);
-                }
-                else if (e.ClickedItem.Text == "Copy")
-                {
-                    clipboard.Copy(tvDefinition.SelectedNode);
-                }
-                else
-                {
-                    clipboard.Paste(tvDefinition.SelectedNode);
-                }
+                TargetArgument = fileName
+            };
+            try
+            {
+                OnOutgoingMessage(this, args);
             }
-            else
+            catch (Exception ex)
             {
-                string nodeText = e.ClickedItem.Name.Remove(0, 3);
-                nodeText = nodeText.Substring(0, nodeText.IndexOf("ToolStripMenuItem"));
-
-                var newNode = new TreeNode(nodeText);
-                newNode.Tag = new Dictionary<string, string>();
-                newNode.Name = newNode.Text.Replace(" ", "");
-                var e2 = new TreeNodeMouseClickEventArgs(newNode, MouseButtons.Left, 1, 0, 0);
-
-                if (newNode.Text == "Export" && tvDefinition.SelectedNode.Text.StartsWith("DataBlock"))
-                {
-                    var attributesNode = AddChildNode(newNode, "Attributes");
-                    var firstAttributeNode = AddChildNode(attributesNode, "Attribute");
-                }
-                else if (newNode.Text == "Import" && tvDefinition.SelectedNode.Text.StartsWith("DataBlock"))
-                {
-                    var matchNode = AddChildNode(newNode, "Match");
-                    var firstAttributeNode = AddChildNode(matchNode, "Attribute");
-                }
-
-                if (nodeText == "Filter")
-                {
-                    int i = 0;
-                    while (i < tvDefinition.SelectedNode.Nodes.Count &&
-                        tvDefinition.SelectedNode.Nodes[i].Text.StartsWith("Filter"))
-                    {
-                        i++;
-                    }
-                    tvDefinition.SelectedNode.Nodes.Insert(i, newNode);
-                }
-                else if (nodeText == "Sort")
-                {
-                    int i = 0;
-                    while (i < tvDefinition.SelectedNode.Nodes.Count &&
-                        (tvDefinition.SelectedNode.Nodes[i].Text.StartsWith("Filter") ||
-                         tvDefinition.SelectedNode.Nodes[i].Text.StartsWith("Sort")))
-                    {
-                        i++;
-                    }
-                    tvDefinition.SelectedNode.Nodes.Insert(i, newNode);
-                }
-                else
-                {
-                    tvDefinition.SelectedNode.Nodes.Add(newNode);
-                }
-                tvDefinitionNodeMouseClick(tvDefinition, e2);
+                MessageBox.Show("Calliung Shuffle Runner failed:\n" + ex.Message);
             }
         }
 
-        private void toolStripButtonMoveDown_Click(object sender, EventArgs e)
+        internal void CallFXB(string text)
         {
-            toolStripButtonMoveDown.Enabled = false;
-
-            TreeNode tnmNode = tvDefinition.SelectedNode;
-            TreeNode tnmNextNode = tnmNode.NextNode;
-
-            if (tnmNextNode != null)
+            CommitLastChange();
+            var args = new MessageBusEventArgs("FetchXML Builder", false)
             {
-                int idxBegin = tnmNode.Index;
-                int idxEnd = tnmNextNode.Index;
-                TreeNode tnmNodeParent = tnmNode.Parent;
-                if (tnmNodeParent != null)
-                {
-                    tnmNode.Remove();
-                    tnmNextNode.Remove();
-
-                    tnmNodeParent.Nodes.Insert(idxBegin, tnmNextNode);
-                    tnmNodeParent.Nodes.Insert(idxEnd, tnmNode);
-
-                    tvDefinition.SelectedNode = tnmNode;
-                }
-            }
-
-            toolStripButtonMoveDown.Enabled = true;
+                TargetArgument = text
+            };
+            OnOutgoingMessage(this, args);
         }
 
-        private void toolStripButtonMoveUp_Click(object sender, EventArgs e)
+        private void tvDefinition_KeyDown(object sender, KeyEventArgs e)
         {
-            toolStripButtonMoveUp.Enabled = false;
-
-            TreeNode tnmNode = tvDefinition.SelectedNode;
-            TreeNode tnmPreviousNode = tnmNode.PrevNode;
-
-            if (tnmPreviousNode != null)
-            {
-                int idxBegin = tnmNode.Index;
-                int idxEnd = tnmPreviousNode.Index;
-                TreeNode tnmNodeParent = tnmNode.Parent;
-                if (tnmNodeParent != null)
-                {
-                    tnmNode.Remove();
-                    tnmPreviousNode.Remove();
-
-                    tnmNodeParent.Nodes.Insert(idxEnd, tnmNode);
-                    tnmNodeParent.Nodes.Insert(idxBegin, tnmPreviousNode);
-
-                    tvDefinition.SelectedNode = tnmNode;
-                }
-            }
-
-            toolStripButtonMoveUp.Enabled = true;
+            HandleTVKeyDown(e);
         }
 
-        private void toolStripButtonDelete_Click(object sender, EventArgs e)
+        internal void QuickActionLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            tvDefinition.SelectedNode.Remove();
+            HandleNodeMenuClick((sender as LinkLabel)?.Tag?.ToString());
         }
 
-        private void toolStripButtonDisplayXml_Click(object sender, EventArgs e)
+        private void tsbCloseThisTab_Click(object sender, EventArgs e)
         {
-            TreeNode selectedNode = tvDefinition.SelectedNode;
-            var collec = (Dictionary<string, string>)selectedNode.Tag;
-
-            var doc = new XmlDocument();
-            doc.AppendChild(doc.CreateElement(selectedNode.Text.Split(' ')[0]));
-
-            foreach (string key in collec.Keys)
-            {
-                XmlAttribute attr = doc.CreateAttribute(key);
-                attr.Value = collec[key];
-
-                doc.DocumentElement.Attributes.Append(attr);
-            }
-
-            foreach (TreeNode node in selectedNode.Nodes)
-            {
-                AddXmlNode(node, doc.DocumentElement);
-            }
-
-            var xcdDialog = new XmlContentDisplayDialog(doc.OuterXml);
-            xcdDialog.StartPosition = FormStartPosition.CenterParent;
-            xcdDialog.ShowDialog();
+            CloseTool();
         }
 
         #endregion
@@ -458,11 +200,11 @@ namespace Innofactor.Crm.Shuffle.Builder
         /// <summary>
         ///     Loads the Definition from the extracted Xml solution files
         /// </summary>
-        private void DisplayDefinition()
+        private void DisplayDefinition(XmlDocument doc)
         {
             XmlNode definitionXmlNode = null;
 
-            MethodInvoker miReadDefinition = delegate { definitionXmlNode = definitionDoc.DocumentElement; };
+            MethodInvoker miReadDefinition = delegate { definitionXmlNode = doc.DocumentElement; };
 
             if (InvokeRequired)
             {
@@ -485,6 +227,11 @@ namespace Innofactor.Crm.Shuffle.Builder
                 {
                     tvDefinition.Nodes[0].Nodes[0].Expand();
                 }
+                UpdateLiveXML();
+                if (tvDefinition.Nodes.Count > 0)
+                {
+                    tvDefinition.SelectedNode = tvDefinition.Nodes[0];
+                }
             };
 
             if (tvDefinition.InvokeRequired)
@@ -497,6 +244,11 @@ namespace Innofactor.Crm.Shuffle.Builder
             }
         }
 
+        internal void EnableControls()
+        {
+            EnableControls(buttonsEnabled);
+        }
+
         internal void EnableControls(bool enabled)
         {
             MethodInvoker mi = delegate
@@ -504,9 +256,9 @@ namespace Innofactor.Crm.Shuffle.Builder
                 toolStripButtonSave.Enabled = enabled;
                 toolStripButtonOpen.Enabled = enabled;
                 toolStripButtonRunit.Enabled = enabled && !string.IsNullOrEmpty(fileName);
-                gbSiteMap.Enabled = enabled;
-                gbProperties.Enabled = enabled;
-                lblFilename.Text = string.IsNullOrEmpty(fileName) ? "<no file selected>" : fileName;
+                tvDefinition.Enabled = enabled;
+                SendMessageToStatusBar(this, new StatusBarMessageEventArgs(string.IsNullOrEmpty(fileName) ? "<no file selected>" : fileName));
+                buttonsEnabled = enabled;
             };
 
             if (InvokeRequired)
@@ -517,6 +269,46 @@ namespace Innofactor.Crm.Shuffle.Builder
             {
                 mi();
             }
+        }
+
+        private void CommitLastChange()
+        {
+            // This will trigger Leave event of any property panel being active, which till trigger it saving
+            tvDefinition.Focus();
+        }
+
+        private bool BuildAndValidateXml(bool validate = true)
+        {
+            var result = true;
+            if (tvDefinition.Nodes.Count > 0 && validate)
+            {
+                // Build the Xml from TreeView
+                var def = GetDefinitionDocument();
+                try
+                {
+                    ShuffleHelper.ValidateDefinitionXml(def, null);
+                }
+                catch (Exception ex)
+                {
+                    result = false;
+                    MessageBox.Show(ex.Message);
+                }
+            }
+            return result;
+        }
+
+        private XmlDocument GetDefinitionDocument()
+        {
+            var doc = new XmlDocument();
+            if (tvDefinition.Nodes.Count > 0)
+            {
+                XmlNode rootNode = doc.CreateElement("root");
+                doc.AppendChild(rootNode);
+                TreeNodeHelper.AddXmlNode(tvDefinition.Nodes[0], rootNode);
+                var xmlbody = doc.SelectSingleNode("root/ShuffleDefinition").OuterXml;
+                doc.LoadXml(xmlbody);
+            }
+            return doc;
         }
 
         /// <summary>
@@ -561,8 +353,13 @@ namespace Innofactor.Crm.Shuffle.Builder
         /// <param name="e"></param>
         internal void CtrlSaved(object sender, SaveEventArgs e)
         {
+            if (tvDefinition.SelectedNode == null)
+            {
+                return;
+            }
             tvDefinition.SelectedNode.Tag = e.AttributeCollection;
             TreeNodeHelper.SetNodeText(tvDefinition.SelectedNode);
+            UpdateLiveXML();
         }
 
         /// <summary>
@@ -572,13 +369,12 @@ namespace Innofactor.Crm.Shuffle.Builder
         {
             TreeNode selectedNode = tvDefinition.SelectedNode;
 
-            tsbItemSave.Enabled = selectedNode != null;
-            toolStripButtonDelete.Enabled = selectedNode != null && selectedNode.Text != "ShuffleDefinition";
-            toolStripButtonMoveUp.Enabled = selectedNode != null && selectedNode.Parent != null &&
-                                            selectedNode.Index != 0;
-            toolStripButtonMoveDown.Enabled = selectedNode != null && selectedNode.Parent != null &&
-                                              selectedNode.Index != selectedNode.Parent.Nodes.Count - 1;
-            toolStripButtonDisplayXml.Enabled = selectedNode != null;
+            //toolStripButtonDelete.Enabled = selectedNode != null && selectedNode.Text != "ShuffleDefinition";
+            //toolStripButtonMoveUp.Enabled = selectedNode != null && selectedNode.Parent != null &&
+            //                                selectedNode.Index != 0;
+            //toolStripButtonMoveDown.Enabled = selectedNode != null && selectedNode.Parent != null &&
+            //                                  selectedNode.Index != selectedNode.Parent.Nodes.Count - 1;
+            //toolStripButtonDisplayXml.Enabled = selectedNode != null;
 
             toolStripButtonSave.Enabled = tvDefinition.Nodes.Count > 0;
         }
@@ -641,72 +437,586 @@ namespace Innofactor.Crm.Shuffle.Builder
         //    }
         //}
 
-        private void tsbCloseThisTab_Click(object sender, EventArgs e)
-        {
-            CloseTool();
-        }
-
-        private void GetSolutions()
+        internal void LoadSolutions(Action callback)
         {
             if (Service == null)
             {
+                Solutions = new EntityCollection();
+                callback?.Invoke();
                 return;
             }
-            if (working)
+            WorkAsync(new WorkAsyncInfo
             {
+                Message = "Loading solutions",
+                Work = (worker, args) =>
+                {
+                    var qry = new QueryByAttribute("solution");
+                    qry.AddAttributeValue("isvisible", true);
+                    qry.AddAttributeValue("ismanaged", false);
+                    qry.ColumnSet = new ColumnSet("solutionid", "uniquename", "friendlyname", "version");
+                    args.Result = Service.RetrieveMultiple(qry);
+                },
+                PostWorkCallBack = (args) =>
+                {
+                    if (args.Error != null)
+                    {
+                        MessageBox.Show(args.Error.Message);
+                    }
+                    else if (args.Result is EntityCollection solutions)
+                    {
+                        this.Solutions = solutions;
+                        callback?.Invoke();
+                    }
+                }
+            });
+        }
+
+        internal void LoadEntities(Action callback)
+        {
+            if (Service == null)
+            {
+                Entities = new List<EntityMetadata>();
+                callback?.Invoke();
                 return;
             }
-            working = true;
-            WorkAsync(new WorkAsyncInfo("Loading solutions",
-                (eventargs) =>
-                {
-                    var svc = new CrmServiceProxy(Service);
-                    var log = new PluginLogger("ShuffleBuilder", true, "");
-                    try
-                    {
-                        solutionsUnmanaged = CintDynEntity.RetrieveMultiple(svc, "solution",
-                            new string[] { "isvisible", "ismanaged" },
-                            new object[] { true, false },
-                            new ColumnSet("solutionid", "uniquename", "friendlyname", "version"), log);
-                    }
-                    finally
-                    {
-                        log.CloseLog();
-                    }
-                })
+            WorkAsync(new WorkAsyncInfo
             {
-                PostWorkCallBack =
-                (completedargs) =>
+                Message = "Loading entities",
+                Work = (worker, args) =>
                 {
-                    if (completedargs.Error != null)
+                    args.Result = MetadataHelper.LoadEntities(Service, ConnectionDetail.OrganizationMajorVersion);
+                },
+                PostWorkCallBack = (args) =>
+                {
+                    if (args.Error != null)
                     {
-                        MessageBox.Show(completedargs.Error.Message);
+                        MessageBox.Show(args.Error.Message);
                     }
-                    working = false;
+                    else if (args.Result is RetrieveMetadataChangesResponse resp)
+                    {
+                        Entities = resp.EntityMetadata.ToList();
+                        callback?.Invoke();
+                    }
+                }
+            });
+        }
+
+        internal void LoadAttributes(string entity, Action callback)
+        {
+            if (Attributes == null)
+            {
+                Attributes = new Dictionary<string, List<AttributeMetadata>>();
+            }
+            if (Service == null)
+            {
+                Attributes.Add(entity, new List<AttributeMetadata>());
+                callback?.Invoke();
+                return;
+            }
+            if (Attributes.ContainsKey(entity))
+            {
+                Attributes.Remove(entity);
+            }
+            WorkAsync(new WorkAsyncInfo
+            {
+                Message = $"Loading attributes for {entity}",
+                Work = (worker, args) =>
+                {
+                    args.Result = MetadataHelper.LoadEntityDetails(Service, entity);
+                },
+                PostWorkCallBack = (args) =>
+                {
+                    if (args.Error != null)
+                    {
+                        MessageBox.Show(args.Error.Message);
+                    }
+                    else if (args.Result is RetrieveMetadataChangesResponse resp &&
+                        resp.EntityMetadata.Count > 0 &&
+                        resp.EntityMetadata[0] is EntityMetadata entitymeta)
+                    {
+                        Attributes.Add(entity, entitymeta.Attributes.ToList());
+                        callback?.Invoke();
+                    }
                 }
             });
         }
 
         public void OnIncomingMessage(MessageBusEventArgs message)
         {
-            throw new NotImplementedException("Shuffle Builder cannot accept calls from other plugins in this version");
+            if (message.SourcePlugin != "FetchXML Builder" ||
+                !(message.TargetArgument is string fetchxml))
+            {
+                MessageBox.Show($"Not sure what to do with a {message.TargetArgument.GetType()} message from {message.SourcePlugin}", "Incoming Message", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            if (tvDefinition.SelectedNode == null)
+            {
+                MessageBox.Show($"No node selected to handle value returned from {message.SourcePlugin}.\nMake sure a FetchXML node is selected when returning.", "Incoming Message", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            if (tvDefinition.SelectedNode.Name != "FetchXML" ||
+                !(tvDefinition.SelectedNode.Tag is Dictionary<string, string> collec))
+            {
+                MessageBox.Show($"Current node '{tvDefinition.SelectedNode.Name}' cannot handle value returned from {message.SourcePlugin}.\nMake sure a FetchXML node is selected when returning.", "Incoming Message", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            if (collec.ContainsKey("#text"))
+            {
+                collec["#text"] = fetchxml;
+            }
+            else
+            {
+                collec.Add("#text", fetchxml);
+            }
+            HandleNodeSelection(tvDefinition.SelectedNode);
         }
 
-        public event EventHandler<MessageBusEventArgs> OnOutgoingMessage;
-
-        private void toolStripButtonRunit_Click(object sender, EventArgs e)
+        private void HandleNodeSelection(TreeNode node)
         {
-            var args = new MessageBusEventArgs("Shuffle Runner")
+            if (tvDefinition.SelectedNode != node)
             {
-                TargetArgument = fileName
-            };
+                tvDefinition.SelectedNode = node;
+                return;
+            }
+
+            UserControl ctrl = null;
+            if (node != null)
+            {
+                TreeNodeHelper.AddContextMenu(node, this);
+                this.deleteToolStripMenuItem.Text = "Delete " + node.Name;
+                var collec = (Dictionary<string, string>)node.Tag;
+
+                switch (node.Name)
+                {
+                    case "ShuffleDefinition":
+                        ctrl = new ShuffleDefinitionControl(collec, this);
+                        break;
+                    case "DataBlock":
+                        ctrl = new DataBlockControl(collec, this, Entities);
+                        break;
+                    case "SolutionBlock":
+                        ctrl = new SolutionBlockControl(collec, this);
+                        break;
+                    case "Export":
+                        if (node.Parent?.Name == "DataBlock")
+                        {
+                            ctrl = new DataBlockExportControl(collec, this);
+                        }
+                        else if (node.Parent?.Name == "SolutionBlock")
+                        {
+                            ctrl = new SolutionBlockExportControl(collec, this);
+                        }
+                        else
+                        {
+                            ctrl = new ErrorControl("Invalid parent", "Parent node is neither DataBlock nor SolutionBlock.");
+                        }
+                        break;
+                    case "Import":
+                        if (node.Parent?.Name == "DataBlock")
+                        {
+                            ctrl = new DataBlockImportControl(collec, this);
+                        }
+                        else if (node.Parent?.Name == "SolutionBlock")
+                        {
+                            ctrl = new SolutionBlockImportControl(collec, this);
+                        }
+                        else
+                        {
+                            ctrl = new ErrorControl("Invalid parent", "Parent node is neither DataBlock nor SolutionBlock.");
+                        }
+                        break;
+
+                    case "Relation":
+                        ctrl = new RelationControl(collec, node, this);
+                        break;
+
+                    case "Attribute":
+                        {
+                            if (node.Parent?.Name == "Attributes")
+                            {
+                                if (node.Parent?.Parent?.Parent?.Name == "DataBlock" &&
+                                    node.Parent?.Parent?.Parent?.Tag is Dictionary<string, string> entityprops)
+                                {
+                                    if (entityprops.ContainsKey("Entity") &&
+                                        entityprops["Entity"] is string entity &&
+                                        !string.IsNullOrWhiteSpace(entity))
+                                    {
+                                        ctrl = new ExportAttributeControl(collec, this, entity);
+                                    }
+                                    else
+                                    {
+                                        ctrl = new ErrorControl("Invalid entity", "Entity not defined on parent block node.");
+                                    }
+                                }
+                                else
+                                {
+                                    ctrl = new ErrorControl("Invalid block", "This is not a valid DataBlock.");
+                                }
+                            }
+                            else if (node.Parent?.Name == "Match")
+                            {
+                                if (node.Parent?.Parent?.Parent?.Name == "DataBlock" &&
+                                    node.Parent?.Parent?.Parent?.Tag is Dictionary<string, string> entityprops)
+                                {
+                                    if (entityprops.ContainsKey("Entity") &&
+                                        entityprops["Entity"] is string entity &&
+                                        !string.IsNullOrWhiteSpace(entity))
+                                    {
+                                        ctrl = new ImportAttributeControl(collec, this, entity);
+                                    }
+                                    else
+                                    {
+                                        ctrl = new ErrorControl("Invalid entity", "Entity not defined on parent block node.");
+                                    }
+                                }
+                                else
+                                {
+                                    ctrl = new ErrorControl("Invalid block", "This is not a valid DataBlock.");
+                                }
+                            }
+                            else
+                            {
+                                ctrl = new ErrorControl("Invalid parent", "Parent node is neither Attributes nor Match.");
+                            }
+                            break;
+                        }
+                    case "FetchXML":
+                        {
+                            if (node.Parent?.Parent?.Name == "DataBlock" &&
+                                  node.Parent?.Parent?.Tag is Dictionary<string, string> entityprops)
+                            {
+                                if (entityprops.ContainsKey("Entity") &&
+                                    entityprops["Entity"] is string entity &&
+                                    !string.IsNullOrWhiteSpace(entity))
+                                {
+                                    ctrl = new FetchControl(collec, this, entity);
+                                }
+                                else
+                                {
+                                    ctrl = new ErrorControl("Invalid entity", "Entity not defined on parent block node.");
+                                }
+                            }
+                            else
+                            {
+                                ctrl = new ErrorControl("Invalid block", "This is not a valid DataBlock.");
+                            }
+                            break;
+                        }
+                    case "Filter":
+                        {
+                            if (node.Parent?.Parent?.Name == "DataBlock" &&
+                                node.Parent?.Parent?.Tag is Dictionary<string, string> entityprops)
+                            {
+                                if (entityprops.ContainsKey("Entity") &&
+                                    entityprops["Entity"] is string entity &&
+                                    !string.IsNullOrWhiteSpace(entity))
+                                {
+                                    ctrl = new FilterControl(collec, this, entity);
+                                }
+                                else
+                                {
+                                    ctrl = new ErrorControl("Invalid entity", "Entity not defined on parent block node.");
+                                }
+                            }
+                            else
+                            {
+                                ctrl = new ErrorControl("Invalid block", "This is not a valid DataBlock.");
+                            }
+                            break;
+                        }
+                    case "Sort":
+                        ctrl = new SortControl(collec, this);
+                        break;
+
+                    case "Match":
+                        ctrl = new ImportMatchControl(collec, this);
+                        break;
+
+                    case "Settings":
+                        ctrl = new SettingsControl(collec, this);
+                        break;
+
+                    case "Solution":
+                        if (node.Parent?.Name == "PreRequisites")
+                        {
+                            ctrl = new PreReqSolutionControl(collec, this);
+                        }
+                        else
+                        {
+                            ctrl = new ErrorControl("Invalid node", "This is only valid under PreRequisites.");
+                        }
+                        break;
+
+                    default:
+                        {
+                            panelContainer.Controls.Clear();
+                        }
+                        break;
+                }
+            }
+            var existingControl = panelContainer.Controls.Count > 0 ? panelContainer.Controls[0] : null;
+            if (ctrl != null)
+            {
+                panelContainer.Controls.Add(ctrl);
+                ctrl.BringToFront();
+                ctrl.Dock = DockStyle.Fill;
+            }
+            if (existingControl != null)
+            {
+                panelContainer.Controls.Remove(existingControl);
+            }
+
+            ManageMenuDisplay();
+            ShowNodeXml(node);
+        }
+
+        private void HandleTVKeyDown(KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Delete)
+            {
+                if (deleteToolStripMenuItem.Enabled)
+                {
+                    if (MessageBox.Show(deleteToolStripMenuItem.Text + " ?", "Confirm", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation) == DialogResult.OK)
+                    {
+                        HandleNodeMenuClick(deleteToolStripMenuItem.Tag?.ToString());
+                    }
+                }
+                e.Handled = true;
+                e.SuppressKeyPress = true;
+            }
+            else if (e.KeyCode == Keys.Insert)
+            {
+                addMenu.Show(tvDefinition.PointToScreen(tvDefinition.Location));
+            }
+            else if (e.Control && e.KeyCode == Keys.K && commentToolStripMenuItem.Enabled)
+            {
+                HandleNodeMenuClick(commentToolStripMenuItem.Tag?.ToString());
+            }
+            else if (e.Control && e.KeyCode == Keys.U && uncommentToolStripMenuItem.Enabled)
+            {
+                HandleNodeMenuClick(uncommentToolStripMenuItem.Tag?.ToString());
+            }
+            else if (e.Control && e.KeyCode == Keys.Up && moveUpToolStripMenuItem.Enabled)
+            {
+                HandleNodeMenuClick(moveUpToolStripMenuItem.Tag?.ToString());
+            }
+            else if (e.Control && e.KeyCode == Keys.Down && moveDownToolStripMenuItem.Enabled)
+            {
+                HandleNodeMenuClick(moveDownToolStripMenuItem.Tag?.ToString());
+            }
+        }
+
+        private void HandleNodeMenuClick(string ClickedTag)
+        {
+            var node = tvDefinition.SelectedNode;
+            if (ClickedTag == null || ClickedTag == "Add" || node == null)
+            {
+                return;
+            }
+            TreeNode updateNode = null;
+            if (ClickedTag == "Delete")
+            {
+                DeleteNode(node);
+            }
+            else if (ClickedTag == "Comment")
+            {
+                CommentNode(node);
+            }
+            else if (ClickedTag == "Uncomment")
+            {
+                UncommentNode(node);
+            }
+            else if (ClickedTag == "MoveDown")
+            {
+                MoveNodeDown(node);
+            }
+            else if (ClickedTag == "MoveUp")
+            {
+                MoveNodeUp(node);
+            }
+            else if (ClickedTag == "Cut" || ClickedTag == "Copy" || ClickedTag == "Paste")
+            {
+                if (ClickedTag == "Cut")
+                {
+                    clipboard.Cut(tvDefinition.SelectedNode);
+                }
+                else if (ClickedTag == "Copy")
+                {
+                    clipboard.Copy(tvDefinition.SelectedNode);
+                }
+                else
+                {
+                    clipboard.Paste(tvDefinition.SelectedNode);
+                }
+            }
+            else
+            {
+                string nodeText = ClickedTag;
+                updateNode = TreeNodeHelper.AddChildNode(tvDefinition.SelectedNode, nodeText);
+                HandleNodeSelection(updateNode);
+            }
+            if (updateNode != null)
+            {
+                TreeNodeHelper.SetNodeTooltip(updateNode);
+            }
+            UpdateLiveXML();
+        }
+
+        internal void UpdateLiveXML()
+        {
+            var xml = string.Empty;
+            string GetXml()
+            {
+                if (string.IsNullOrWhiteSpace(xml))
+                {
+                    xml = GetXmlString(true, false);
+                }
+                return xml;
+            }
+            txtXML.Text = GetXml();
             try
             {
-                OnOutgoingMessage(this, args);
+                txtXML.Process();
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Calliung Shuffle Runner failed:\n" + ex.Message);
+                MessageBox.Show(ex.Message, "XML Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void ShowNodeXml(TreeNode node)
+        {
+            txtPropertyXml.Text = TreeNodeHelper.GetNodeXml(node);
+            try
+            {
+                txtPropertyXml.Process();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "XML Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private string GetXmlString(bool format, bool validate)
+        {
+            var xml = string.Empty;
+            if (BuildAndValidateXml(validate))
+            {
+                if (tvDefinition.Nodes.Count > 0)
+                {
+                    var doc = GetDefinitionDocument();
+                    xml = doc.OuterXml;
+                }
+                if (format)
+                {
+                    XDocument doc = XDocument.Parse(xml);
+                    xml = doc.ToString();
+                }
+            }
+            return xml;
+        }
+
+        private void MoveNodeDown(TreeNode node)
+        {
+            TreeNode nextnode = node.NextNode;
+            if (nextnode != null)
+            {
+                int idxBegin = node.Index;
+                int idxEnd = nextnode.Index;
+                TreeNode tnmNodeParent = node.Parent;
+                if (tnmNodeParent != null)
+                {
+                    node.Remove();
+                    nextnode.Remove();
+                    tnmNodeParent.Nodes.Insert(idxBegin, nextnode);
+                    tnmNodeParent.Nodes.Insert(idxEnd, node);
+                    tvDefinition.SelectedNode = node;
+                    UpdateLiveXML();
+                }
+            }
+        }
+
+        private void MoveNodeUp(TreeNode node)
+        {
+            TreeNode prevnode = node.PrevNode;
+            if (prevnode != null)
+            {
+                int idxBegin = node.Index;
+                int idxEnd = prevnode.Index;
+                TreeNode tnmNodeParent = node.Parent;
+                if (tnmNodeParent != null)
+                {
+                    node.Remove();
+                    prevnode.Remove();
+                    tnmNodeParent.Nodes.Insert(idxEnd, node);
+                    tnmNodeParent.Nodes.Insert(idxBegin, prevnode);
+                    tvDefinition.SelectedNode = node;
+                    UpdateLiveXML();
+                }
+            }
+        }
+
+        private void DeleteNode(TreeNode node)
+        {
+            node.Remove();
+        }
+
+        private void CommentNode(TreeNode node)
+        {
+            var doc = new XmlDocument();
+            XmlNode rootNode = doc.CreateElement("root");
+            doc.AppendChild(rootNode);
+            TreeNodeHelper.AddXmlNode(node, rootNode);
+            XDocument xdoc = XDocument.Parse(rootNode.InnerXml);
+            var comment = xdoc.ToString();
+            if (node.Nodes != null && node.Nodes.Count > 0)
+            {
+                comment = "\r\n" + comment + "\r\n";
+            }
+            if (comment.Contains("--"))
+            {
+                comment = comment.Replace("--", "~~");
+            }
+            if (comment.EndsWith("-"))
+            {
+                comment = comment.Substring(0, comment.Length - 1) + "~";
+            }
+            var commentNode = doc.CreateComment(comment);
+            var parent = node.Parent;
+            var index = node.Index;
+            node.Parent.Nodes.Remove(node);
+            tvDefinition.SelectedNode = TreeNodeHelper.AddTreeViewNode(parent, commentNode, this, index);
+        }
+
+        private void UncommentNode(TreeNode node)
+        {
+            var coll = node.Tag as Dictionary<string, string>;
+            if (coll.ContainsKey("#comment"))
+            {
+                var comment = coll["#comment"];
+                if (comment.Contains("~~"))
+                {
+                    comment = comment.Replace("~~", "--");
+                }
+                if (comment.EndsWith("~"))
+                {
+                    comment = comment.Substring(0, comment.Length - 1) + "-";
+                }
+                var doc = new XmlDocument();
+                try
+                {
+                    doc.LoadXml(comment);
+                    var parent = node.Parent;
+                    var index = node.Index;
+                    node.Parent.Nodes.Remove(node);
+                    tvDefinition.SelectedNode = TreeNodeHelper.AddTreeViewNode(parent, doc.DocumentElement, this, index);
+                    tvDefinition.SelectedNode.Expand();
+                }
+                catch (XmlException ex)
+                {
+                    var msg = "Comment does contain well formatted xml.\nError description:\n\n" + ex.Message;
+                    MessageBox.Show(msg, "Uncomment", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
             }
         }
     }

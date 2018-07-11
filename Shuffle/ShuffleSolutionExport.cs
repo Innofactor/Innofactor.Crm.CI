@@ -1,5 +1,6 @@
 ﻿using Cinteros.Crm.Utils.Common;
 using Cinteros.Crm.Utils.Misc;
+using Cinteros.Crm.Utils.Shuffle.Types;
 using Microsoft.Crm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Query;
 using System;
@@ -13,18 +14,13 @@ namespace Cinteros.Crm.Utils.Shuffle
     {
         #region Private Methods
 
-        private void ExportSolutionBlock(XmlNode xBlock)
+        private void ExportSolutionBlock(SolutionBlock block)
         {
             log.StartSection("ExportSolutionBlock");
-
-            if (xBlock.Name != "SolutionBlock")
-            {
-                throw new ArgumentOutOfRangeException("Type", xBlock.Name, "Invalid Block type");
-            }
-            string name = CintXML.GetAttribute(xBlock, "Name");
+            string name = block.Name;
             log.Log("Block: {0}", name);
-            string path = CintXML.GetAttribute(xBlock, "Path");
-            string file = CintXML.GetAttribute(xBlock, "File");
+            string path = block.Path;
+            string file = block.File;
             if (string.IsNullOrWhiteSpace(path) && !string.IsNullOrWhiteSpace(definitionpath))
             {
                 path = definitionpath;
@@ -34,13 +30,12 @@ namespace Cinteros.Crm.Utils.Shuffle
             {
                 file = name;
             }
-            XmlNode xExport = CintXML.FindChild(xBlock, "Export");
-            if (xExport != null)
+            if (block.Export != null)
             {
-                string type = CintXML.GetAttribute(xExport, "Type");
-                string setversion = CintXML.GetAttribute(xExport, "SetVersion");
-                bool publish = CintXML.GetBoolAttribute(xExport, "PublishBeforeExport", false);
-                string targetversion = CintXML.GetAttribute(xExport, "TargetVersion");
+                var type = block.Export.Type;
+                var setversion = block.Export.SetVersion;
+                bool publish = block.Export.PublishBeforeExport;
+                string targetversion = block.Export.TargetVersion;
 
                 CintDynEntity cdSolution = GetAndVerifySolutionForExport(name);
                 var currentversion = new Version(cdSolution.Property("version", "1.0.0.0"));
@@ -68,21 +63,20 @@ namespace Cinteros.Crm.Utils.Shuffle
                     req.TargetVersion = targetversion;
                 }
 #endif
-                XmlNode xSettings = CintXML.FindChild(xExport, "Settings");
-                if (xSettings != null)
+                if (block.Export.Settings != null)
                 {
-                    req.ExportAutoNumberingSettings = CintXML.GetBoolAttribute(xSettings, "AutoNumbering", false);
-                    req.ExportCalendarSettings = CintXML.GetBoolAttribute(xSettings, "Calendar", false);
-                    req.ExportCustomizationSettings = CintXML.GetBoolAttribute(xSettings, "Customization", false);
-                    req.ExportEmailTrackingSettings = CintXML.GetBoolAttribute(xSettings, "EmailTracking", false);
-                    req.ExportGeneralSettings = CintXML.GetBoolAttribute(xSettings, "General", false);
-                    req.ExportMarketingSettings = CintXML.GetBoolAttribute(xSettings, "Marketing", false);
-                    req.ExportOutlookSynchronizationSettings = CintXML.GetBoolAttribute(xSettings, "OutlookSync", false);
-                    req.ExportRelationshipRoles = CintXML.GetBoolAttribute(xSettings, "RelationshipRoles", false);
-                    req.ExportIsvConfig = CintXML.GetBoolAttribute(xSettings, "IsvConfig", false);
+                    req.ExportAutoNumberingSettings = block.Export.Settings.AutoNumbering;
+                    req.ExportCalendarSettings = block.Export.Settings.Calendar;
+                    req.ExportCustomizationSettings = block.Export.Settings.Customization;
+                    req.ExportEmailTrackingSettings = block.Export.Settings.EmailTracking;
+                    req.ExportGeneralSettings = block.Export.Settings.General;
+                    req.ExportMarketingSettings = block.Export.Settings.Marketing;
+                    req.ExportOutlookSynchronizationSettings = block.Export.Settings.OutlookSync;
+                    req.ExportRelationshipRoles = block.Export.Settings.RelationshipRoles;
+                    req.ExportIsvConfig = block.Export.Settings.IsvConfig;
                 }
 
-                if (type == "Managed" || type == "Both")
+                if (type == SolutionTypes.Managed || type == SolutionTypes.Both)
                 {
                     string filename = path + file + "_managed.zip";
                     SendLine("Exporting solution to: {0}", filename);
@@ -91,7 +85,7 @@ namespace Cinteros.Crm.Utils.Shuffle
                     byte[] exportXml = exportSolutionResponse.ExportSolutionFile;
                     File.WriteAllBytes(filename, exportXml);
                 }
-                if (type == "Unmanaged" || type == "Both")
+                if (type == SolutionTypes.Unmanaged || type == SolutionTypes.Both)
                 {
                     string filename = path + file + ".zip";
                     SendLine("Exporting solution to: {0}", filename);

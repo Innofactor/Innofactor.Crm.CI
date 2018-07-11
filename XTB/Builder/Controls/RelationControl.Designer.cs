@@ -55,6 +55,7 @@
             this.txtPKAttribute.Name = "txtPKAttribute";
             this.txtPKAttribute.Size = new System.Drawing.Size(234, 20);
             this.txtPKAttribute.TabIndex = 3;
+            this.txtPKAttribute.Tag = "PK-Attribute|false";
             // 
             // lblIncludeNull
             // 
@@ -73,6 +74,7 @@
             this.txtAttribute.Name = "txtAttribute";
             this.txtAttribute.Size = new System.Drawing.Size(234, 20);
             this.txtAttribute.TabIndex = 2;
+            this.txtAttribute.Tag = "Attribute|true";
             // 
             // label1
             // 
@@ -100,6 +102,7 @@
             this.cmbBlock.Name = "cmbBlock";
             this.cmbBlock.Size = new System.Drawing.Size(234, 21);
             this.cmbBlock.TabIndex = 1;
+            this.cmbBlock.Tag = "Block|true";
             // 
             // chkIncludeNull
             // 
@@ -108,6 +111,7 @@
             this.chkIncludeNull.Name = "chkIncludeNull";
             this.chkIncludeNull.Size = new System.Drawing.Size(15, 14);
             this.chkIncludeNull.TabIndex = 10;
+            this.chkIncludeNull.Tag = "IncludeNull";
             this.chkIncludeNull.UseVisualStyleBackColor = true;
             // 
             // label3
@@ -133,8 +137,6 @@
             this.Controls.Add(this.txtPKAttribute);
             this.Controls.Add(this.lblName);
             this.Name = "RelationControl";
-            this.Size = new System.Drawing.Size(450, 150);
-            this.Leave += new System.EventHandler(this.RelationControl_Leave);
             this.ResumeLayout(false);
             this.PerformLayout();
 

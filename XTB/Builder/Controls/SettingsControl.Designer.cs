@@ -243,7 +243,6 @@ namespace Innofactor.Crm.Shuffle.Builder.Controls
             this.Controls.Add(this.chkAutonum);
             this.Name = "SettingsControl";
             this.Size = new System.Drawing.Size(450, 306);
-            this.Leave += new System.EventHandler(this.DataBlockExportControl_Leave);
             this.ResumeLayout(false);
             this.PerformLayout();
 

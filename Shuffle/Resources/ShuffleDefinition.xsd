@@ -59,6 +59,9 @@
   </xs:simpleType>
 
   <xs:element name="ShuffleDefinition">
+    <xs:annotation>
+      <xs:documentation>The ShuffleDefinition defines Timeout and StopOnError to control general behavior of the Shuffle.</xs:documentation>
+    </xs:annotation>
     <xs:complexType>
       <xs:sequence>
         <xs:element name="Blocks" type="Blocks"/>
@@ -142,6 +145,9 @@
       <xs:element minOccurs="0" maxOccurs="1" name="Export" type="DataBlockExport" />
       <xs:element minOccurs="0" maxOccurs="1" name="Import" type="DataBlockImport" />
       <xs:element name="Relation" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>Declare Relation block to filter what is exported based on relationships to previously exported data blocks.</xs:documentation>
+        </xs:annotation>
         <xs:complexType>
           <xs:attribute name="Block" type="xs:string" use="required" />
           <xs:attribute name="Attribute" type="xs:string" use="required" />
@@ -157,40 +163,46 @@
   </xs:complexType>
 
   <xs:complexType name="DataBlockExport">
-    <xs:sequence>
-      <xs:element minOccurs="0" maxOccurs="unbounded" name="Filter">
-        <xs:complexType>
-          <xs:attribute name="Attribute" type="xs:string" use="required" />
-          <xs:attribute name="Operator" type="ConditionOperator" use="required" />
-          <xs:attribute name="Type" type="FilterTypes" use="optional" />
-          <xs:attribute name="Value" type="xs:string" use="optional" />
-        </xs:complexType>
-      </xs:element>
-      <xs:element minOccurs="0" maxOccurs="unbounded" name="Sort">
-        <xs:complexType>
-          <xs:attribute name="Attribute" type="xs:string" use="required" />
-          <xs:attribute name="Type" type="SortTypes" use="optional" default="Asc" />
-        </xs:complexType>
-      </xs:element>
-      <xs:element name="Attributes">
-        <xs:complexType>
-          <xs:sequence>
-            <xs:element maxOccurs="unbounded" name="Attribute">
-              <xs:complexType>
-                <xs:attribute name="Name" type="xs:string" use="required" />
-                <xs:attribute name="IncludeNull" type="xs:boolean" default="false" use="optional" />
-              </xs:complexType>
-            </xs:element>
-          </xs:sequence>
-        </xs:complexType>
-      </xs:element>
-    </xs:sequence>
+    <xs:choice minOccurs="1" maxOccurs="1">
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" name="Filter">
+          <xs:complexType>
+            <xs:attribute name="Attribute" type="xs:string" use="required" />
+            <xs:attribute name="Operator" type="ConditionOperator" use="required" />
+            <xs:attribute name="Type" type="FilterTypes" use="optional" />
+            <xs:attribute name="Value" type="xs:string" use="optional" />
+          </xs:complexType>
+        </xs:element>
+        <xs:element minOccurs="0" maxOccurs="unbounded" name="Sort">
+          <xs:complexType>
+            <xs:attribute name="Attribute" type="xs:string" use="required" />
+            <xs:attribute name="Type" type="SortTypes" use="optional" default="Asc" />
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Attributes">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element maxOccurs="unbounded" name="Attribute">
+                <xs:complexType>
+                  <xs:attribute name="Name" type="xs:string" use="required" />
+                  <xs:attribute name="IncludeNull" type="xs:boolean" default="false" use="optional" />
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:element name="FetchXML" type="xs:string" />
+    </xs:choice>
     <xs:attribute name="ActiveOnly" type="xs:boolean" use="optional" default="false" />
   </xs:complexType>
 
   <xs:complexType name="DataBlockImport">
     <xs:sequence>
       <xs:element name="Match" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Define which attributes to match with existing records during import.</xs:documentation>
+        </xs:annotation>
         <xs:complexType>
           <xs:sequence>
             <xs:element maxOccurs="unbounded" name="Attribute">

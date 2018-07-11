@@ -39,6 +39,7 @@ namespace Innofactor.Crm.Shuffle.Builder.Controls
             this.chkActiveOnly.Name = "chkActiveOnly";
             this.chkActiveOnly.Size = new System.Drawing.Size(15, 14);
             this.chkActiveOnly.TabIndex = 2;
+            this.chkActiveOnly.Tag = "ActiveOnly|false|true";
             this.chkActiveOnly.UseVisualStyleBackColor = true;
             // 
             // label1
@@ -57,8 +58,6 @@ namespace Innofactor.Crm.Shuffle.Builder.Controls
             this.Controls.Add(this.label1);
             this.Controls.Add(this.chkActiveOnly);
             this.Name = "DataBlockExportControl";
-            this.Size = new System.Drawing.Size(450, 150);
-            this.Leave += new System.EventHandler(this.DataBlockExportControl_Leave);
             this.ResumeLayout(false);
             this.PerformLayout();
 

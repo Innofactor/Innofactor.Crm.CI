@@ -29,13 +29,13 @@
         private void InitializeComponent()
         {
             this.lblTimeout = new System.Windows.Forms.Label();
-            this.txtAttribute = new System.Windows.Forms.TextBox();
             this.lblEntity = new System.Windows.Forms.Label();
             this.lblType = new System.Windows.Forms.Label();
             this.cmbType = new System.Windows.Forms.ComboBox();
             this.txtValue = new System.Windows.Forms.TextBox();
             this.lblIntersect = new System.Windows.Forms.Label();
             this.cmbOperator = new System.Windows.Forms.ComboBox();
+            this.cmbAttribute = new System.Windows.Forms.ComboBox();
             this.SuspendLayout();
             // 
             // lblTimeout
@@ -46,15 +46,6 @@
             this.lblTimeout.Size = new System.Drawing.Size(46, 13);
             this.lblTimeout.TabIndex = 0;
             this.lblTimeout.Text = "Attribute";
-            // 
-            // txtAttribute
-            // 
-            this.txtAttribute.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtAttribute.Location = new System.Drawing.Point(213, 4);
-            this.txtAttribute.Name = "txtAttribute";
-            this.txtAttribute.Size = new System.Drawing.Size(234, 20);
-            this.txtAttribute.TabIndex = 1;
             // 
             // lblEntity
             // 
@@ -94,6 +85,7 @@
             this.cmbType.Name = "cmbType";
             this.cmbType.Size = new System.Drawing.Size(234, 21);
             this.cmbType.TabIndex = 3;
+            this.cmbType.Tag = "Type|true";
             // 
             // txtValue
             // 
@@ -103,6 +95,7 @@
             this.txtValue.Name = "txtValue";
             this.txtValue.Size = new System.Drawing.Size(234, 20);
             this.txtValue.TabIndex = 4;
+            this.txtValue.Tag = "Value";
             // 
             // lblIntersect
             // 
@@ -171,22 +164,32 @@
             this.cmbOperator.Name = "cmbOperator";
             this.cmbOperator.Size = new System.Drawing.Size(234, 21);
             this.cmbOperator.TabIndex = 2;
+            this.cmbOperator.Tag = "Operator|true";
+            // 
+            // cmbAttribute
+            // 
+            this.cmbAttribute.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.cmbAttribute.FormattingEnabled = true;
+            this.cmbAttribute.Location = new System.Drawing.Point(213, 4);
+            this.cmbAttribute.Name = "cmbAttribute";
+            this.cmbAttribute.Size = new System.Drawing.Size(234, 21);
+            this.cmbAttribute.TabIndex = 1;
+            this.cmbAttribute.Tag = "Attribute|true";
             // 
             // FilterControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.cmbAttribute);
             this.Controls.Add(this.cmbOperator);
             this.Controls.Add(this.txtValue);
             this.Controls.Add(this.lblIntersect);
             this.Controls.Add(this.cmbType);
             this.Controls.Add(this.lblType);
             this.Controls.Add(this.lblEntity);
-            this.Controls.Add(this.txtAttribute);
             this.Controls.Add(this.lblTimeout);
             this.Name = "FilterControl";
-            this.Size = new System.Drawing.Size(450, 150);
-            this.Leave += new System.EventHandler(this.FilterControl_Leave);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -195,12 +198,12 @@
         #endregion
 
         private System.Windows.Forms.Label lblTimeout;
-        private System.Windows.Forms.TextBox txtAttribute;
         private System.Windows.Forms.Label lblEntity;
         private System.Windows.Forms.Label lblType;
         private System.Windows.Forms.ComboBox cmbType;
         private System.Windows.Forms.TextBox txtValue;
         private System.Windows.Forms.Label lblIntersect;
         private System.Windows.Forms.ComboBox cmbOperator;
+        private System.Windows.Forms.ComboBox cmbAttribute;
     }
 }

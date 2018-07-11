@@ -1,104 +1,56 @@
-﻿using Innofactor.Crm.Shuffle.Builder.AppCode;
+﻿using Microsoft.Xrm.Sdk.Metadata;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace Innofactor.Crm.Shuffle.Builder.Controls
 {
-    public partial class DataBlockControl : UserControl, IDefinitionSavable
+    public partial class DataBlockControl : ControlBase
     {
-        private readonly Dictionary<string, string> collec;
-        private string controlsCheckSum = "";
+        List<EntityMetadata> entities;
 
-        #region Delegates
-
-        public delegate void SaveEventHandler(object sender, SaveEventArgs e);
-
-        #endregion
-
-        #region Event Handlers
-
-        public event SaveEventHandler Saved;
-
-        #endregion
-
-        public DataBlockControl()
+        public DataBlockControl(Dictionary<string, string> collection, ShuffleBuilder shuffleBuilder, List<EntityMetadata> entities)
+            : base(collection, shuffleBuilder)
         {
-            InitializeComponent();
-            collec = new Dictionary<string, string>();
+            this.entities = entities;
         }
 
-        public DataBlockControl(Dictionary<string, string> collection, ShuffleBuilder shuffleBuilder)
-            : this()
+        public override ControlCollection GetControls()
         {
-            if (collection != null)
+            if (InitializationNeeded(Controls))
             {
-                collec = collection;
+                InitializeComponent();
             }
-
-            FillControls();
-            Saved += shuffleBuilder.CtrlSaved;
+            return Controls;
         }
 
-        private void FillControls()
+        public override void PopulateControls()
         {
-            txtName.Text = collec.ContainsKey("Name") ? collec["Name"] : "";
-            txtEntity.Text = collec.ContainsKey("Entity") ? collec["Entity"] : "";
-            cmbType.SelectedIndex = cmbType.FindStringExact(collec.ContainsKey("Type") ? collec["Type"] : "");
-            txtIntersect.Text = collec.ContainsKey("IntersectName") ? collec["IntersectName"] : "";
-            controlsCheckSum = ControlsChecksum();
-        }
-
-        public void Save()
-        {
-            Dictionary<string, string> collection = new Dictionary<string, string>();
-            collection.Add("Name", txtName.Text);
-            collection.Add("Entity", txtEntity.Text);
-            if (cmbType.SelectedItem != null)
+            if (shuffleBuilder.Entities == null)
             {
-                collection.Add("Type", cmbType.Text);
-                if (cmbType.Text == "Intersect" && !string.IsNullOrWhiteSpace(txtIntersect.Text))
-                {
-                    collection.Add("IntersectName", txtIntersect.Text);
-                }
+                shuffleBuilder.LoadEntities(PopulateControls);
+                return;
             }
-            controlsCheckSum = ControlsChecksum();
-            SendSaveMessage(collection);
-        }
-
-        /// <summary>
-        /// Sends a connection success message 
-        /// </summary>
-        /// <param name="service">IOrganizationService generated</param>
-        /// <param name="parameters">Lsit of parameter</param>
-        private void SendSaveMessage(Dictionary<string, string> collection)
-        {
-            SaveEventArgs sea = new SaveEventArgs { AttributeCollection = collection };
-
-            if (Saved != null)
+            cmbEntity.Items.Clear();
+            cmbEntity.Items.AddRange(shuffleBuilder.Entities.OrderBy(e => e.LogicalName).Select(e => e.LogicalName).ToArray());
+            if (cmbEntity.Items.Count > 0)
             {
-                Saved(this, sea);
+                cmbEntity.DropDownStyle = ComboBoxStyle.DropDown;
             }
+            else
+            {
+                cmbEntity.DropDownStyle = ComboBoxStyle.Simple;
+            }
+            base.PopulateControls();
         }
 
         private void cmbType_SelectedIndexChanged(object sender, EventArgs e)
         {
             txtIntersect.Enabled = cmbType.Text == "Intersect";
-        }
-
-        public string ControlsChecksum()
-        {
-            return string.Format("{0}/{1}/{2}/{3}", txtName.Text, txtEntity.Text, cmbType.SelectedIndex, txtIntersect.Text);
-        }
-
-        private void DataBlockControl_Leave(object sender, EventArgs e)
-        {
-            if (controlsCheckSum != ControlsChecksum())
+            if (!txtIntersect.Enabled)
             {
-                if (MessageBox.Show("Save changes?", "Question", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
-                {
-                    Save();
-                }
+                txtIntersect.Text = string.Empty;
             }
         }
     }

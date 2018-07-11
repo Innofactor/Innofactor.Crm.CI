@@ -1,5 +1,5 @@
 ﻿using Cinteros.Crm.Utils.Common;
-using Cinteros.Crm.Utils.Misc;
+using Cinteros.Crm.Utils.Shuffle.Types;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
 using System;
@@ -8,7 +8,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.ServiceModel;
-using System.Xml;
 
 namespace Cinteros.Crm.Utils.Shuffle
 {
@@ -40,17 +39,17 @@ namespace Cinteros.Crm.Utils.Shuffle
             return match;
         }
 
-        private static string GetEntityDisplayString(XmlNode xMatch, CintDynEntity cdEntity)
+        private static string GetEntityDisplayString(DataBlockImportMatch match, CintDynEntity cdEntity)
         {
             var unique = new List<string>();
-            if (xMatch != null && xMatch.ChildNodes.Count > 0)
+            if (match != null && match.Attribute.Length > 0)
             {
-                foreach (XmlNode xMatchAttr in xMatch.ChildNodes)
+                foreach (var attribute in match.Attribute)
                 {
-                    string matchdisplay = CintXML.GetAttribute(xMatchAttr, "Display");
+                    string matchdisplay = attribute.Display;
                     if (string.IsNullOrEmpty(matchdisplay))
                     {
-                        matchdisplay = CintXML.GetAttribute(xMatchAttr, "Name");
+                        matchdisplay = attribute.Name;
                     }
                     var matchvalue = "<null>";
                     if (cdEntity.Contains(matchdisplay, true))
@@ -137,14 +136,14 @@ namespace Cinteros.Crm.Utils.Shuffle
             return matches;
         }
 
-        private List<string> GetMatchAttributes(XmlNode xMatch)
+        private List<string> GetMatchAttributes(DataBlockImportMatch match)
         {
             var result = new List<string>();
-            if (xMatch != null)
+            if (match != null)
             {
-                foreach (XmlNode xMatchAttr in xMatch.ChildNodes)
+                foreach (var attribute in match.Attribute)
                 {
-                    var matchattr = CintXML.GetAttribute(xMatchAttr, "Name");
+                    var matchattr = attribute.Name;
                     if (string.IsNullOrEmpty(matchattr))
                     {
                         throw new ArgumentOutOfRangeException("Match Attribute name not set");
@@ -248,7 +247,7 @@ namespace Cinteros.Crm.Utils.Shuffle
             return result;
         }
 
-        private Tuple<int, int, int, int, int, EntityReferenceCollection> ImportDataBlock(XmlNode xBlock, CintDynEntityCollection cEntities)
+        private Tuple<int, int, int, int, int, EntityReferenceCollection> ImportDataBlock(DataBlock block, CintDynEntityCollection cEntities)
         {
             log.StartSection("ImportDataBlock");
             int created = 0;
@@ -258,263 +257,242 @@ namespace Cinteros.Crm.Utils.Shuffle
             int failed = 0;
             EntityReferenceCollection references = new EntityReferenceCollection();
 
-            string name = CintXML.GetAttribute(xBlock, "Name");
+            string name = block.Name;
             log.Log("Block: {0}", name);
             SendStatus(name, null);
             SendLine();
 
-            switch (xBlock.Name)
+            if (block.Import != null)
             {
-                case "DataBlock":
-                    string type = CintXML.GetAttribute(xBlock, "Type");
-                    XmlNode xImport = CintXML.FindChild(xBlock, "Import");
-                    if (xImport != null)
+                var includeid = block.Import.CreateWithId;
+                var save = block.Import.Save;
+                var delete = block.Import.Delete;
+                var updateinactive = block.Import.UpdateInactive;
+                var updateidentical = block.Import.UpdateIdentical;
+                if (block.Import.OverwriteSpecified)
+                {
+                    SendLine("DEPRECATED use of attribute Overwrite!");
+                    save = block.Import.Overwrite ? SaveTypes.CreateUpdate : SaveTypes.CreateOnly;
+                }
+                var matchattributes = GetMatchAttributes(block.Import.Match);
+                var updateattributes = !updateidentical ? GetUpdateAttributes(cEntities) : new List<string>();
+                var preretrieveall = (bool)block.Import.Match?.PreRetrieveAll;
+
+                SendLine();
+                SendLine("Importing block {0} - {1} records ", name, cEntities.Count);
+
+                var i = 1;
+
+                if (delete == DeleteTypes.All && (matchattributes.Count == 0))
+                {   // All records shall be deleted, no match attribute defined, so just get all and delete all
+                    string entity = block.Entity;
+                    var qDelete = new QueryExpression(entity);
+                    qDelete.ColumnSet.AddColumn(crmsvc.PrimaryAttribute(entity, log));
+                    var deleterecords = CintDynEntity.RetrieveMultiple(crmsvc, qDelete, log);
+                    SendLine("Deleting ALL {0} - {1} records", entity, deleterecords.Count);
+                    foreach (var record in deleterecords)
                     {
-                        var includeid = CintXML.GetBoolAttribute(xImport, "CreateWithId", false);
-                        var save = CintXML.GetAttribute(xImport, "Save");
-                        var delete = CintXML.GetAttribute(xImport, "Delete");
-                        var updateinactive = CintXML.GetBoolAttribute(xImport, "UpdateInactive", false);
-                        var updateidentical = CintXML.GetBoolAttribute(xImport, "UpdateIdentical", false);
-                        var deprecatedoverwrite = CintXML.GetAttribute(xImport, "Overwrite");
-                        if (!string.IsNullOrWhiteSpace(deprecatedoverwrite))
+                        SendLine("{0:000} Deleting existing: {1}", i, record);
+                        try
                         {
-                            SendLine("DEPRECATED use of attribute Overwrite!");
-                            bool overwrite = CintXML.GetBoolAttribute(xImport, "Overwrite", true);
-                            save = overwrite ? "CreateUpdate" : "CreateOnly";
+                            record.Delete();
+                            deleted++;
                         }
-                        if (string.IsNullOrWhiteSpace(save))
-                        {   // Default
-                            save = "CreateUpdate";
-                        }
-                        if (string.IsNullOrWhiteSpace(delete))
-                        {   // Default
-                            delete = "None";
-                        }
-                        XmlNode xMatch = CintXML.FindChild(xImport, "Match");
-                        var matchattributes = GetMatchAttributes(xMatch);
-                        var updateattributes = !updateidentical ? GetUpdateAttributes(cEntities) : new List<string>();
-                        var preretrieveall = xMatch != null ? CintXML.GetBoolAttribute(xMatch, "PreRetrieveAll", false) : false;
-
-                        SendLine();
-                        SendLine("Importing block {0} - {1} records ", name, cEntities.Count);
-
-                        var i = 1;
-
-                        if (delete == "All" && (matchattributes.Count == 0))
-                        {   // All records shall be deleted, no match attribute defined, so just get all and delete all
-                            string entity = CintXML.GetAttribute(xBlock, "Entity");
-                            var qDelete = new QueryExpression(entity);
-                            qDelete.ColumnSet.AddColumn(crmsvc.PrimaryAttribute(entity, log));
-                            var deleterecords = CintDynEntity.RetrieveMultiple(crmsvc, qDelete, log);
-                            SendLine("Deleting ALL {0} - {1} records", entity, deleterecords.Count);
-                            foreach (var record in deleterecords)
+                        catch (FaultException<OrganizationServiceFault> ex)
+                        {
+                            if (ex.Message.ToUpperInvariant().Contains("DOES NOT EXIST"))
+                            {   // This may happen through delayed cascade delete in CRM
+                                SendLine("      ...already deleted");
+                            }
+                            else
                             {
-                                SendLine("{0:000} Deleting existing: {1}", i, record);
-                                try
-                                {
-                                    record.Delete();
-                                    deleted++;
-                                }
-                                catch (FaultException<OrganizationServiceFault> ex)
-                                {
-                                    if (ex.Message.ToUpperInvariant().Contains("DOES NOT EXIST"))
-                                    {   // This may happen through delayed cascade delete in CRM
-                                        SendLine("      ...already deleted");
-                                    }
-                                    else
-                                    {
-                                        throw;
-                                    }
-                                }
-                                i++;
+                                throw;
                             }
                         }
-                        int totalRecords = cEntities.Count;
-                        i = 1;
-                        CintDynEntityCollection cAllRecordsToMatch = null;
-                        foreach (CintDynEntity cdEntity in cEntities)
+                        i++;
+                    }
+                }
+                int totalRecords = cEntities.Count;
+                i = 1;
+                CintDynEntityCollection cAllRecordsToMatch = null;
+                foreach (CintDynEntity cdEntity in cEntities)
+                {
+                    string unique = cdEntity.Id.ToString();
+                    SendStatus(-1, -1, totalRecords, i);
+                    try
+                    {
+                        Guid oldid = cdEntity.Id;
+                        Guid newid = Guid.Empty;
+
+                        ReplaceGuids(cdEntity, includeid);
+                        ReplaceUpdateInfo(cdEntity);
+                        unique = GetEntityDisplayString(block.Import.Match, cdEntity);
+                        SendStatus(null, unique);
+
+                        if (!block.TypeSpecified || block.Type == EntityTypes.Entity)
                         {
-                            string unique = cdEntity.Id.ToString();
-                            SendStatus(-1, -1, totalRecords, i);
-                            try
+                            #region Entity
+
+                            if (matchattributes.Count == 0)
                             {
-                                Guid oldid = cdEntity.Id;
-                                Guid newid = Guid.Empty;
-
-                                ReplaceGuids(cdEntity, includeid);
-                                ReplaceUpdateInfo(cdEntity);
-                                unique = GetEntityDisplayString(xMatch, cdEntity);
-                                SendStatus(null, unique);
-
-                                if (type == "Entity" || string.IsNullOrEmpty(type))
+                                if (save == SaveTypes.Never || save == SaveTypes.UpdateOnly)
                                 {
-                                    #region Entity
-
-                                    if (matchattributes.Count == 0)
+                                    skipped++;
+                                    SendLine("{0:000} Not saving: {1}", i, unique);
+                                }
+                                else
+                                {
+                                    if (!includeid)
                                     {
-                                        if (save == "Never" || save == "UpdateOnly")
+                                        cdEntity.Id = Guid.Empty;
+                                    }
+                                    if (SaveEntity(cdEntity, null, updateinactive, updateidentical, i, unique))
+                                    {
+                                        created++;
+                                        newid = cdEntity.Id;
+                                        references.Add(cdEntity.Entity.ToEntityReference());
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                var matches = GetMatchingRecords(cdEntity, matchattributes, updateattributes, preretrieveall, ref cAllRecordsToMatch);
+                                if (delete == DeleteTypes.All || (matches.Count == 1 && delete == DeleteTypes.Existing))
+                                {
+                                    foreach (CintDynEntity cdMatch in matches)
+                                    {
+                                        SendLine("{0:000} Deleting existing: {1}", i, unique);
+                                        try
                                         {
-                                            skipped++;
-                                            SendLine("{0:000} Not saving: {1}", i, unique);
+                                            cdMatch.Delete();
+                                            deleted++;
+                                        }
+                                        catch (FaultException<OrganizationServiceFault> ex)
+                                        {
+                                            if (ex.Message.ToUpperInvariant().Contains("DOES NOT EXIST"))
+                                            {   // This may happen through cascade delete in CRM
+                                                SendLine("      ...already deleted");
+                                            }
+                                            else
+                                            {
+                                                throw;
+                                            }
+                                        }
+                                    }
+                                    matches.Clear();
+                                }
+                                if (matches.Count == 0)
+                                {
+                                    if (save == SaveTypes.Never || save == SaveTypes.UpdateOnly)
+                                    {
+                                        skipped++;
+                                        SendLine("{0:000} Not creating: {1}", i, unique);
+                                    }
+                                    else
+                                    {
+                                        if (!includeid)
+                                        {
+                                            cdEntity.Id = Guid.Empty;
+                                        }
+                                        if (SaveEntity(cdEntity, null, updateinactive, updateidentical, i, unique))
+                                        {
+                                            created++;
+                                            newid = cdEntity.Id;
+                                            references.Add(cdEntity.Entity.ToEntityReference());
+                                        }
+                                    }
+                                }
+                                else if (matches.Count == 1)
+                                {
+                                    var match = matches[0];
+                                    newid = match.Id;
+                                    if (save == SaveTypes.CreateUpdate || save == SaveTypes.UpdateOnly)
+                                    {
+                                        if (SaveEntity(cdEntity, match, updateinactive, updateidentical, i, unique))
+                                        {
+                                            updated++;
+                                            references.Add(cdEntity.Entity.ToEntityReference());
                                         }
                                         else
                                         {
-                                            if (!includeid)
-                                            {
-                                                cdEntity.Id = Guid.Empty;
-                                            }
-                                            if (SaveEntity(cdEntity, null, updateinactive, updateidentical, i, unique))
-                                            {
-                                                created++;
-                                                newid = cdEntity.Id;
-                                                references.Add(cdEntity.Entity.ToEntityReference());
-                                            }
+                                            skipped++;
                                         }
                                     }
                                     else
                                     {
-                                        var matches = GetMatchingRecords(cdEntity, matchattributes, updateattributes, preretrieveall, ref cAllRecordsToMatch);
-                                        if (delete == "All" || (matches.Count == 1 && delete == "Existing"))
-                                        {
-                                            foreach (CintDynEntity cdMatch in matches)
-                                            {
-                                                SendLine("{0:000} Deleting existing: {1}", i, unique);
-                                                try
-                                                {
-                                                    cdMatch.Delete();
-                                                    deleted++;
-                                                }
-                                                catch (FaultException<OrganizationServiceFault> ex)
-                                                {
-                                                    if (ex.Message.ToUpperInvariant().Contains("DOES NOT EXIST"))
-                                                    {   // This may happen through cascade delete in CRM
-                                                        SendLine("      ...already deleted");
-                                                    }
-                                                    else
-                                                    {
-                                                        throw;
-                                                    }
-                                                }
-                                            }
-                                            matches.Clear();
-                                        }
-                                        if (matches.Count == 0)
-                                        {
-                                            if (save == "Never" || save == "UpdateOnly")
-                                            {
-                                                skipped++;
-                                                SendLine("{0:000} Not creating: {1}", i, unique);
-                                            }
-                                            else
-                                            {
-                                                if (!includeid)
-                                                {
-                                                    cdEntity.Id = Guid.Empty;
-                                                }
-                                                if (SaveEntity(cdEntity, null, updateinactive, updateidentical, i, unique))
-                                                {
-                                                    created++;
-                                                    newid = cdEntity.Id;
-                                                    references.Add(cdEntity.Entity.ToEntityReference());
-                                                }
-                                            }
-                                        }
-                                        else if (matches.Count == 1)
-                                        {
-                                            var match = matches[0];
-                                            newid = match.Id;
-                                            if (save == "CreateUpdate" || save == "UpdateOnly")
-                                            {
-                                                if (SaveEntity(cdEntity, match, updateinactive, updateidentical, i, unique))
-                                                {
-                                                    updated++;
-                                                    references.Add(cdEntity.Entity.ToEntityReference());
-                                                }
-                                                else
-                                                {
-                                                    skipped++;
-                                                }
-                                            }
-                                            else
-                                            {
-                                                skipped++;
-                                                SendLine("{0:000} Exists: {1}", i, unique);
-                                            }
-                                        }
-                                        else
-                                        {
-                                            failed++;
-                                            SendLine("Import object matches {0} records in target database!", matches.Count);
-                                            SendLine(unique);
-                                        }
+                                        skipped++;
+                                        SendLine("{0:000} Exists: {1}", i, unique);
                                     }
-                                    if (!oldid.Equals(Guid.Empty) && !newid.Equals(Guid.Empty) && !oldid.Equals(newid) && !guidmap.ContainsKey(oldid))
-                                    {
-                                        log.Log("Mapping IDs: {0} ==> {1}", oldid, newid);
-                                        guidmap.Add(oldid, newid);
-                                    }
-
-                                    #endregion Entity
                                 }
-                                else if (type == "Intersect")
+                                else
                                 {
-                                    #region Intersect
-
-                                    if (cdEntity.Attributes.Count != 2)
-                                    {
-                                        throw new ArgumentOutOfRangeException("Attributes", cdEntity.Attributes.Count, "Invalid Attribute count for intersect object");
-                                    }
-                                    string intersect = CintXML.GetAttribute(xBlock, "IntersectName");
-                                    if (string.IsNullOrEmpty(intersect))
-                                    {
-                                        intersect = cdEntity.Name;
-                                    }
-
-                                    EntityReference ref1 = (EntityReference)cdEntity.Attributes.ElementAt(0).Value;
-                                    EntityReference ref2 = (EntityReference)cdEntity.Attributes.ElementAt(1).Value;
-                                    CintDynEntity party1 = CintDynEntity.InitFromNameAndId(ref1.LogicalName, ref1.Id, crmsvc, log);
-                                    CintDynEntity party2 = CintDynEntity.InitFromNameAndId(ref2.LogicalName, ref2.Id, crmsvc, log);
-                                    try
-                                    {
-                                        party1.Associate(party2, intersect);
-                                        created++;
-                                        SendLine("{0} Associated: {1}", i.ToString().PadLeft(3, '0'), name);
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        if (ex.Message.Contains("duplicate"))
-                                        {
-                                            SendLine("{0} Association exists: {1}", i.ToString().PadLeft(3, '0'), name);
-                                            skipped++;
-                                        }
-                                        else
-                                        {
-                                            throw;
-                                        }
-                                    }
-
-                                    #endregion Intersect
+                                    failed++;
+                                    SendLine("Import object matches {0} records in target database!", matches.Count);
+                                    SendLine(unique);
                                 }
+                            }
+                            if (!oldid.Equals(Guid.Empty) && !newid.Equals(Guid.Empty) && !oldid.Equals(newid) && !guidmap.ContainsKey(oldid))
+                            {
+                                log.Log("Mapping IDs: {0} ==> {1}", oldid, newid);
+                                guidmap.Add(oldid, newid);
+                            }
+
+                            #endregion Entity
+                        }
+                        else if (block.Type == EntityTypes.Intersect)
+                        {
+                            #region Intersect
+
+                            if (cdEntity.Attributes.Count != 2)
+                            {
+                                throw new ArgumentOutOfRangeException("Attributes", cdEntity.Attributes.Count, "Invalid Attribute count for intersect object");
+                            }
+                            string intersect = block.IntersectName;
+                            if (string.IsNullOrEmpty(intersect))
+                            {
+                                intersect = cdEntity.Name;
+                            }
+
+                            EntityReference ref1 = (EntityReference)cdEntity.Attributes.ElementAt(0).Value;
+                            EntityReference ref2 = (EntityReference)cdEntity.Attributes.ElementAt(1).Value;
+                            CintDynEntity party1 = CintDynEntity.InitFromNameAndId(ref1.LogicalName, ref1.Id, crmsvc, log);
+                            CintDynEntity party2 = CintDynEntity.InitFromNameAndId(ref2.LogicalName, ref2.Id, crmsvc, log);
+                            try
+                            {
+                                party1.Associate(party2, intersect);
+                                created++;
+                                SendLine("{0} Associated: {1}", i.ToString().PadLeft(3, '0'), name);
                             }
                             catch (Exception ex)
                             {
-                                failed++;
-                                SendLine("\n*** Error record: {0} ***\n{1}", unique, ex.Message);
-                                log.Log(ex);
-                                if (stoponerror)
+                                if (ex.Message.Contains("duplicate"))
+                                {
+                                    SendLine("{0} Association exists: {1}", i.ToString().PadLeft(3, '0'), name);
+                                    skipped++;
+                                }
+                                else
                                 {
                                     throw;
                                 }
                             }
-                            i++;
+
+                            #endregion Intersect
                         }
-
-                        SendLine("Created: {0} Updated: {1} Skipped: {2} Deleted: {3} Failed: {4}", created, updated, skipped, deleted, failed);
                     }
-                    break;
+                    catch (Exception ex)
+                    {
+                        failed++;
+                        SendLine("\n*** Error record: {0} ***\n{1}", unique, ex.Message);
+                        log.Log(ex);
+                        if (stoponerror)
+                        {
+                            throw;
+                        }
+                    }
+                    i++;
+                }
 
-                default:
-                    throw new ArgumentOutOfRangeException("Type", xBlock.Name, "Invalid Block type");
+                SendLine("Created: {0} Updated: {1} Skipped: {2} Deleted: {3} Failed: {4}", created, updated, skipped, deleted, failed);
             }
             log.EndSection();
             return new Tuple<int, int, int, int, int, EntityReferenceCollection>(created, updated, skipped, deleted, failed, references);

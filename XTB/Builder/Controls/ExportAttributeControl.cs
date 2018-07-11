@@ -1,90 +1,46 @@
-﻿using Innofactor.Crm.Shuffle.Builder.AppCode;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace Innofactor.Crm.Shuffle.Builder.Controls
 {
-    public partial class ExportAttributeControl : UserControl, IDefinitionSavable
+    public partial class ExportAttributeControl : ControlBase
     {
-        private readonly Dictionary<string, string> collec;
-        private string controlsCheckSum = "";
+        string entity;
 
-        #region Delegates
-
-        public delegate void SaveEventHandler(object sender, SaveEventArgs e);
-
-        #endregion
-
-        #region Event Handlers
-
-        public event SaveEventHandler Saved;
-
-        #endregion
-
-        public ExportAttributeControl()
+        public ExportAttributeControl(Dictionary<string, string> collection, ShuffleBuilder shuffleBuilder, string entity)
+            : base(collection, shuffleBuilder)
         {
-            InitializeComponent();
-            collec = new Dictionary<string, string>();
+            this.entity = entity;
         }
 
-        public ExportAttributeControl(Dictionary<string, string> collection, ShuffleBuilder shuffleBuilder)
-            : this()
+        public override ControlCollection GetControls()
         {
-            if (collection != null)
+            if (InitializationNeeded(Controls))
             {
-                collec = collection;
+                InitializeComponent();
             }
-
-            FillControls();
-            Saved += shuffleBuilder.CtrlSaved;
+            return Controls;
         }
 
-        private void FillControls()
+        public override void PopulateControls()
         {
-            txtName.Text = collec.ContainsKey("Name") ? collec["Name"] : "";
-            chkIncludeNull.Checked = bool.Parse(collec.ContainsKey("IncludeNull") ? collec["IncludeNull"] : "false");
-            controlsCheckSum = ControlsChecksum();
-        }
-
-        public void Save()
-        {
-            Dictionary<string, string> collection = new Dictionary<string, string>();
-            collection.Add("Name", txtName.Text);
-            collection.Add("IncludeNull", chkIncludeNull.Checked ? "true" : "false");
-            controlsCheckSum = ControlsChecksum();
-            SendSaveMessage(collection);
-        }
-
-        /// <summary>
-        /// Sends a connection success message 
-        /// </summary>
-        /// <param name="service">IOrganizationService generated</param>
-        /// <param name="parameters">Lsit of parameter</param>
-        private void SendSaveMessage(Dictionary<string, string> collection)
-        {
-            SaveEventArgs sea = new SaveEventArgs { AttributeCollection = collection };
-
-            if (Saved != null)
+            if (shuffleBuilder.Attributes == null || !shuffleBuilder.Attributes.ContainsKey(entity))
             {
-                Saved(this, sea);
+                shuffleBuilder.LoadAttributes(entity, PopulateControls);
+                return;
             }
-        }
-
-        public string ControlsChecksum()
-        {
-            return string.Format("{0}/{1}", txtName.Text, chkIncludeNull.Checked);
-        }
-
-        private void ExportAttributeControl_Leave(object sender, EventArgs e)
-        {
-            if (controlsCheckSum != ControlsChecksum())
+            cmbAttribute.Items.Clear();
+            cmbAttribute.Items.AddRange(shuffleBuilder.Attributes[entity].OrderBy(e => e.LogicalName).Select(e => e.LogicalName).ToArray());
+            if (cmbAttribute.Items.Count > 0)
             {
-                if (MessageBox.Show("Save changes?", "Question", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
-                {
-                    Save();
-                }
+                cmbAttribute.DropDownStyle = ComboBoxStyle.DropDown;
             }
+            else
+            {
+                cmbAttribute.DropDownStyle = ComboBoxStyle.Simple;
+            }
+            base.PopulateControls();
         }
     }
 }

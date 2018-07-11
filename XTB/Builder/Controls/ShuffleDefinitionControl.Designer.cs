@@ -49,6 +49,7 @@
             this.txtTimeout.Name = "txtTimeout";
             this.txtTimeout.Size = new System.Drawing.Size(100, 20);
             this.txtTimeout.TabIndex = 1;
+            this.txtTimeout.Tag = "Timeout";
             // 
             // chkStopOnError
             // 
@@ -57,6 +58,7 @@
             this.chkStopOnError.Name = "chkStopOnError";
             this.chkStopOnError.Size = new System.Drawing.Size(15, 14);
             this.chkStopOnError.TabIndex = 2;
+            this.chkStopOnError.Tag = "StopOnError";
             this.chkStopOnError.UseVisualStyleBackColor = true;
             // 
             // lblStopOnError
@@ -77,8 +79,6 @@
             this.Controls.Add(this.txtTimeout);
             this.Controls.Add(this.lblTimeout);
             this.Name = "ShuffleDefinitionControl";
-            this.Size = new System.Drawing.Size(450, 150);
-            this.Leave += new System.EventHandler(this.ShuffleDefinitionControl_Leave);
             this.ResumeLayout(false);
             this.PerformLayout();
 

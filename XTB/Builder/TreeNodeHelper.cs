@@ -3,10 +3,12 @@
 // CODEPLEX: http://xrmtoolbox.codeplex.com
 // BLOG: http://mscrmtools.blogspot.com
 
+using Innofactor.Crm.Shuffle.Builder.Controls;
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 using System.Xml;
+using System.Xml.Linq;
 
 namespace Innofactor.Crm.Shuffle.Builder.AppCode
 {
@@ -24,190 +26,204 @@ namespace Innofactor.Crm.Shuffle.Builder.AppCode
         /// <param name="xmlNode">Xml node from the sitemap</param>
         /// <param name="form">Current application form</param>
         /// <param name="isDisabled"> </param>
-        public static void AddTreeViewNode(object parentObject, XmlNode xmlNode, ShuffleBuilder form, bool isDisabled = false)
+        public static TreeNode AddTreeViewNode(object parentObject, XmlNode xmlNode, ShuffleBuilder form, int index = -1)
         {
-            TreeNode node = new TreeNode(xmlNode.Name);
-
-            Dictionary<string, string> attributes = new Dictionary<string, string>();
-
-            foreach (XmlAttribute attr in xmlNode.Attributes)
+            TreeNode node = null;
+            if (xmlNode is XmlElement || xmlNode is XmlComment)
             {
-                attributes.Add(attr.Name, attr.Value);
-            }
+                node = new TreeNode(xmlNode.Name);
+                node.Name = xmlNode.Name;
+                Dictionary<string, string> attributes = new Dictionary<string, string>();
 
-            node.Tag = attributes;
-            SetNodeText(node);
-            node.Name = node.Text.Replace(" ", "");
-
-            AddContextMenu(node, form);
-
-            if (parentObject is TreeView)
-            {
-                ((TreeView)parentObject).Nodes.Add(node);
-            }
-            else if (parentObject is TreeNode)
-            {
-                ((TreeNode)parentObject).Nodes.Add(node);
-            }
-            else
-            {
-                throw new Exception("AddTreeViewNode: Unsupported control type");
-            }
-
-            foreach (XmlNode childNode in xmlNode.ChildNodes)
-            {
-                if (childNode.NodeType != XmlNodeType.Comment)
+                if (xmlNode.NodeType == XmlNodeType.Comment)
                 {
-                    AddTreeViewNode(node, childNode, form);
+                    attributes.Add("#comment", xmlNode.Value);
+                    node.ForeColor = System.Drawing.Color.Gray;
+                }
+                else if (xmlNode.Attributes != null)
+                {
+                    foreach (XmlAttribute attr in xmlNode.Attributes)
+                    {
+                        attributes.Add(attr.Name, attr.Value);
+                    }
+                }
+                if (parentObject is TreeView)
+                {
+                    ((TreeView)parentObject).Nodes.Add(node);
+                }
+                else if (parentObject is TreeNode)
+                {
+                    if (index == -1)
+                    {
+                        ((TreeNode)parentObject).Nodes.Add(node);
+                    }
+                    else
+                    {
+                        ((TreeNode)parentObject).Nodes.Insert(index, node);
+                    }
                 }
                 else
                 {
-                    //var commentDoc = new XmlDocument();
-                    //commentDoc.LoadXml(childNode.InnerText);
-
-                    //AddTreeViewNode(node, commentDoc.DocumentElement, form, true);
+                    throw new Exception("AddTreeViewNode: Unsupported control type");
+                }
+                node.Tag = attributes;
+                AddContextMenu(node, form);
+                foreach (XmlNode childNode in xmlNode.ChildNodes)
+                {
+                    AddTreeViewNode(node, childNode, form);
+                }
+                SetNodeText(node);
+            }
+            else if (xmlNode is XmlText && parentObject is TreeNode)
+            {
+                var treeNode = (TreeNode)parentObject;
+                if (treeNode.Tag is Dictionary<string, string>)
+                {
+                    var attributes = (Dictionary<string, string>)treeNode.Tag;
+                    attributes.Add("#text", ((XmlText)xmlNode).Value);
                 }
             }
+            return node;
         }
 
         public static void SetNodeText(TreeNode node)
         {
-            var text = node.Text.Split(' ')[0];
-            Dictionary<string, string> attributes =
-                node.Tag is Dictionary<string, string> ?
-                    (Dictionary<string, string>)node.Tag :
-                    new Dictionary<string, string>();
-            if (text == "Filter")
+            if (node == null)
             {
-                text += " " +
-                    (attributes.ContainsKey("Attribute") ? attributes["Attribute"] : "?") + " " +
-                    (attributes.ContainsKey("Operator") ? attributes["Operator"] : "?") + " " +
-                    (attributes.ContainsKey("Value") ? attributes["Value"] : "");
+                return;
             }
-            else if ((text == "Export" || text == "Import") &&
-                node.Parent != null && node.Parent.Text.StartsWith("SolutionBlock"))
+            var text = node.Name;
+            if ((node.Name == "Export" || node.Name == "Import") &&
+                node.Parent?.Name == "SolutionBlock")
             {
-                text += attributes.ContainsKey("Type") ? " " + attributes["Type"] : "";
+                text += GetAttributeFromNode(node, "Type");
             }
-            else if (attributes.ContainsKey("Name"))
+            else if (node.Name == "Export" && node.Nodes.ContainsKey("FetchXML"))
             {
-                text += " " + attributes["Name"];
+                text += " FetchXML";
             }
-            else if (attributes.ContainsKey("Block"))
+            else if (node.Name == "Filter")
             {
-                text += " " + attributes["Block"];
+                text +=
+                    GetAttributeFromNode(node, "Attribute") +
+                    GetAttributeFromNode(node, "Operator") +
+                    GetAttributeFromNode(node, "Value");
             }
-            else if (attributes.ContainsKey("Attribute"))
+            else if (node.Name == "#comment")
             {
-                text += " " + attributes["Attribute"];
+                text = GetAttributeFromNode(node, "#comment").Trim().Replace("\r\n", "  ");
+                if (string.IsNullOrWhiteSpace(text))
+                {
+                    text = " - comment - ";
+                }
             }
-            node.Text = text;
+            else
+            {
+                text += GetAttributeFromNode(node, "Name");
+                text += GetAttributeFromNode(node, "Block");
+                text += GetAttributeFromNode(node, "Attribute");
+            }
+            if (node.Name == "Blocks" || node.Name == "Attributes" || node.Name == "Match" || node.Name == "PreRequisites")
+            {
+                text += $" ({node.Nodes.Count})";
+            }
+            node.Text = text.Trim();
         }
 
         /// <summary>
         /// Adds a context menu to a TreeNode control
         /// </summary>
         /// <param name="node">TreeNode where to add the context menu</param>
-        /// <param name="form">Current application form</param>
-        public static void AddContextMenu(TreeNode node, ShuffleBuilder form)
+        /// <param name="tree">Current application form</param>
+        public static void AddContextMenu(TreeNode node, ShuffleBuilder tree)
         {
-            var collec = (Dictionary<string, string>)node.Tag;
 
-            HideAllContextMenuItems(form.nodeMenu);
-            form.deleteToolStripMenuItem.Visible = true;
-
-            var nodetype = node.Text.Split(' ')[0];
-            var delete = false;
-            var cutcopy = false;
-            switch (nodetype)
+            tree.addMenu.Items.Clear();
+            tree.gbNodeQuickActions.Controls.Clear();
+            if (node == null && tree.tvDefinition.Nodes.Count > 0)
             {
-                case "Blocks":
-                    form.addDataBlockToolStripMenuItem.Visible = true;
-                    form.addSolutionBlockToolStripMenuItem.Visible = true;
-                    break;
-
-                case "DataBlock":
-                case "SolutionBlock":
-                    if (!node.Nodes.ContainsKey("Export"))
-                    {
-                        form.addExportToolStripMenuItem.Visible = true;
-                    }
-                    if (!node.Nodes.ContainsKey("Import"))
-                    {
-                        form.addImportToolStripMenuItem.Visible = true;
-                    }
-                    if (nodetype == "DataBlock")
-                    {
-                        form.addRelationToolStripMenuItem.Visible = true;
-                    }
-                    delete = true;
-                    cutcopy = true;
-                    break;
-
-                case "Export":
-                    if (node.Parent != null && node.Parent.Text.Split(' ')[0] == "DataBlock")
-                    {
-                        form.addFilterToolStripMenuItem.Visible = true;
-                        form.addSortToolStripMenuItem.Visible = true;
-                    }
-                    else if (node.Parent != null && node.Parent.Text.Split(' ')[0] == "SolutionBlock" && !node.Nodes.ContainsKey("Settings"))
-                    {
-                        form.addSettingsToolStripMenuItem.Visible = true;
-                    }
-                    delete = true;
-                    cutcopy = true;
-                    break;
-
-                case "Import":
-                    if (node.Parent != null && node.Parent.Text.Split(' ')[0] == "DataBlock" && !node.Nodes.ContainsKey("Match"))
-                    {
-                        form.addMatchToolStripMenuItem.Visible = true;
-                    }
-                    else if (node.Parent != null && node.Parent.Text.Split(' ')[0] == "SolutionBlock" && !node.Nodes.ContainsKey("PreRequisites"))
-                    {
-                        form.addPreRequisitesToolStripMenuItem.Visible = true;
-                    }
-                    delete = true;
-                    cutcopy = true;
-                    break;
-
-                case "Attributes":
-                case "Match":
-                    form.addAttributeToolStripMenuItem.Visible = true;
-                    delete = nodetype == "Match";
-                    cutcopy = true;
-                    break;
-
-                case "Attribute":
-                    delete = node.Parent != null && node.Parent.Nodes.Count > 1;
-                    cutcopy = true;
-                    break;
-
-                case "Filter":
-                case "Sort":
-                case "Relation":
-                case "Settings":
-                    delete = true;
-                    cutcopy = true;
-                    break;
-
-                case "PreRequisites":
-                    form.addSolutionToolStripMenuItem.Visible = true;
-                    delete = true;
-                    cutcopy = true;
-                    break;
-
-                case "Solution":
-                    delete = node.Parent != null && node.Parent.Nodes.Count > 1;
-                    cutcopy = true;
-                    break;
+                node = tree.tvDefinition.Nodes[0];
             }
-            form.deleteToolStripMenuItem.Visible = delete;
-            form.cutToolStripMenuItem.Enabled = cutcopy;
-            form.copyToolStripMenuItem.Enabled = cutcopy;
-            form.pasteToolStripMenuItem.Enabled = form.clipboard.IsValidForPaste(node);
+            if (node != null)
+            {
+                var nodecapabilities = new DefinitionNodeCapabilities(node);
 
-            node.ContextMenuStrip = form.nodeMenu;
+                foreach (var childcapability in nodecapabilities.ChildTypes)
+                {
+                    if (childcapability.Name == "-")
+                    {
+                        tree.addMenu.Items.Add(new ToolStripSeparator());
+                        AddLinkSeparator(tree);
+                    }
+                    else if (childcapability.Multiple || !node.Nodes.ContainsKey(childcapability.Name))
+                    {
+                        AddMenuFromCapability(tree.addMenu, childcapability.Name);
+                        AddLinkFromCapability(tree, childcapability.Name, null, childcapability.Name == "#comment");
+                    }
+                }
+                if (tree.addMenu.Items.Count == 0)
+                {
+                    AddLinkFromCapability(tree, "nothing to add", string.Empty);
+                    var dummy = tree.addMenu.Items.Add("nothing to add");
+                    dummy.Enabled = false;
+                }
+
+                tree.deleteToolStripMenuItem.Enabled = nodecapabilities.Delete;
+                tree.commentToolStripMenuItem.Enabled = nodecapabilities.Comment;
+                tree.uncommentToolStripMenuItem.Enabled = nodecapabilities.Uncomment;
+                tree.cutToolStripMenuItem.Enabled = nodecapabilities.CutCopy;
+                tree.copyToolStripMenuItem.Enabled = nodecapabilities.CutCopy;
+                tree.pasteToolStripMenuItem.Enabled = tree.clipboard.IsValidForPaste(node);
+
+                node.ContextMenuStrip = tree.nodeMenu;
+            }
+            return;
+        }
+
+        private static void AddLinkSeparator(ShuffleBuilder tree)
+        {
+            var sep = new Label();
+            sep.AutoSize = true;
+            sep.Dock = DockStyle.Left;
+            sep.Text = "|";
+            tree.gbNodeQuickActions.Controls.Add(sep);
+            sep.BringToFront();
+        }
+
+        private static void AddLinkFromCapability(ShuffleBuilder tree, string name, string tag = null, bool alignright = false)
+        {
+            var link = new LinkLabel();
+            link.AutoSize = true;
+            link.Dock = alignright ? DockStyle.Right : DockStyle.Left;
+            link.TabIndex = tree.gbNodeQuickActions.Controls.Count;
+            link.TabStop = true;
+            link.Text = name;
+            var tagstr = tag ?? name;
+            if (!string.IsNullOrEmpty(tagstr))
+            {
+                link.Tag = tagstr;
+                link.LinkBehavior = LinkBehavior.HoverUnderline;
+                link.LinkClicked += tree.QuickActionLink_LinkClicked;
+            }
+            else
+            {
+                link.Enabled = false;
+            }
+            tree.gbNodeQuickActions.Controls.Add(link);
+            if (!alignright)
+            {
+                link.BringToFront();
+            }
+        }
+
+        private static void AddMenuFromCapability(ToolStrip owner, string name, bool alignright = false, string prefix = "")
+        {
+            var additem = owner.Items.Add(prefix + name);
+            additem.Tag = name;
+            if (alignright)
+            {
+                additem.Alignment = ToolStripItemAlignment.Right;
+            }
         }
 
         /// <summary>
@@ -231,6 +247,146 @@ namespace Innofactor.Crm.Shuffle.Builder.AppCode
                     o.Visible = false;
                 }
             }
+        }
+
+        internal static TreeNode AddChildNode(TreeNode parentNode, string name)
+        {
+            var childNode = new TreeNode(name);
+            childNode.Tag = new Dictionary<string, string>();
+            childNode.Name = childNode.Text.Replace(" ", "");
+            if (name == "#comment")
+            {
+                childNode.ForeColor = System.Drawing.Color.Gray;
+            }
+            if (parentNode != null)
+            {
+                var parentCap = new DefinitionNodeCapabilities(parentNode);
+                var nodeIndex = parentCap.IndexOfChild(name);
+                var pos = 0;
+                while (pos < parentNode.Nodes.Count && nodeIndex >= parentCap.IndexOfChild(parentNode.Nodes[pos].Name))
+                {
+                    pos++;
+                }
+                if (pos == parentNode.Nodes.Count)
+                {
+                    parentNode.Nodes.Add(childNode);
+                }
+                else
+                {
+                    parentNode.Nodes.Insert(pos, childNode);
+                }
+                if (parentNode.Name == "DataBlock")
+                {
+                    if (name == "Export")
+                    {
+                        //var attributesNode = AddChildNode(childNode, "Attributes");
+                        //AddChildNode(attributesNode, "Attribute");
+                    }
+                    else if (name == "Import")
+                    {
+                        var matchNode = AddChildNode(childNode, "Match");
+                        AddChildNode(matchNode, "Attribute");
+                    }
+                }
+            }
+            return childNode;
+        }
+
+        internal static void SetNodeTooltip(TreeNode node)
+        {
+            if (node != null)
+            {
+                string tooltip = GetNodeXml(node);
+                node.ToolTipText = tooltip;
+                if (node.Parent != null)
+                {
+                    SetNodeTooltip(node.Parent);
+                }
+            }
+        }
+
+        internal static string GetNodeXml(TreeNode node)
+        {
+            if (node == null)
+            {
+                return string.Empty;
+            }
+            var doc = new XmlDocument();
+            XmlNode rootNode = doc.CreateElement("root");
+            doc.AppendChild(rootNode);
+            TreeNodeHelper.AddXmlNode(node, rootNode);
+            var tooltip = "";
+            try
+            {
+                XDocument xdoc = XDocument.Parse(rootNode.InnerXml);
+                tooltip = xdoc.ToString();
+            }
+            catch
+            {
+                tooltip = rootNode.InnerXml;
+            }
+            return tooltip;
+        }
+
+        internal static void AddXmlNode(TreeNode currentNode, XmlNode parentXmlNode)
+        {
+            if (currentNode?.Tag is Dictionary<string, string> collec)
+            {
+                XmlNode newNode;
+                if (currentNode.Name == "#comment")
+                {
+                    newNode = parentXmlNode.OwnerDocument.CreateComment(collec.ContainsKey("#comment") ? collec["#comment"] : "");
+                }
+                else
+                {
+                    newNode = parentXmlNode.OwnerDocument.CreateElement(currentNode.Name);
+                    foreach (string key in collec.Keys)
+                    {
+                        if (key == "#text")
+                        {
+                            XmlText newText = parentXmlNode.OwnerDocument.CreateTextNode(collec[key]);
+                            newNode.AppendChild(newText);
+                        }
+                        else
+                        {
+                            XmlAttribute attr = parentXmlNode.OwnerDocument.CreateAttribute(key);
+                            attr.Value = collec[key];
+                            newNode.Attributes.Append(attr);
+                        }
+                    }
+
+                    var others = new List<TreeNode>();
+
+                    foreach (TreeNode childNode in currentNode.Nodes)
+                    {
+                        others.Add(childNode);
+                    }
+
+                    foreach (TreeNode otherNode in others)
+                    {
+                        AddXmlNode(otherNode, newNode);
+                    }
+                }
+                parentXmlNode.AppendChild(newNode);
+            }
+        }
+
+        internal static string GetAttributeFromNode(TreeNode treeNode, string attribute)
+        {
+            var result = "";
+            if (treeNode != null && treeNode.Tag != null && treeNode.Tag is Dictionary<string, string>)
+            {
+                var collection = (Dictionary<string, string>)treeNode.Tag;
+                if (collection.ContainsKey(attribute))
+                {
+                    result = collection[attribute];
+                }
+            }
+            if (!string.IsNullOrEmpty(result.Trim()))
+            {
+                result = " " + result.Trim();
+            }
+            return result;
         }
 
         #endregion Methods

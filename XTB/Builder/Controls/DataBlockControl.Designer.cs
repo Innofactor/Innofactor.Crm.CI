@@ -30,12 +30,12 @@
         {
             this.lblTimeout = new System.Windows.Forms.Label();
             this.txtName = new System.Windows.Forms.TextBox();
-            this.txtEntity = new System.Windows.Forms.TextBox();
             this.lblEntity = new System.Windows.Forms.Label();
             this.lblType = new System.Windows.Forms.Label();
             this.cmbType = new System.Windows.Forms.ComboBox();
             this.txtIntersect = new System.Windows.Forms.TextBox();
             this.lblIntersect = new System.Windows.Forms.Label();
+            this.cmbEntity = new System.Windows.Forms.ComboBox();
             this.SuspendLayout();
             // 
             // lblTimeout
@@ -55,15 +55,7 @@
             this.txtName.Name = "txtName";
             this.txtName.Size = new System.Drawing.Size(234, 20);
             this.txtName.TabIndex = 1;
-            // 
-            // txtEntity
-            // 
-            this.txtEntity.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtEntity.Location = new System.Drawing.Point(213, 30);
-            this.txtEntity.Name = "txtEntity";
-            this.txtEntity.Size = new System.Drawing.Size(234, 20);
-            this.txtEntity.TabIndex = 3;
+            this.txtName.Tag = "Name|true";
             // 
             // lblEntity
             // 
@@ -98,6 +90,7 @@
             this.cmbType.Name = "cmbType";
             this.cmbType.Size = new System.Drawing.Size(234, 21);
             this.cmbType.TabIndex = 5;
+            this.cmbType.Tag = "Type|false";
             this.cmbType.SelectedIndexChanged += new System.EventHandler(this.cmbType_SelectedIndexChanged);
             // 
             // txtIntersect
@@ -109,6 +102,7 @@
             this.txtIntersect.Name = "txtIntersect";
             this.txtIntersect.Size = new System.Drawing.Size(234, 20);
             this.txtIntersect.TabIndex = 7;
+            this.txtIntersect.Tag = "IntersectName|false";
             // 
             // lblIntersect
             // 
@@ -119,21 +113,41 @@
             this.lblIntersect.TabIndex = 6;
             this.lblIntersect.Text = "Intersect name";
             // 
+            // cmbEntity
+            // 
+            this.cmbEntity.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.cmbEntity.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.cmbEntity.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            this.cmbEntity.FormattingEnabled = true;
+            this.cmbEntity.Location = new System.Drawing.Point(213, 30);
+            this.cmbEntity.Name = "cmbEntity";
+            this.cmbEntity.Size = new System.Drawing.Size(234, 21);
+            this.cmbEntity.TabIndex = 3;
+            this.cmbEntity.Tag = "Entity|true";
+            // 
             // DataBlockControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.cmbEntity);
             this.Controls.Add(this.txtIntersect);
             this.Controls.Add(this.lblIntersect);
             this.Controls.Add(this.cmbType);
             this.Controls.Add(this.lblType);
-            this.Controls.Add(this.txtEntity);
             this.Controls.Add(this.lblEntity);
             this.Controls.Add(this.txtName);
             this.Controls.Add(this.lblTimeout);
             this.Name = "DataBlockControl";
-            this.Size = new System.Drawing.Size(450, 150);
-            this.Leave += new System.EventHandler(this.DataBlockControl_Leave);
+            this.Size = new System.Drawing.Size(450, 236);
+            this.Controls.SetChildIndex(this.lblTimeout, 0);
+            this.Controls.SetChildIndex(this.txtName, 0);
+            this.Controls.SetChildIndex(this.lblEntity, 0);
+            this.Controls.SetChildIndex(this.lblType, 0);
+            this.Controls.SetChildIndex(this.cmbType, 0);
+            this.Controls.SetChildIndex(this.lblIntersect, 0);
+            this.Controls.SetChildIndex(this.txtIntersect, 0);
+            this.Controls.SetChildIndex(this.cmbEntity, 0);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -143,11 +157,11 @@
 
         private System.Windows.Forms.Label lblTimeout;
         private System.Windows.Forms.TextBox txtName;
-        private System.Windows.Forms.TextBox txtEntity;
         private System.Windows.Forms.Label lblEntity;
         private System.Windows.Forms.Label lblType;
         private System.Windows.Forms.ComboBox cmbType;
         private System.Windows.Forms.TextBox txtIntersect;
         private System.Windows.Forms.Label lblIntersect;
+        private System.Windows.Forms.ComboBox cmbEntity;
     }
 }
