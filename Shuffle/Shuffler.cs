@@ -1,22 +1,24 @@
-﻿using Cinteros.Crm.Utils.Common;
-using Cinteros.Crm.Utils.Common.Interfaces;
-using Cinteros.Crm.Utils.Misc;
-using Cinteros.Crm.Utils.Shuffle.Types;
-using Microsoft.Xrm.Sdk;
-using Microsoft.Xrm.Sdk.Client;
-using Microsoft.Xrm.Sdk.Query;
-using Microsoft.Xrm.Tooling.Connector;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Xml;
-using System.Xml.Serialization;
-
-/// <summary>Common namespace for Cinteros Shuffle functionality</summary>
+﻿/// <summary>
+/// Common namespace for Cinteros Shuffle functionality
+/// </summary>
 namespace Cinteros.Crm.Utils.Shuffle
 {
+    using Cinteros.Crm.Utils.Common;
+    using Cinteros.Crm.Utils.Common.Interfaces;
+    using Cinteros.Crm.Utils.Misc;
+    using Cinteros.Crm.Utils.Shuffle.Types;
+    using Microsoft.Xrm.Sdk;
+    using Microsoft.Xrm.Sdk.Client;
+    using Microsoft.Xrm.Sdk.Query;
+    using Microsoft.Xrm.Tooling.Connector;
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Text;
+    using System.Xml;
+    using System.Xml.Serialization;
+
     /// <summary>
     /// Class for Shuffling functionality
     /// </summary>
@@ -34,9 +36,9 @@ namespace Cinteros.Crm.Utils.Shuffle
         private readonly IServicable crmsvc;
         private readonly ILoggable log;
         private XmlDocument definition;
-        private ShuffleDefinition shuffledefinition;
         private string definitionpath;
         private Dictionary<Guid, Guid> guidmap = null;
+        private ShuffleDefinition shuffledefinition;
         private bool stoponerror = false;
         private int timeout = 120;
 
@@ -473,35 +475,6 @@ namespace Cinteros.Crm.Utils.Shuffle
             return xml;
         }
 
-        private double SetTimeout()
-        {
-            SendLine("Setting timeout: {0} minutes", timeout);
-            double savedtimeout = -1;
-            if (crmsvc.Service is OrganizationServiceProxy orgsvcpxy)
-            {
-                savedtimeout = orgsvcpxy.Timeout.TotalMinutes;
-                orgsvcpxy.Timeout = new TimeSpan(0, timeout, 0);
-            }
-            else if (crmsvc.Service is CrmServiceClient svcclient)
-            {
-                savedtimeout = svcclient.OrganizationServiceProxy.Timeout.TotalMinutes;
-                svcclient.OrganizationServiceProxy.Timeout = new TimeSpan(0, timeout, 0);
-            }
-            return savedtimeout;
-        }
-
-        private void ResetTimeout(double savedtimeout)
-        {
-            if (crmsvc.Service is OrganizationServiceProxy orgsvcpxy)
-            {
-                orgsvcpxy.Timeout = new TimeSpan(0, (int)savedtimeout, 0);
-            }
-            else if (crmsvc.Service is CrmServiceClient svcclient)
-            {
-                svcclient.OrganizationServiceProxy.Timeout = new TimeSpan(0, (int)savedtimeout, 0);
-            }
-        }
-
         #endregion Public Methods
 
         #region Protected Methods
@@ -531,6 +504,18 @@ namespace Cinteros.Crm.Utils.Shuffle
                 new object[] { true },
                 new ColumnSet("solutionid", "uniquename", "friendlyname", "version", "ismanaged"), log);
             return cSolutions;
+        }
+
+        private void ResetTimeout(double savedtimeout)
+        {
+            if (crmsvc.Service is OrganizationServiceProxy orgsvcpxy)
+            {
+                orgsvcpxy.Timeout = new TimeSpan(0, (int)savedtimeout, 0);
+            }
+            else if (crmsvc.Service is CrmServiceClient svcclient)
+            {
+                svcclient.OrganizationServiceProxy.Timeout = new TimeSpan(0, (int)savedtimeout, 0);
+            }
         }
 
         private void SendLine()
@@ -576,6 +561,23 @@ namespace Cinteros.Crm.Utils.Shuffle
                 }
             }
             OnRaiseShuffleEvent(new ShuffleEventArgs(msg, totalBlocks, currentBlock, blockRecords, currentRecord, replacelast));
+        }
+
+        private double SetTimeout()
+        {
+            SendLine("Setting timeout: {0} minutes", timeout);
+            double savedtimeout = -1;
+            if (crmsvc.Service is OrganizationServiceProxy orgsvcpxy)
+            {
+                savedtimeout = orgsvcpxy.Timeout.TotalMinutes;
+                orgsvcpxy.Timeout = new TimeSpan(0, timeout, 0);
+            }
+            else if (crmsvc.Service is CrmServiceClient svcclient)
+            {
+                savedtimeout = svcclient.OrganizationServiceProxy.Timeout.TotalMinutes;
+                svcclient.OrganizationServiceProxy.Timeout = new TimeSpan(0, timeout, 0);
+            }
+            return savedtimeout;
         }
 
         #endregion Private Methods

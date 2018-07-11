@@ -1,19 +1,19 @@
-﻿using Cinteros.Crm.Utils.Common;
-using Cinteros.Crm.Utils.Misc;
-using Cinteros.Crm.Utils.Shuffle.Types;
-using Ionic.Zip;
-using Microsoft.Crm.Sdk.Messages;
-using Microsoft.Xrm.Sdk;
-using Microsoft.Xrm.Sdk.Messages;
-using Microsoft.Xrm.Sdk.Query;
-using System;
-using System.Collections;
-using System.IO;
-using System.Reflection;
-using System.Xml;
-
-namespace Cinteros.Crm.Utils.Shuffle
+﻿namespace Cinteros.Crm.Utils.Shuffle
 {
+    using Cinteros.Crm.Utils.Common;
+    using Cinteros.Crm.Utils.Misc;
+    using Cinteros.Crm.Utils.Shuffle.Types;
+    using Ionic.Zip;
+    using Microsoft.Crm.Sdk.Messages;
+    using Microsoft.Xrm.Sdk;
+    using Microsoft.Xrm.Sdk.Messages;
+    using Microsoft.Xrm.Sdk.Query;
+    using System;
+    using System.Collections;
+    using System.IO;
+    using System.Reflection;
+    using System.Xml;
+
     public partial class Shuffler
     {
         #region Private Methods

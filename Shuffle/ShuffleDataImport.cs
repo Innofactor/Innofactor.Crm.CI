@@ -1,16 +1,16 @@
-﻿using Cinteros.Crm.Utils.Common;
-using Cinteros.Crm.Utils.Shuffle.Types;
-using Microsoft.Xrm.Sdk;
-using Microsoft.Xrm.Sdk.Query;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.ServiceModel;
-
-namespace Cinteros.Crm.Utils.Shuffle
+﻿namespace Cinteros.Crm.Utils.Shuffle
 {
+    using Cinteros.Crm.Utils.Common;
+    using Cinteros.Crm.Utils.Shuffle.Types;
+    using Microsoft.Xrm.Sdk;
+    using Microsoft.Xrm.Sdk.Query;
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Reflection;
+    using System.ServiceModel;
+
     public partial class Shuffler
     {
         #region Private Methods
