@@ -32,15 +32,30 @@
       "label": "Assembly",
       "defaultValue": "",
       "required": true,
-      "helpMarkDown": "Local assembly file to obfuscate"
+      "helpMarkDown": "Path to assembly file to obfuscate"
     },
     {
-      "name": "updateManaged",
-      "type": "boolean",
-      "label": "Update Managed",
+      "name": "level",
+      "type": "pickList",
+      "label": "Obfuscation",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "Level of assembly obfuscation — please consider using `Recommended` level for Microsoft Dynamics CRM assemblies — it will combined reasonable protection with maximum possible speed and size of the assembly",
+      "options": {
+        "recommended": "No issues uploading obfuscated assemblies to Microsoft Dynamics CRM instance",
+        "minimum": "Scrambling of symbols is done, control flow is still perfectly reverse engineerable",
+        "normal": "Symbols and control flow are fully scrambled",
+        "aggresive": "Source code is unrecoverable",
+        "maximum": "Total mess"
+      }
+    },
+    {
+      "name": "key",
+      "type": "filePath",
+      "label": "Sign assembly with following key",
       "defaultValue": "false",
       "required": false,
-      "helpMarkDown": "Check this to allow update of assemblies that are managed in target CRM environment.",
+      "helpMarkDown": "Path to key file to sign assembly",
       "groupName": "advanced"
     }
   ],
