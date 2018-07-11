@@ -65,7 +65,7 @@ namespace CSRichTextBoxSyntaxHighlighting
         /// </param>
         public void Process()
         {
-            if (string.IsNullOrWhiteSpace(this.Text))
+            if (string.IsNullOrWhiteSpace(Text))
             {
                 return;
             }
@@ -81,7 +81,7 @@ namespace CSRichTextBoxSyntaxHighlighting
 
                 // Get the XDocument from the Text property.
                 var xmlDoc = new XmlDocument();
-                xmlDoc.LoadXml(this.Text);
+                xmlDoc.LoadXml(Text);
 
                 var xmlRtfContent = new StringBuilder();
 
@@ -91,7 +91,7 @@ namespace CSRichTextBoxSyntaxHighlighting
                 xmlRtfContent.Append(rootRtfContent);
 
                 // Construct the completed Rtf, and set the Rtf property to this value.
-                this.Rtf = string.Format(rtfFormat, Settings.ToRtfFormatString(),
+                Rtf = string.Format(rtfFormat, Settings.ToRtfFormatString(),
                     xmlRtfContent.ToString());
 
             }

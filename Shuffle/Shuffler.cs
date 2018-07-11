@@ -50,8 +50,8 @@ namespace Cinteros.Crm.Utils.Shuffle
         /// <param name="container"></param>
         public Shuffler(IContainable container)
         {
-            this.crmsvc = container.Service;
-            this.log = container.Logger;
+            crmsvc = container.Service;
+            log = container.Logger;
         }
 
         #endregion Public Constructors
@@ -105,40 +105,36 @@ namespace Cinteros.Crm.Utils.Shuffle
         #region Public Methods
 
         /// <summary>Export data according to shuffle definition in Definition to format Type</summary>
+        /// <param name="container"></param>
         /// <param name="Definition">Shuffle Definition</param>
         /// <param name="Type">Type of target file</param>
         /// <param name="Delimeter">Delimeter to use when exporting to Type: Text</param>
         /// <param name="ShuffleEventHandler">Event handler processing messages from the export. May be null.</param>
-        /// <param name="container"></param>
         /// <returns>XmlDocument with exported data</returns>
-        public static XmlDocument QuickExport(XmlDocument Definition, SerializationType Type, char Delimeter, EventHandler<ShuffleEventArgs> ShuffleEventHandler, IContainable container)
-        {
-            return QuickExport(Definition, Type, Delimeter, ShuffleEventHandler, container, null);
-        }
+        public static XmlDocument QuickExport(IContainable container, XmlDocument Definition, SerializationType Type, char Delimeter, EventHandler<ShuffleEventArgs> ShuffleEventHandler) =>
+            QuickExport(container, Definition, Type, Delimeter, ShuffleEventHandler, null);
 
         /// <summary>Export data according to shuffle definition in Definition to format Type</summary>
+        /// <param name="container"></param>
         /// <param name="Definition">Shuffle Definition</param>
         /// <param name="Type">Type of target file</param>
         /// <param name="Delimeter">Delimeter to use when exporting to Type: Text</param>
         /// <param name="ShuffleEventHandler">Event handler processing messages from the export. May be null.</param>
-        /// <param name="container"></param>
         /// <param name="defpath">Folder path for the shuffle definition file.</param>
         /// <returns>XmlDocument with exported data</returns>
-        public static XmlDocument QuickExport(XmlDocument Definition, SerializationType Type, char Delimeter, EventHandler<ShuffleEventArgs> ShuffleEventHandler, IContainable container, string defpath)
-        {
-            return QuickExport(Definition, Type, Delimeter, ShuffleEventHandler, container, defpath, false);
-        }
+        public static XmlDocument QuickExport(IContainable container, XmlDocument Definition, SerializationType Type, char Delimeter, EventHandler<ShuffleEventArgs> ShuffleEventHandler, string defpath) =>
+            QuickExport(container, Definition, Type, Delimeter, ShuffleEventHandler, defpath, false);
 
         /// <summary>Export data according to shuffle definition in Definition to format Type</summary>
+        /// <param name="container"></param>
         /// <param name="Definition">Shuffle Definition</param>
         /// <param name="Type">Type of target file</param>
         /// <param name="Delimeter">Delimeter to use when exporting to Type: Text</param>
         /// <param name="ShuffleEventHandler">Event handler processing messages from the export. May be null.</param>
-        /// <param name="container"></param>
         /// <param name="defpath">Folder path for the shuffle definition file.</param>
         /// <param name="clearRemainingShuffleVars"></param>
         /// <returns>XmlDocument with exported data</returns>
-        public static XmlDocument QuickExport(XmlDocument Definition, SerializationType Type, char Delimeter, EventHandler<ShuffleEventArgs> ShuffleEventHandler, IContainable container, string defpath, bool clearRemainingShuffleVars)
+        public static XmlDocument QuickExport(IContainable container, XmlDocument Definition, SerializationType Type, char Delimeter, EventHandler<ShuffleEventArgs> ShuffleEventHandler, string defpath, bool clearRemainingShuffleVars)
         {
             container.Logger.StartSection("QuickExport");
             var shuffle = new Shuffler(container);
@@ -156,37 +152,33 @@ namespace Cinteros.Crm.Utils.Shuffle
         }
 
         /// <summary>Import data in Data according to shuffle definition in Definition</summary>
+        /// <param name="container"></param>
         /// <param name="Definition">Shuffle Definition</param>
         /// <param name="Data">Exported data</param>
         /// <param name="ShuffleEventHandler">Event handler processing messages from the import. May be null.</param>
-        /// <param name="container"></param>
         /// <returns>Tuple with counters for: Created, Updated, Skipped and Failed records and a collection of entityreferences for the created/updated records</returns>
-        public static Tuple<int, int, int, int, int, EntityReferenceCollection> QuickImport(XmlDocument Definition, XmlDocument Data, EventHandler<ShuffleEventArgs> ShuffleEventHandler, IContainable container)
-        {
-            return QuickImport(Definition, Data, ShuffleEventHandler, container, null);
-        }
+        public static Tuple<int, int, int, int, int, EntityReferenceCollection> QuickImport(IContainable container, XmlDocument Definition, XmlDocument Data, EventHandler<ShuffleEventArgs> ShuffleEventHandler) =>
+            QuickImport(container, Definition, Data, ShuffleEventHandler, null);
 
         /// <summary>Import data in Data according to shuffle definition in Definition</summary>
+        /// <param name="container"></param>
         /// <param name="Definition">Shuffle Definition</param>
         /// <param name="Data">Exported data</param>
         /// <param name="ShuffleEventHandler">Event handler processing messages from the import. May be null.</param>
-        /// <param name="container"></param>
         /// <param name="defpath">Path to definition file, if not standard</param>
         /// <returns>Tuple with counters for: Created, Updated, Skipped and Failed records and a collection of entityreferences for the created/updated records</returns>
-        public static Tuple<int, int, int, int, int, EntityReferenceCollection> QuickImport(XmlDocument Definition, XmlDocument Data, EventHandler<ShuffleEventArgs> ShuffleEventHandler, IContainable container, string defpath)
-        {
-            return QuickImport(Definition, Data, ShuffleEventHandler, container, defpath, false);
-        }
+        public static Tuple<int, int, int, int, int, EntityReferenceCollection> QuickImport(IContainable container, XmlDocument Definition, XmlDocument Data, EventHandler<ShuffleEventArgs> ShuffleEventHandler, string defpath) =>
+            QuickImport(container, Definition, Data, ShuffleEventHandler, defpath, false);
 
         /// <summary>Import data in Data according to shuffle definition in Definition</summary>
+        /// <param name="container"></param>
         /// <param name="Definition">Shuffle Definition</param>
         /// <param name="Data">Exported data</param>
         /// <param name="ShuffleEventHandler">Event handler processing messages from the import. May be null.</param>
-        /// <param name="container"></param>
         /// <param name="defpath">Path to definition file, if not standard</param>
         /// <param name="clearRemainingShuffleVars"></param>
         /// <returns>Tuple with counters for: Created, Updated, Skipped and Failed records and a collection of entityreferences for the created/updated records</returns>
-        public static Tuple<int, int, int, int, int, EntityReferenceCollection> QuickImport(XmlDocument Definition, XmlDocument Data, EventHandler<ShuffleEventArgs> ShuffleEventHandler, IContainable container, string defpath, bool clearRemainingShuffleVars)
+        public static Tuple<int, int, int, int, int, EntityReferenceCollection> QuickImport(IContainable container, XmlDocument Definition, XmlDocument Data, EventHandler<ShuffleEventArgs> ShuffleEventHandler, string defpath, bool clearRemainingShuffleVars)
         {
             container.Logger.StartSection("QuickImport");
             var shuffle = new Shuffler(container);

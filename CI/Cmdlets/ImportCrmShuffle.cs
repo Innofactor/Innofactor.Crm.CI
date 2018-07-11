@@ -65,7 +65,7 @@
             try
             {
                 WriteDebug("Importing");
-                var result = Shuffler.QuickImport(Definition, Data, ShuffleListener, Container, Folder, true);
+                var result = Shuffler.QuickImport(container, Definition, Data, ShuffleListener, Folder, true);
                 var output = new ShuffleImportResult
                 {
                     Created = result.Item1,

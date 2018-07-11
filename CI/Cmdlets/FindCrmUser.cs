@@ -16,7 +16,7 @@
 
             WriteVerbose(string.Format("Invoking Organization Service"));
 
-            var response = (Container.Service.Execute(new WhoAmIRequest()) as WhoAmIResponse);
+            var response = (container.Service.Execute(new WhoAmIRequest()) as WhoAmIResponse);
 
             WriteObject(response);
 

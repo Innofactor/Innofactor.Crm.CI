@@ -1,10 +1,10 @@
 ﻿// Heavily inspired by Wael Hamze xrm-ci-framework
 // https://github.com/WaelHamze/xrm-ci-framework/blob/master/CRM365/Xrm.Framework.CI/Xrm.Framework.CI.PowerShell.Cmdlets/XrmCommandBase.cs
 
-using Cinteros.Crm.Utils.Common;
-
 namespace Cinteros.Crm.Utils.CI.Cmdlets.Structure
 {
+    using Cinteros.Crm.Utils.Common;
+    using Cinteros.Crm.Utils.Common.Interfaces;
     using Microsoft.Xrm.Tooling.Connector;
     using System.Management.Automation;
     using System.Net;
@@ -13,14 +13,13 @@ namespace Cinteros.Crm.Utils.CI.Cmdlets.Structure
     {
         #region Protected Fields
 
-        protected CintContainer Container;
+        protected IContainable container;
 
         #endregion Protected Fields
 
         #region Private Fields
 
         private int DefaultTime = 120;
-        private CrmServiceClient ServiceClient;
 
         #endregion Private Fields
 
@@ -48,37 +47,33 @@ namespace Cinteros.Crm.Utils.CI.Cmdlets.Structure
             SetSecurityProtocol();
             WriteDebug("Connecting to CRM");
             WriteVerbose("Creating CrmServiceClient with: " + ConnectionString);
-            ServiceClient = new CrmServiceClient(ConnectionString);
-            if (ServiceClient == null)
+            var client = new CrmServiceClient(ConnectionString);
+            if (client == null)
             {
                 throw new PSArgumentException("Connection not established", "ConnectionString");
             }
-            if (ServiceClient.OrganizationServiceProxy == null)
+            if (client.OrganizationServiceProxy == null)
             {
-                throw new PSArgumentException("Connection not established. Last CRM error message:\n" + ServiceClient.LastCrmError, "ConnectionString");
+                throw new PSArgumentException("Connection not established. Last CRM error message:\n" + client.LastCrmError, "ConnectionString");
             }
             if (Timeout == 0)
             {
-                ServiceClient.OrganizationServiceProxy.Timeout = new System.TimeSpan(0, 0, DefaultTime);
+                client.OrganizationServiceProxy.Timeout = new System.TimeSpan(0, 0, DefaultTime);
             }
             else
             {
-                ServiceClient.OrganizationServiceProxy.Timeout = new System.TimeSpan(0, 0, Timeout);
+                client.OrganizationServiceProxy.Timeout = new System.TimeSpan(0, 0, Timeout);
             }
-            Container = new CintContainer(new CrmServiceProxy(ServiceClient.OrganizationServiceProxy), CommandRuntime.ToString(), true);
+            container = new CintContainer(new CrmServiceProxy(client.OrganizationServiceProxy), CommandRuntime.ToString(), true);
         }
 
         protected override void EndProcessing()
         {
             base.EndProcessing();
 
-            if (ServiceClient != null)
+            if (container != null)
             {
-                ServiceClient.Dispose();
-            }
-            if (Container != null)
-            {
-                Container.Dispose();
+                (container as CintContainer)?.Dispose();
             }
         }
 

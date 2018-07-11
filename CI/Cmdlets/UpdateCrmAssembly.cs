@@ -2,6 +2,7 @@
 {
     using Cinteros.Crm.Utils.CI.Cmdlets.Structure;
     using Cinteros.Crm.Utils.Common;
+    using Cinteros.Crm.Utils.Common.Interfaces;
     using Microsoft.Xrm.Sdk.Query;
     using System;
     using System.IO;
@@ -44,7 +45,7 @@
 
         protected override void ProcessRecord()
         {
-            var assembly = GetAssembly(Container);
+            var assembly = GetAssembly(container);
             if (assembly != null)
             {
                 UpdateAssembly(assembly);
@@ -55,7 +56,7 @@
 
         #region Private Methods
 
-        private CintDynEntity GetAssembly(CintContainer container)
+        private CintDynEntity GetAssembly(IContainable container)
         {
             WriteObject($"Reading assembly file {AssemblyFile}");
             var file = ReadFile(AssemblyFile);
@@ -116,7 +117,7 @@
         private void UpdateAssembly(CintDynEntity plugin)
         {
             WriteVerbose("Reading assembly file " + AssemblyFile);
-            var file = this.ReadFile(AssemblyFile);
+            var file = ReadFile(AssemblyFile);
             WriteVerbose("Adding Base64String to entity");
             var updateplugin = plugin.Clone(true);
             updateplugin.AddProperty("version", fileversion.ToString());

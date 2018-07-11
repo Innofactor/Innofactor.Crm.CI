@@ -381,8 +381,10 @@ namespace Innofactor.Crm.Shuffle.Builder
 
         private static TreeNode AddChildNode(TreeNode parentNode, string name)
         {
-            var childNode = new TreeNode(name);
-            childNode.Tag = new Dictionary<string, string>();
+            var childNode = new TreeNode(name)
+            {
+                Tag = new Dictionary<string, string>()
+            };
             childNode.Name = childNode.Text.Replace(" ", "");
             var e3 = new TreeNodeMouseClickEventArgs(childNode, MouseButtons.Left, 1, 0, 0);
             parentNode.Nodes.Add(childNode);
@@ -464,7 +466,7 @@ namespace Innofactor.Crm.Shuffle.Builder
                     }
                     else if (args.Result is EntityCollection solutions)
                     {
-                        this.Solutions = solutions;
+                        Solutions = solutions;
                         callback?.Invoke();
                     }
                 }
@@ -583,7 +585,7 @@ namespace Innofactor.Crm.Shuffle.Builder
             if (node != null)
             {
                 TreeNodeHelper.AddContextMenu(node, this);
-                this.deleteToolStripMenuItem.Text = "Delete " + node.Name;
+                deleteToolStripMenuItem.Text = "Delete " + node.Name;
                 var collec = (Dictionary<string, string>)node.Tag;
 
                 switch (node.Name)
