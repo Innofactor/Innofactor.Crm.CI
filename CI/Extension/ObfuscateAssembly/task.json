@@ -23,7 +23,7 @@
       "displayName": "Advanced",
       "isExpanded": false
     }
-  ],
+  ], 
   "instanceNameFormat": "Obfuscate Assembly",
   "inputs": [
     {
@@ -42,11 +42,11 @@
       "required": true,
       "helpMarkDown": "Level of assembly obfuscation — please consider using `Recommended` level for Microsoft Dynamics CRM assemblies — it will combined reasonable protection with maximum possible speed and size of the assembly",
       "options": {
-        "recommended": "No issues uploading obfuscated assemblies to Microsoft Dynamics CRM instance",
-        "minimum": "Scrambling of symbols is done, control flow is still perfectly reverse engineerable",
-        "normal": "Symbols and control flow are fully scrambled",
-        "aggresive": "Source code is unrecoverable",
-        "maximum": "Total mess"
+        "0": "Recommended",
+        "1": "Minimum",
+        "2": "Normal",
+        "3": "Aggresive",
+        "4": "Maximum"
       }
     },
     {
