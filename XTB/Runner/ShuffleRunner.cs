@@ -233,7 +233,14 @@ namespace Innofactor.Crm.Shuffle.Runner
                     }
                     lbLog.SelectedIndex = this.lbLog.Items.Count - 1;
                 };
-                if (InvokeRequired) Invoke(mi); else mi();
+                if (InvokeRequired)
+                {
+                    Invoke(mi);
+                }
+                else
+                {
+                    mi();
+                }
             }
         }
 
@@ -246,7 +253,14 @@ namespace Innofactor.Crm.Shuffle.Runner
                     pbBlocks.Maximum = e.Counters.Blocks;
                     pbBlocks.Value = e.Counters.BlockNo;
                 };
-                if (InvokeRequired) Invoke(mi); else mi();
+                if (InvokeRequired)
+                {
+                    Invoke(mi);
+                }
+                else
+                {
+                    mi();
+                }
             }
             if (e.Counters.Items >= 0 && e.Counters.ItemNo >= 0)
             {
@@ -255,7 +269,14 @@ namespace Innofactor.Crm.Shuffle.Runner
                     pbRecords.Maximum = e.Counters.Items;
                     pbRecords.Value = e.Counters.ItemNo;
                 };
-                if (InvokeRequired) Invoke(mi); else mi();
+                if (InvokeRequired)
+                {
+                    Invoke(mi);
+                }
+                else
+                {
+                    mi();
+                }
             }
         }
 
@@ -270,7 +291,14 @@ namespace Innofactor.Crm.Shuffle.Runner
                      (rbImport.Checked && (!datafilerequired || File.Exists(txtData.Text))));
                 btnShuffle.Enabled = enabled;
             };
-            if (InvokeRequired) Invoke(mi); else mi();
+            if (InvokeRequired)
+            {
+                Invoke(mi);
+            }
+            else
+            {
+                mi();
+            }
         }
 
         private void txtData_TextChanged(object sender, EventArgs e)

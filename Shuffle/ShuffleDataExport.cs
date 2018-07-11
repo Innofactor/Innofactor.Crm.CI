@@ -34,9 +34,13 @@ namespace Cinteros.Crm.Utils.Shuffle
                     foreach (CintDynEntity parent in parentcoll)
                     {
                         if (string.IsNullOrEmpty(pkattribute))
+                        {
                             ids.Add(parent.Id.ToString());
+                        }
                         else
+                        {
                             ids.Add(parent.Property<EntityReference>(pkattribute, new EntityReference()).Id.ToString());
+                        }
                     }
                 }
                 else
@@ -210,14 +214,24 @@ namespace Cinteros.Crm.Utils.Shuffle
                     foreach (CintDynEntity parent in parentcoll)
                     {
                         if (string.IsNullOrEmpty(pkattribute))
+                        {
                             if (type == AttributeTypeCode.String)
+                            {
                                 ids.Add(parent.Id.ToString());
+                            }
                             else
+                            {
                                 ids.Add(parent.Id);
+                            }
+                        }
                         else if (type == AttributeTypeCode.String)
+                        {
                             ids.Add(parent.Property<EntityReference>(pkattribute, new EntityReference()).Id.ToString());
+                        }
                         else
+                        {
                             ids.Add(parent.Property<EntityReference>(pkattribute, new EntityReference()).Id);
+                        }
                     }
                 }
                 else

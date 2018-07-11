@@ -298,10 +298,14 @@ namespace Cinteros.Crm.Utils.CI.Cmdlets.WebResources
                         script.Id = existingEntity.Id;
 
                         if (!script.Contains("displayname") && existingEntity.Contains("displayname"))
+                        {
                             script.AddProperty("displayname", existingEntity.Property("displayname", ""));
+                        }
 
                         if (!script.Contains("description") && existingEntity.Contains("description"))
+                        {
                             script.AddProperty("description", existingEntity.Property("description", ""));
+                        }
 
                         script.Save();
                     }

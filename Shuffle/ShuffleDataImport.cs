@@ -503,12 +503,21 @@ namespace Cinteros.Crm.Utils.Shuffle
             foreach (KeyValuePair<string, object> prop in cdEntity.Attributes)
             {
                 if (prop.Value is Guid && guidmap.ContainsKey((Guid)prop.Value))
+                {
                     if (includeid)
+                    {
                         throw new NotImplementedException("Cannot handle replacement of Guid type attributes");
+                    }
                     else
+                    {
                         log.Log("No action, we don't care about the guid of the object");
+                    }
+                }
+
                 if (prop.Value is EntityReference && guidmap.ContainsKey(((EntityReference)prop.Value).Id))
+                {
                     ((EntityReference)prop.Value).Id = guidmap[((EntityReference)prop.Value).Id];
+                }
             }
         }
 

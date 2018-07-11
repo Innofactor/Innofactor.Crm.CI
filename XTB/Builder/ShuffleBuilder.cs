@@ -207,9 +207,13 @@ namespace Innofactor.Crm.Shuffle.Builder
             MethodInvoker miReadDefinition = delegate { definitionXmlNode = doc.DocumentElement; };
 
             if (InvokeRequired)
+            {
                 Invoke(miReadDefinition);
+            }
             else
+            {
                 miReadDefinition();
+            }
 
             MethodInvoker miFillTreeView = delegate
             {
@@ -757,7 +761,11 @@ namespace Innofactor.Crm.Shuffle.Builder
                 ctrl.BringToFront();
                 ctrl.Dock = DockStyle.Fill;
             }
-            if (existingControl != null) panelContainer.Controls.Remove(existingControl);
+            if (existingControl != null)
+            {
+                panelContainer.Controls.Remove(existingControl);
+            }
+
             ManageMenuDisplay();
             ShowNodeXml(node);
         }
@@ -829,11 +837,17 @@ namespace Innofactor.Crm.Shuffle.Builder
             else if (ClickedTag == "Cut" || ClickedTag == "Copy" || ClickedTag == "Paste")
             {
                 if (ClickedTag == "Cut")
+                {
                     clipboard.Cut(tvDefinition.SelectedNode);
+                }
                 else if (ClickedTag == "Copy")
+                {
                     clipboard.Copy(tvDefinition.SelectedNode);
+                }
                 else
+                {
                     clipboard.Paste(tvDefinition.SelectedNode);
+                }
             }
             else
             {
