@@ -51,9 +51,9 @@ namespace Cinteros.Crm.Utils.Shuffle
         private SolutionImportConditions CheckIfImportRequired(SolutionBlockImport import, string name, Version thisversion)
         {
             log.StartSection("CheckIfImportRequired");
-            SolutionImportConditions result = SolutionImportConditions.Create;
-            bool overwritesame = import.OverwriteSameVersion;
-            bool overwritenewer = import.OverwriteNewerVersion;
+            var result = SolutionImportConditions.Create;
+            var overwritesame = import.OverwriteSameVersion;
+            var overwritenewer = import.OverwriteNewerVersion;
             var cSolutions = GetExistingSolutions();
             foreach (var cdSolution in cSolutions)
             {
@@ -93,11 +93,11 @@ namespace Cinteros.Crm.Utils.Shuffle
         {
             log.StartSection(MethodBase.GetCurrentMethod().Name);
             var result = false;
-            bool activatecode = import.ActivateServersideCode;
-            bool overwrite = import.OverwriteCustomizations;
+            var activatecode = import.ActivateServersideCode;
+            var overwrite = import.OverwriteCustomizations;
             Exception ex = null;
             SendLine("Importing solution: {0} Version: {1}", filename, version);
-            byte[] fileBytes = File.ReadAllBytes(filename);
+            var fileBytes = File.ReadAllBytes(filename);
             var impSolReq = new ImportSolutionRequest()
             {
                 CustomizationFile = fileBytes,
@@ -277,7 +277,7 @@ namespace Cinteros.Crm.Utils.Shuffle
         private Version ExtractVersionFromSolutionZip(string filename)
         {
             log.StartSection("ExtractVersionFromSolutionZip");
-            using (ZipFile zip = ZipFile.Read(filename))
+            using (var zip = ZipFile.Read(filename))
             {
                 zip["solution.xml"].Extract(definitionpath, ExtractExistingFileAction.OverwriteSilently);
             }
@@ -285,20 +285,20 @@ namespace Cinteros.Crm.Utils.Shuffle
             {
                 throw new Exception("Unable to unzip solution.xml from file: " + filename);
             }
-            XmlDocument xSolution = new XmlDocument();
+            var xSolution = new XmlDocument();
             xSolution.Load(definitionpath + "\\solution.xml");
             System.IO.File.Delete(definitionpath + "\\solution.xml");
-            XmlNode xRoot = CintXML.FindChild(xSolution, "ImportExportXml");
+            var xRoot = CintXML.FindChild(xSolution, "ImportExportXml");
             if (xRoot == null)
             {
                 throw new XmlException("Cannot find root element ImportExportXml");
             }
-            XmlNode xManifest = CintXML.FindChild(xRoot, "SolutionManifest");
+            var xManifest = CintXML.FindChild(xRoot, "SolutionManifest");
             if (xManifest == null)
             {
                 throw new XmlException("Cannot find element SolutionManifest");
             }
-            XmlNode xVersion = CintXML.FindChild(xManifest, "Version");
+            var xVersion = CintXML.FindChild(xManifest, "Version");
             if (xVersion == null)
             {
                 throw new XmlException("Cannot find element Version");
@@ -312,12 +312,12 @@ namespace Cinteros.Crm.Utils.Shuffle
         private string GetSolutionFilename(SolutionBlock block)
         {
             log.StartSection("GetSolutionFilename");
-            string file = block.File;
+            var file = block.File;
             if (string.IsNullOrWhiteSpace(file))
             {
                 file = block.Name;
             }
-            string path = block.Path;
+            var path = block.Path;
             if (string.IsNullOrWhiteSpace(path) && !string.IsNullOrWhiteSpace(definitionpath))
             {
                 path = definitionpath;
@@ -339,7 +339,7 @@ namespace Cinteros.Crm.Utils.Shuffle
 
             if (filename.Contains("%"))
             {
-                IDictionary envvars = Environment.GetEnvironmentVariables();
+                var envvars = Environment.GetEnvironmentVariables();
                 foreach (DictionaryEntry de in envvars)
                 {
                     filename = filename.Replace("%" + de.Key.ToString() + "%", de.Value.ToString());
@@ -367,7 +367,7 @@ namespace Cinteros.Crm.Utils.Shuffle
                 try
                 {
                     ValidatePreReqs(block.Import, version);
-                    SolutionImportConditions ImportCondition = CheckIfImportRequired(block.Import, name, version);
+                    var ImportCondition = CheckIfImportRequired(block.Import, name, version);
                     if (ImportCondition != SolutionImportConditions.Skip)
                     {
                         if (DoImportSolution(block.Import, filename, version))
@@ -386,7 +386,7 @@ namespace Cinteros.Crm.Utils.Shuffle
                             importResult = ItemImportResult.Failed;
                             log.Log("Failed during import");
                         }
-                        bool publish = block.Import.PublishAll;
+                        var publish = block.Import.PublishAll;
                         if (publish)
                         {
                             SendLine("Publishing customizations");
@@ -429,7 +429,7 @@ namespace Cinteros.Crm.Utils.Shuffle
                 var prog = job.Property<double>("progress", 0);
                 if (job.Contains("data", true))
                 {
-                    XmlDocument doc = new XmlDocument();
+                    var doc = new XmlDocument();
                     var data = job.Property("data", "");
                     log.Log("Job data length: {0}", data.Length);
                     if (!string.IsNullOrWhiteSpace(data))
@@ -490,7 +490,7 @@ namespace Cinteros.Crm.Utils.Shuffle
                     version = new Version(prereq.Version.Replace('*', '0'));
                 }
 
-                foreach (CintDynEntity cdSolution in cSolutions)
+                foreach (var cdSolution in cSolutions)
                 {
                     if (cdSolution.Property("uniquename", "") == name)
                     {

@@ -34,11 +34,11 @@ namespace Cinteros.Crm.Utils.Shuffle
         private static void LoadDefinitionSchemas()
         {
             schemas = new XmlSchemaSet();
-            Assembly assembly = Assembly.GetExecutingAssembly();
+            var assembly = Assembly.GetExecutingAssembly();
             var shufdefresource = assembly.GetManifestResourceNames().Where(n => n.ToLowerInvariant().EndsWith("shuffledefinition.xsd")).FirstOrDefault();
             var qryexpresource = assembly.GetManifestResourceNames().Where(n => n.ToLowerInvariant().EndsWith("queryexpression.xsd")).FirstOrDefault();
 
-            Stream stream = assembly.GetManifestResourceStream(shufdefresource);
+            var stream = assembly.GetManifestResourceStream(shufdefresource);
             if (stream != null)
             {
                 schemas.Add(null, XmlReader.Create(stream));
@@ -57,12 +57,12 @@ namespace Cinteros.Crm.Utils.Shuffle
         /// <returns>Block with text-serialized CRM data</returns>
         public static string XmlSerializedToTextFile(XmlDocument xml)
         {
-            XmlNode root = CintXML.FindChild(xml, "ShuffleData");
-            string sertype = CintXML.GetAttribute(root, "Type");
+            var root = CintXML.FindChild(xml, "ShuffleData");
+            var sertype = CintXML.GetAttribute(root, "Type");
             if (sertype == SerializationType.Text.ToString())
             {
-                XmlNode xText = CintXML.FindChild(root, "Text");
-                string text = xText.InnerText;
+                var xText = CintXML.FindChild(root, "Text");
+                var text = xText.InnerText;
                 return text;
             }
             else
@@ -85,7 +85,7 @@ namespace Cinteros.Crm.Utils.Shuffle
         /// <returns></returns>
         public static XmlDocument StringToXmlSerialized(string SerializedData, char delimeter)
         {
-            XmlDocument data = new XmlDocument();
+            var data = new XmlDocument();
             try
             {
                 data.LoadXml(SerializedData);
@@ -109,10 +109,10 @@ namespace Cinteros.Crm.Utils.Shuffle
             }
             if (delimeter == '\0')
             {
-                StringReader reader = new StringReader(text);
+                var reader = new StringReader(text);
                 if (reader.ReadLine() != null)  // Första raden innehöll nåt
                 {
-                    string cols = reader.ReadLine();    // Läs andra raden
+                    var cols = reader.ReadLine();    // Läs andra raden
                     if (cols != null && cols.StartsWith("Entity") && cols.Length > 6)
                     {
                         delimeter = cols[6];
@@ -123,7 +123,7 @@ namespace Cinteros.Crm.Utils.Shuffle
             {
                 throw new ArgumentNullException("delimeter", "Cannot parse delimeter from data string");
             }
-            XmlDocument xml = new XmlDocument();
+            var xml = new XmlDocument();
             XmlNode root = xml.CreateElement("ShuffleData");
             xml.AppendChild(root);
             CintXML.AppendAttribute(root, "Type", SerializationType.Text.ToString());
@@ -140,7 +140,7 @@ namespace Cinteros.Crm.Utils.Shuffle
         {
             try
             {
-                XmlSerializer deserializer = new XmlSerializer(typeof(ShuffleDefinition));
+                var deserializer = new XmlSerializer(typeof(ShuffleDefinition));
                 TextReader textReader = new StreamReader(definitionfile);
                 var content = textReader.ReadToEnd();
                 content = VerifyShuffleVars(content, clearVariables);
@@ -193,12 +193,12 @@ namespace Cinteros.Crm.Utils.Shuffle
 
         private static string GetSolutionFilename(SolutionBlock solBlock, string definitionpath)
         {
-            string file = solBlock.File;
+            var file = solBlock.File;
             if (string.IsNullOrWhiteSpace(file))
             {
                 file = solBlock.Name;
             }
-            string path = solBlock.Path;
+            var path = solBlock.Path;
             if (string.IsNullOrWhiteSpace(path) && !string.IsNullOrWhiteSpace(definitionpath))
             {
                 path = definitionpath;
@@ -220,7 +220,7 @@ namespace Cinteros.Crm.Utils.Shuffle
 
             if (filename.Contains("%"))
             {
-                IDictionary envvars = Environment.GetEnvironmentVariables();
+                var envvars = Environment.GetEnvironmentVariables();
                 foreach (DictionaryEntry de in envvars)
                 {
                     filename = filename.Replace("%" + de.Key.ToString() + "%", de.Value.ToString());
@@ -252,16 +252,16 @@ namespace Cinteros.Crm.Utils.Shuffle
         /// <returns></returns>
         public static XmlDocument LoadDataFile(string dataFile)
         {
-            XmlDocument data = new XmlDocument();
+            var data = new XmlDocument();
             try
             {
                 data.Load(dataFile);
             }
             catch (XmlException)
             {
-                using (StreamReader sr = new StreamReader(dataFile))
+                using (var sr = new StreamReader(dataFile))
                 {
-                    String textfile = sr.ReadToEnd();
+                    var textfile = sr.ReadToEnd();
                     data = StringToXmlSerialized(textfile);
                 }
             }
@@ -387,7 +387,7 @@ namespace Cinteros.Crm.Utils.Shuffle
         /// <param name="clearExisting">Set this to first try to remove all existing variables</param>
         public static void VerifyShuffleVars(XmlDocument xDefinitionDoc, bool clearExisting)
         {
-            string xml = xDefinitionDoc.InnerXml;
+            var xml = xDefinitionDoc.InnerXml;
             xml = VerifyShuffleVars(xml, clearExisting);
             xDefinitionDoc.InnerXml = xml;
         }

@@ -29,8 +29,8 @@ namespace CSRichTextBoxSyntaxHighlighting
                 return string.Empty;
             }
 
-            StringBuilder encodedText = new StringBuilder();
-            for (int i = 0; i < originalText.Length; i++)
+            var encodedText = new StringBuilder();
+            for (var i = 0; i < originalText.Length; i++)
             {
                 switch (originalText[i])
                 {

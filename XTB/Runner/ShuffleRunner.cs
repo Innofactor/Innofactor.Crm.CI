@@ -186,13 +186,13 @@ namespace Innofactor.Crm.Shuffle.Runner
 
         private void ReplaceShufflePlaceholders(XmlDocument definition)
         {
-            string xml = definition.InnerXml;
-            foreach (string arg in txtParams.Lines)
+            var xml = definition.InnerXml;
+            foreach (var arg in txtParams.Lines)
             {
                 if (arg.IndexOf("=", StringComparison.OrdinalIgnoreCase) > 1)
                 {
-                    string name = "{ShuffleVar:" + arg.Substring(0, arg.IndexOf("=", StringComparison.OrdinalIgnoreCase)) + "}";
-                    string value = arg.Substring(arg.IndexOf("=", StringComparison.OrdinalIgnoreCase) + 1);
+                    var name = "{ShuffleVar:" + arg.Substring(0, arg.IndexOf("=", StringComparison.OrdinalIgnoreCase)) + "}";
+                    var value = arg.Substring(arg.IndexOf("=", StringComparison.OrdinalIgnoreCase) + 1);
                     if (xml.Contains(name))
                     {
                         xml = xml.Replace(name, value);

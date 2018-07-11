@@ -139,7 +139,7 @@ namespace Cinteros.Crm.Utils.Shuffle
         public static XmlDocument QuickExport(XmlDocument Definition, SerializationType Type, char Delimeter, EventHandler<ShuffleEventArgs> ShuffleEventHandler, IContainable container, string defpath, bool clearRemainingShuffleVars)
         {
             container.Logger.StartSection("QuickExport");
-            Shuffler shuffle = new Shuffler(container);
+            var shuffle = new Shuffler(container);
             if (ShuffleEventHandler != null)
             {
                 shuffle.RaiseShuffleEvent += ShuffleEventHandler;
@@ -147,8 +147,8 @@ namespace Cinteros.Crm.Utils.Shuffle
             ShuffleHelper.VerifyShuffleVars(Definition, clearRemainingShuffleVars);
             shuffle.Definition = Definition;
             shuffle.definitionpath = defpath;
-            ShuffleBlocks blocks = shuffle.ExportFromCRM();
-            XmlDocument result = shuffle.Serialize(blocks, Type, Delimeter);
+            var blocks = shuffle.ExportFromCRM();
+            var result = shuffle.Serialize(blocks, Type, Delimeter);
             container.Logger.EndSection();
             return result;
         }
@@ -187,7 +187,7 @@ namespace Cinteros.Crm.Utils.Shuffle
         public static Tuple<int, int, int, int, int, EntityReferenceCollection> QuickImport(XmlDocument Definition, XmlDocument Data, EventHandler<ShuffleEventArgs> ShuffleEventHandler, IContainable container, string defpath, bool clearRemainingShuffleVars)
         {
             container.Logger.StartSection("QuickImport");
-            Shuffler shuffle = new Shuffler(container);
+            var shuffle = new Shuffler(container);
             if (ShuffleEventHandler != null)
             {
                 shuffle.RaiseShuffleEvent += ShuffleEventHandler;
@@ -195,8 +195,8 @@ namespace Cinteros.Crm.Utils.Shuffle
             ShuffleHelper.VerifyShuffleVars(Definition, clearRemainingShuffleVars);
             shuffle.Definition = Definition;
             shuffle.definitionpath = defpath;
-            ShuffleBlocks blocks = shuffle.Deserialize(Data);
-            Tuple<int, int, int, int, int, EntityReferenceCollection> result = shuffle.ImportToCRM(blocks);
+            var blocks = shuffle.Deserialize(Data);
+            var result = shuffle.ImportToCRM(blocks);
             container.Logger.EndSection();
             return result;
         }
@@ -209,11 +209,11 @@ namespace Cinteros.Crm.Utils.Shuffle
         public ShuffleBlocks Deserialize(XmlDocument serialized)
         {
             log.StartSection("Deserialize");
-            ShuffleBlocks result = new ShuffleBlocks();
+            var result = new ShuffleBlocks();
             if (serialized != null)
             {
-                XmlNode root = CintXML.FindChild(serialized, "ShuffleData");
-                string sertype = CintXML.GetAttribute(root, "Type");
+                var root = CintXML.FindChild(serialized, "ShuffleData");
+                var sertype = CintXML.GetAttribute(root, "Type");
                 SendLine("Deserialize from {0}", sertype);
                 if (sertype == SerializationType.Full.ToString() ||
                     sertype == SerializationType.Simple.ToString() ||
@@ -225,10 +225,10 @@ namespace Cinteros.Crm.Utils.Shuffle
                     {
                         if (xBlock.NodeType == XmlNodeType.Element && xBlock.Name == "Block" && xBlock.ChildNodes.Count == 1)
                         {
-                            string name = CintXML.GetAttribute(xBlock, "Name");
-                            XmlDocument xml = new XmlDocument();
+                            var name = CintXML.GetAttribute(xBlock, "Name");
+                            var xml = new XmlDocument();
                             xml.AppendChild(xml.ImportNode(xBlock.ChildNodes[0], true));
-                            CintDynEntityCollection cEntities = new CintDynEntityCollection(xml, crmsvc, log);
+                            var cEntities = new CintDynEntityCollection(xml, crmsvc, log);
                             SendLine("Block {0}: {1} records", name, cEntities.Count);
                             result.Add(name, cEntities);
                         }
@@ -236,14 +236,14 @@ namespace Cinteros.Crm.Utils.Shuffle
                 }
                 else if (sertype == SerializationType.Text.ToString())
                 {
-                    string strdelimeter = CintXML.GetAttribute(root, "Delimeter");
-                    char delimeter = strdelimeter.Length == 1 ? strdelimeter[0] : '\t';
-                    XmlNode xText = CintXML.FindChild(root, "Text");
-                    StringReader reader = new StringReader(xText.InnerText);
-                    int line = 0;
-                    string name = "";
+                    var strdelimeter = CintXML.GetAttribute(root, "Delimeter");
+                    var delimeter = strdelimeter.Length == 1 ? strdelimeter[0] : '\t';
+                    var xText = CintXML.FindChild(root, "Text");
+                    var reader = new StringReader(xText.InnerText);
+                    var line = 0;
+                    var name = "";
                     StringBuilder serializedblock = null;
-                    string current = reader.ReadLine();
+                    var current = reader.ReadLine();
                     while (current != null)
                     {
                         log.Log("Line {0:000}: {1}", line, current);
@@ -252,7 +252,7 @@ namespace Cinteros.Crm.Utils.Shuffle
                             log.Log("Block start");
                             if (!string.IsNullOrWhiteSpace(name) && serializedblock != null)
                             {
-                                CintDynEntityCollection cEntities = new CintDynEntityCollection(serializedblock.ToString(), delimeter, crmsvc, log);
+                                var cEntities = new CintDynEntityCollection(serializedblock.ToString(), delimeter, crmsvc, log);
                                 result.Add(name, cEntities);
                                 SendLine("Block {0}: {1} records", name, cEntities.Count);
                             }
@@ -269,7 +269,7 @@ namespace Cinteros.Crm.Utils.Shuffle
                     }
                     if (!string.IsNullOrWhiteSpace(serializedblock.ToString()))
                     {
-                        CintDynEntityCollection cEntities = new CintDynEntityCollection(serializedblock.ToString(), delimeter, crmsvc, log);
+                        var cEntities = new CintDynEntityCollection(serializedblock.ToString(), delimeter, crmsvc, log);
                         result.Add(name, cEntities);
                         SendLine("Block {0}: {1} records", name, cEntities.Count);
                     }
@@ -290,7 +290,7 @@ namespace Cinteros.Crm.Utils.Shuffle
             {
                 throw new ArgumentNullException("Definition", "Shuffle definition must be specified to export data");
             }
-            ShuffleBlocks blocks = new ShuffleBlocks();
+            var blocks = new ShuffleBlocks();
             ExistingSolutionVersions = null;
             if (ShuffleDefinition.Blocks.Items.Any(b => (b is DataBlock data && data.Export != null) || b is SolutionBlock sol && sol.Export != null))
             {
@@ -302,8 +302,8 @@ namespace Cinteros.Crm.Utils.Shuffle
                     savedtimeout = SetTimeout();
                 }
 
-                int totalBlocks = ShuffleDefinition.Blocks.Items.Length;
-                int currentBlock = 0;
+                var totalBlocks = ShuffleDefinition.Blocks.Items.Length;
+                var currentBlock = 0;
                 foreach (var block in ShuffleDefinition.Blocks.Items)
                 {
                     currentBlock++;
@@ -356,12 +356,12 @@ namespace Cinteros.Crm.Utils.Shuffle
                 throw new ArgumentNullException("Definition", "Shuffle definition must be specified to import data");
             }
 
-            int created = 0;
-            int updated = 0;
-            int skipped = 0;
-            int deleted = 0;
-            int failed = 0;
-            EntityReferenceCollection references = new EntityReferenceCollection();
+            var created = 0;
+            var updated = 0;
+            var skipped = 0;
+            var deleted = 0;
+            var failed = 0;
+            var references = new EntityReferenceCollection();
 
             if (ShuffleDefinition.Blocks.Items.Any(b => (b is DataBlock data && data.Import != null) || b is SolutionBlock sol && sol.Import != null))
             {
@@ -374,8 +374,8 @@ namespace Cinteros.Crm.Utils.Shuffle
                     savedtimeout = SetTimeout();
                 }
 
-                int totalBlocks = ShuffleDefinition.Blocks.Items.Length;
-                int currentBlock = 0;
+                var totalBlocks = ShuffleDefinition.Blocks.Items.Length;
+                var currentBlock = 0;
                 foreach (var block in ShuffleDefinition.Blocks.Items)
                 {
                     currentBlock++;
@@ -387,7 +387,7 @@ namespace Cinteros.Crm.Utils.Shuffle
                         {
                             blocks.Add(name, new CintDynEntityCollection());
                         }
-                        Tuple<int, int, int, int, int, EntityReferenceCollection> dataresult = ImportDataBlock(datablock, blocks[name]);
+                        var dataresult = ImportDataBlock(datablock, blocks[name]);
                         created += dataresult.Item1;
                         updated += dataresult.Item2;
                         skipped += dataresult.Item3;
@@ -443,26 +443,26 @@ namespace Cinteros.Crm.Utils.Shuffle
                     case SerializationType.SimpleWithValue:
                     case SerializationType.SimpleNoId:
                     case SerializationType.Explicit:
-                        foreach (string block in blocks.Keys)
+                        foreach (var block in blocks.Keys)
                         {
                             SendLine("Serializing {0} records in block {1}", blocks[block].Count, block);
                             XmlNode xBlock = xml.CreateElement("Block");
                             root.AppendChild(xBlock);
                             CintXML.AppendAttribute(xBlock, "Name", block);
                             CintXML.AppendAttribute(xBlock, "Count", blocks[block].Count.ToString());
-                            XmlDocument xSerialized = blocks[block].Serialize((SerializationStyle)type);
+                            var xSerialized = blocks[block].Serialize((SerializationStyle)type);
                             xBlock.AppendChild(xml.ImportNode(xSerialized.ChildNodes[0], true));
                         }
                         break;
 
                     case SerializationType.Text:
                         CintXML.AppendAttribute(root, "Delimeter", delimeter.ToString());
-                        StringBuilder text = new StringBuilder();
-                        foreach (string block in blocks.Keys)
+                        var text = new StringBuilder();
+                        foreach (var block in blocks.Keys)
                         {
                             SendLine("Serializing {0} records in block {1}", blocks[block].Count, block);
                             text.AppendLine("<<<" + block + ">>>");
-                            string serializedblock = blocks[block].ToTextFile(delimeter);
+                            var serializedblock = blocks[block].ToTextFile(delimeter);
                             text.Append(serializedblock);
                         }
                         CintXML.AddCDATANode(root, "Text", text.ToString());
@@ -513,7 +513,7 @@ namespace Cinteros.Crm.Utils.Shuffle
         /// Exempel från: http://msdn.microsoft.com/en-us/library/w369ty8x.aspx </remarks>
         protected virtual void OnRaiseShuffleEvent(ShuffleEventArgs e)
         {
-            EventHandler<ShuffleEventArgs> handler = RaiseShuffleEvent;
+            var handler = RaiseShuffleEvent;
             if (handler != null)
             {
                 handler(this, e);
@@ -526,7 +526,7 @@ namespace Cinteros.Crm.Utils.Shuffle
 
         private CintDynEntityCollection GetExistingSolutions()
         {
-            CintDynEntityCollection cSolutions = CintDynEntity.RetrieveMultiple(crmsvc, "solution",
+            var cSolutions = CintDynEntity.RetrieveMultiple(crmsvc, "solution",
                 new string[] { "isvisible" },
                 new object[] { true },
                 new ColumnSet("solutionid", "uniquename", "friendlyname", "version", "ismanaged"), log);

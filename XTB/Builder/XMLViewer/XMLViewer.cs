@@ -73,7 +73,7 @@ namespace CSRichTextBoxSyntaxHighlighting
             {
                 // The Rtf contains 2 parts, header and content. The colortbl is a part of
                 // the header, and the {1} will be replaced with the content.
-                string rtfFormat = @"{{\rtf1\ansi\ansicpg1252\deff0\deflang1033\deflangfe2052
+                var rtfFormat = @"{{\rtf1\ansi\ansicpg1252\deff0\deflang1033\deflangfe2052
 {{\fonttbl{{\f0\fnil Courier New;}}}}
 {{\colortbl ;{0}}}
 \viewkind4\uc1\pard\lang1033\f0\fs18 
@@ -83,10 +83,10 @@ namespace CSRichTextBoxSyntaxHighlighting
                 var xmlDoc = new XmlDocument();
                 xmlDoc.LoadXml(this.Text);
 
-                StringBuilder xmlRtfContent = new StringBuilder();
+                var xmlRtfContent = new StringBuilder();
 
                 // Get the Rtf of the root element.
-                string rootRtfContent = ProcessElement(xmlDoc.DocumentElement, 0);
+                var rootRtfContent = ProcessElement(xmlDoc.DocumentElement, 0);
 
                 xmlRtfContent.Append(rootRtfContent);
 
@@ -110,12 +110,12 @@ namespace CSRichTextBoxSyntaxHighlighting
         // Get the Rtf of the xml element.
         private string ProcessElement(XmlNode element, int level)
         {
-            string elementRtfFormat = string.Empty;
-            StringBuilder childElementsRtfContent = new StringBuilder();
-            StringBuilder attributesRtfContent = new StringBuilder();
+            var elementRtfFormat = string.Empty;
+            var childElementsRtfContent = new StringBuilder();
+            var attributesRtfContent = new StringBuilder();
 
             // Construct the indent.
-            string indent = new string(' ', 2 * level);
+            var indent = new string(' ', 2 * level);
 
             // If the element has child elements or value, then add the element to the 
             // Rtf. {{0}} will be replaced with the attributes and {{1}} will be replaced
@@ -134,7 +134,7 @@ namespace CSRichTextBoxSyntaxHighlighting
                 // Construct the Rtf of child elements.
                 foreach (XmlNode childElement in element.ChildNodes)
                 {
-                    string childElementRtfContent =
+                    var childElementRtfContent =
                         ProcessElement(childElement, level + 1);
                     childElementsRtfContent.Append(childElementRtfContent);
                 }
@@ -210,7 +210,7 @@ namespace CSRichTextBoxSyntaxHighlighting
             {
                 foreach (XmlAttribute attribute in element.Attributes)
                 {
-                    string attributeRtfContent = string.Format(
+                    var attributeRtfContent = string.Format(
                         @" \cf{0} {3}\cf{1} =\cf0 {5}\cf{2} {4}\cf0 {5}",
                         XMLViewerSettings.AttributeKeyID,
                         XMLViewerSettings.TagID,

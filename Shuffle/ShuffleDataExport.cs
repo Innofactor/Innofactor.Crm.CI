@@ -27,11 +27,11 @@ namespace Cinteros.Crm.Utils.Shuffle
                 var attribute = relation.Attribute;
                 var pkattribute = relation.PKAttribute;
                 var includenull = relation.IncludeNull;
-                List<string> ids = new List<string>();
-                CintDynEntityCollection parentcoll = blocks.ContainsKey(block) ? blocks[block] : null;
+                var ids = new List<string>();
+                var parentcoll = blocks.ContainsKey(block) ? blocks[block] : null;
                 if (parentcoll != null && parentcoll.Count > 0)
                 {
-                    foreach (CintDynEntity parent in parentcoll)
+                    foreach (var parent in parentcoll)
                     {
                         if (string.IsNullOrEmpty(pkattribute))
                         {
@@ -64,7 +64,7 @@ namespace Cinteros.Crm.Utils.Shuffle
 
         private static bool IncludeAttribute(string attr, List<string> lAttributes)
         {
-            foreach (string attribute in lAttributes)
+            foreach (var attribute in lAttributes)
             {
                 if (IsSqlLikeMatch(attr, attribute))
                 {
@@ -101,13 +101,13 @@ namespace Cinteros.Crm.Utils.Shuffle
 
         private static void SelectAttributes(CintDynEntityCollection cExportEntities, List<string> lAttributes, List<string> lNullAttributes)
         {
-            foreach (CintDynEntity cde in cExportEntities)
+            foreach (var cde in cExportEntities)
             {
-                int i = 0;
-                List<string> x = new List<string>(cde.Attributes.Keys);
+                var i = 0;
+                var x = new List<string>(cde.Attributes.Keys);
                 while (i < cde.Attributes.Count)
                 {
-                    string attr = x[i];
+                    var attr = x[i];
                     if (attr != cde.PrimaryIdAttribute && !IncludeAttribute(attr, lAttributes))
                     {
                         cde.Attributes.Remove(attr);
@@ -118,7 +118,7 @@ namespace Cinteros.Crm.Utils.Shuffle
                         i++;
                     }
                 }
-                foreach (string nullattribute in lNullAttributes)
+                foreach (var nullattribute in lNullAttributes)
                 {
                     if (!cde.Contains(nullattribute))
                     {
@@ -135,12 +135,12 @@ namespace Cinteros.Crm.Utils.Shuffle
             {
                 throw new ArgumentOutOfRangeException("Name", "Filter", "Parameterized Filters not supported in embedded Shuffle Utils");
             }
-            string operstr = filter.Operator.ToString();
+            var operstr = filter.Operator.ToString();
             if (string.IsNullOrEmpty(operstr))
             {
                 operstr = "Equal";
             }
-            Microsoft.Xrm.Sdk.Query.ConditionOperator oper = (Microsoft.Xrm.Sdk.Query.ConditionOperator)Enum.Parse(typeof(Microsoft.Xrm.Sdk.Query.ConditionOperator), operstr, true);
+            var oper = (Microsoft.Xrm.Sdk.Query.ConditionOperator)Enum.Parse(typeof(Microsoft.Xrm.Sdk.Query.ConditionOperator), operstr, true);
 
             object value = null;
             if (oper != Microsoft.Xrm.Sdk.Query.ConditionOperator.EqualBusinessId &&
@@ -186,7 +186,7 @@ namespace Cinteros.Crm.Utils.Shuffle
                     }
                 }
             }
-            string attribute = filter.Attribute;
+            var attribute = filter.Attribute;
             log.Log("Adding filter: {0} {1} {2}", attribute, oper, value);
             CintQryExp.AppendCondition(qExport.Criteria, LogicalOperator.And, attribute, oper, value);
         }
@@ -203,15 +203,15 @@ namespace Cinteros.Crm.Utils.Shuffle
 
                 var type = GetAttributeType(attribute, entityName);
 
-                ConditionExpression cond = new ConditionExpression();
+                var cond = new ConditionExpression();
                 cond.AttributeName = attribute;
                 cond.Operator = Microsoft.Xrm.Sdk.Query.ConditionOperator.In;
 
-                List<object> ids = new List<object>();
-                CintDynEntityCollection parentcoll = blocks.ContainsKey(block) ? blocks[block] : null;
+                var ids = new List<object>();
+                var parentcoll = blocks.ContainsKey(block) ? blocks[block] : null;
                 if (parentcoll != null && parentcoll.Count > 0)
                 {
-                    foreach (CintDynEntity parent in parentcoll)
+                    foreach (var parent in parentcoll)
                     {
                         if (string.IsNullOrEmpty(pkattribute))
                         {
@@ -267,14 +267,14 @@ namespace Cinteros.Crm.Utils.Shuffle
                 #region Define attributes
 
                 var attributes = block.Export.Items.Where(i => i is DataBlockExportAttributes).FirstOrDefault() as DataBlockExportAttributes;
-                bool allcolumns = false;
-                List<string> lAttributes = new List<string>();
-                List<string> lNullAttributes = new List<string>();
+                var allcolumns = false;
+                var lAttributes = new List<string>();
+                var lNullAttributes = new List<string>();
                 if (attributes != null)
                 {
                     foreach (var attribute in attributes.Attribute)
                     {
-                        string attr = attribute.Name;
+                        var attr = attribute.Name;
                         log.Log("Adding column: {0}", attr);
                         lAttributes.Add(attr.Replace("*", "%"));
                         if (attr.Contains("*"))
@@ -315,7 +315,7 @@ namespace Cinteros.Crm.Utils.Shuffle
                     #region QueryExpression Entity
 
                     log.StartSection("Export entity " + block.Entity);
-                    QueryExpression qExport = new QueryExpression(block.Entity);
+                    var qExport = new QueryExpression(block.Entity);
                     if (block.Export.ActiveOnly)
                     {
                         CintQryExp.AppendConditionActive(qExport.Criteria);
@@ -342,7 +342,7 @@ namespace Cinteros.Crm.Utils.Shuffle
                     }
                     else
                     {
-                        foreach (string attr in lAttributes)
+                        foreach (var attr in lAttributes)
                         {
                             qExport.ColumnSet.AddColumn(attr);
                         }
@@ -375,8 +375,8 @@ namespace Cinteros.Crm.Utils.Shuffle
                     #region FetchXML Intersect
 
                     log.StartSection("Export intersect " + block.Entity);
-                    XmlDocument xDoc = new XmlDocument();
-                    XmlNode xEntity = CintFetchXML.Create(xDoc, block.Entity);
+                    var xDoc = new XmlDocument();
+                    var xEntity = CintFetchXML.Create(xDoc, block.Entity);
                     CintFetchXML.AddAttribute(xEntity, lAttributes.ToArray());
 
                     foreach (var relation in block.Relation)
@@ -393,13 +393,13 @@ namespace Cinteros.Crm.Utils.Shuffle
                     cExportEntities = CintDynEntity.RetrieveMultiple(crmsvc, qExport, log);
                     foreach (var cde in cExportEntities)
                     {
-                        List<KeyValuePair<string, object>> newattributes = new List<KeyValuePair<string, object>>();
+                        var newattributes = new List<KeyValuePair<string, object>>();
                         foreach (var attr in cde.Attributes)
                         {
                             if (attr.Value is Guid)
                             {
                                 var attrname = attr.Key;
-                                string relatedentity = attrname.Substring(0, attrname.Length - (attrname.EndsWith("idone") || attrname.EndsWith("idtwo") ? 5 : 2));
+                                var relatedentity = attrname.Substring(0, attrname.Length - (attrname.EndsWith("idone") || attrname.EndsWith("idtwo") ? 5 : 2));
                                 newattributes.Add(new KeyValuePair<string, object>(attrname, new EntityReference(relatedentity, (Guid)attr.Value)));
                             }
                         }

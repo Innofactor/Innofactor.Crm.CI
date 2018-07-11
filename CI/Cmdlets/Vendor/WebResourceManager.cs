@@ -20,13 +20,13 @@ namespace Cinteros.Crm.Utils.CI.Cmdlets.Vendor
     {
         internal static string GetBase64StringFromString(string content)
         {
-            byte[] byt = System.Text.Encoding.UTF8.GetBytes(content);
+            var byt = System.Text.Encoding.UTF8.GetBytes(content);
             return Convert.ToBase64String(byt);
         }
 
         internal static string GetContentFromBase64String(string base64)
         {
-            byte[] b = Convert.FromBase64String(base64);
+            var b = Convert.FromBase64String(base64);
             return System.Text.Encoding.UTF8.GetString(b);
         }
 
@@ -94,7 +94,7 @@ namespace Cinteros.Crm.Utils.CI.Cmdlets.Vendor
         {
             try
             {
-                string idsXml = string.Empty;
+                var idsXml = string.Empty;
 
                 foreach (var resource in resources)
                 {

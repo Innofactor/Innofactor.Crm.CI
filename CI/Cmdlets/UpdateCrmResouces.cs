@@ -164,7 +164,7 @@
             foreach (var file in files)
             {
                 fileno++;
-                string crmpath = GetCrmPath(file);
+                var crmpath = GetCrmPath(file);
                 WriteVerbose("  " + crmpath);
                 progress.StatusDescription = $"Retrieving {crmpath}";
                 progress.PercentComplete = (fileno * 50) / files.Count;

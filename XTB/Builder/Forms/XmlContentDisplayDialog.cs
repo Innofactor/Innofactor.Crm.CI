@@ -17,15 +17,15 @@ namespace Innofactor.Crm.Shuffle.Builder.Forms
         {
             InitializeComponent();
 
-            string indentedXml = IndentXMLString(xmlString);
+            var indentedXml = IndentXMLString(xmlString);
             txtContent.Text = indentedXml;
         }
 
         private string IndentXMLString(string xml)
         {
-            MemoryStream ms = new MemoryStream();
-            XmlTextWriter xtw = new XmlTextWriter(ms, Encoding.Unicode);
-            XmlDocument doc = new XmlDocument();
+            var ms = new MemoryStream();
+            var xtw = new XmlTextWriter(ms, Encoding.Unicode);
+            var doc = new XmlDocument();
 
             try
             {
@@ -35,7 +35,7 @@ namespace Innofactor.Crm.Shuffle.Builder.Forms
                 doc.WriteContentTo(xtw);
                 xtw.Flush();
                 ms.Seek(0, SeekOrigin.Begin);
-                StreamReader sr = new StreamReader(ms);
+                var sr = new StreamReader(ms);
                 return sr.ReadToEnd();
             }
             catch (Exception ex)

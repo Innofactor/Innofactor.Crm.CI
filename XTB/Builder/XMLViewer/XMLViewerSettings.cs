@@ -75,9 +75,9 @@ namespace CSRichTextBoxSyntaxHighlighting
         public string ToRtfFormatString()
         {
             // The Rtf color definition format.
-            string format = @"\red{0}\green{1}\blue{2};";
+            var format = @"\red{0}\green{1}\blue{2};";
 
-            StringBuilder rtfFormatString = new StringBuilder();
+            var rtfFormatString = new StringBuilder();
 
             rtfFormatString.AppendFormat(format, Element.R, Element.G, Element.B);
             rtfFormatString.AppendFormat(format, Value.R, Value.G, Value.B);

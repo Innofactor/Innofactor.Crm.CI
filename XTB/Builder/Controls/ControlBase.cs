@@ -62,9 +62,9 @@ namespace Innofactor.Crm.Shuffle.Builder.Controls
             var nodename = Tag?.ToString();
             if (string.IsNullOrEmpty(nodename))
             {
-                StackFrame[] stackFrames = new StackTrace(true).GetFrames();
+                var stackFrames = new StackTrace(true).GetFrames();
                 MethodBase mb = null;
-                foreach (StackFrame stackFrame in stackFrames)
+                foreach (var stackFrame in stackFrames)
                 {
                     var tmpmb = stackFrame.GetMethod();
                     if (!tmpmb.ReflectedType.FullName.ToLowerInvariant().EndsWith("controlbase"))
@@ -135,11 +135,11 @@ namespace Innofactor.Crm.Shuffle.Builder.Controls
 
         private Dictionary<string, string> GetAttributesCollection(bool validate = false)
         {
-            Dictionary<string, string> collection = new Dictionary<string, string>();
+            var collection = new Dictionary<string, string>();
 
-            foreach (Control control in GetControls().Cast<Control>().Where(y => y.Tag != null).OrderBy(y => y.TabIndex))
+            foreach (var control in GetControls().Cast<Control>().Where(y => y.Tag != null).OrderBy(y => y.TabIndex))
             {
-                if (GetControlDefinition(control, out string attribute, out bool required, out string defaultvalue))
+                if (GetControlDefinition(control, out var attribute, out var required, out var defaultvalue))
                 {
                     var value = GetValueFromControl(control);
                     if (validate && required && string.IsNullOrEmpty(value))
@@ -228,7 +228,7 @@ namespace Innofactor.Crm.Shuffle.Builder.Controls
                 var value = attributeCollection.ContainsKey(attribute) ? attributeCollection[attribute] : defaultvalue;
                 if (control is CheckBox)
                 {
-                    bool.TryParse(value, out bool chk);
+                    bool.TryParse(value, out var chk);
                     ((CheckBox)control).Checked = chk;
                 }
                 else if (control is TextBox)
@@ -271,7 +271,7 @@ namespace Innofactor.Crm.Shuffle.Builder.Controls
 
         private void FillControls()
         {
-            foreach (Control control in GetControls().Cast<Control>().Where(y => y.Tag != null).OrderBy(y => y.TabIndex))
+            foreach (var control in GetControls().Cast<Control>().Where(y => y.Tag != null).OrderBy(y => y.TabIndex))
             {
                 FillControl(control);
             }
@@ -279,7 +279,7 @@ namespace Innofactor.Crm.Shuffle.Builder.Controls
 
         private void LayoutControls()
         {
-            foreach (Control control in GetControls()
+            foreach (var control in GetControls()
                 .Cast<Control>()
                 .Where(y => y.Tag != null && y.Left > 50)
                 .OrderBy(y => y.TabIndex))

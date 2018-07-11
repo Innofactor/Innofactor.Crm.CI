@@ -17,10 +17,10 @@ namespace Cinteros.Crm.Utils.Shuffle
         private void ExportSolutionBlock(SolutionBlock block)
         {
             log.StartSection("ExportSolutionBlock");
-            string name = block.Name;
+            var name = block.Name;
             log.Log("Block: {0}", name);
-            string path = block.Path;
-            string file = block.File;
+            var path = block.Path;
+            var file = block.File;
             if (string.IsNullOrWhiteSpace(path) && !string.IsNullOrWhiteSpace(definitionpath))
             {
                 path = definitionpath;
@@ -34,10 +34,10 @@ namespace Cinteros.Crm.Utils.Shuffle
             {
                 var type = block.Export.Type;
                 var setversion = block.Export.SetVersion;
-                bool publish = block.Export.PublishBeforeExport;
-                string targetversion = block.Export.TargetVersion;
+                var publish = block.Export.PublishBeforeExport;
+                var targetversion = block.Export.TargetVersion;
 
-                CintDynEntity cdSolution = GetAndVerifySolutionForExport(name);
+                var cdSolution = GetAndVerifySolutionForExport(name);
                 var currentversion = new Version(cdSolution.Property("version", "1.0.0.0"));
 
                 SendLine("Solution: {0} {1}", name, currentversion);
@@ -53,7 +53,7 @@ namespace Cinteros.Crm.Utils.Shuffle
                     crmsvc.Execute(new PublishAllXmlRequest());
                 }
 
-                ExportSolutionRequest req = new ExportSolutionRequest()
+                var req = new ExportSolutionRequest()
                 {
                     SolutionName = name
                 };
@@ -78,20 +78,20 @@ namespace Cinteros.Crm.Utils.Shuffle
 
                 if (type == SolutionTypes.Managed || type == SolutionTypes.Both)
                 {
-                    string filename = path + file + "_managed.zip";
+                    var filename = path + file + "_managed.zip";
                     SendLine("Exporting solution to: {0}", filename);
                     req.Managed = true;
-                    ExportSolutionResponse exportSolutionResponse = (ExportSolutionResponse)crmsvc.Execute(req);
-                    byte[] exportXml = exportSolutionResponse.ExportSolutionFile;
+                    var exportSolutionResponse = (ExportSolutionResponse)crmsvc.Execute(req);
+                    var exportXml = exportSolutionResponse.ExportSolutionFile;
                     File.WriteAllBytes(filename, exportXml);
                 }
                 if (type == SolutionTypes.Unmanaged || type == SolutionTypes.Both)
                 {
-                    string filename = path + file + ".zip";
+                    var filename = path + file + ".zip";
                     SendLine("Exporting solution to: {0}", filename);
                     req.Managed = false;
-                    ExportSolutionResponse exportSolutionResponse = (ExportSolutionResponse)crmsvc.Execute(req);
-                    byte[] exportXml = exportSolutionResponse.ExportSolutionFile;
+                    var exportSolutionResponse = (ExportSolutionResponse)crmsvc.Execute(req);
+                    var exportXml = exportSolutionResponse.ExportSolutionFile;
                     File.WriteAllBytes(filename, exportXml);
                 }
             }
@@ -100,7 +100,7 @@ namespace Cinteros.Crm.Utils.Shuffle
 
         private CintDynEntity GetAndVerifySolutionForExport(string name)
         {
-            CintDynEntityCollection cSolutions = CintDynEntity.RetrieveMultiple(crmsvc, "solution",
+            var cSolutions = CintDynEntity.RetrieveMultiple(crmsvc, "solution",
                 new string[] { "isvisible", "uniquename" },
                 new object[] { true, name },
                 new ColumnSet("solutionid", "friendlyname", "version", "ismanaged"), log);
@@ -112,7 +112,7 @@ namespace Cinteros.Crm.Utils.Shuffle
             {
                 throw new ArgumentOutOfRangeException("SolutionUniqueName", name, "Found " + cSolutions.Count.ToString() + " matching solutions");
             }
-            CintDynEntity cdSolution = cSolutions[0];
+            var cdSolution = cSolutions[0];
             return cdSolution;
         }
 
@@ -122,8 +122,8 @@ namespace Cinteros.Crm.Utils.Shuffle
         {
             log.StartSection("GetCurrentVersions");
             ExistingSolutionVersions = new Dictionary<string, Version>();
-            XmlNode xRoot = CintXML.FindChild(definition, "ShuffleDefinition");
-            XmlNode xBlocks = CintXML.FindChild(xRoot, "Blocks");
+            var xRoot = CintXML.FindChild(definition, "ShuffleDefinition");
+            var xBlocks = CintXML.FindChild(xRoot, "Blocks");
             if (xBlocks != null)
             {
                 var solutions = GetExistingSolutions();
@@ -197,7 +197,7 @@ namespace Cinteros.Crm.Utils.Shuffle
             if (!currentversion.Equals(newversion))
             {
                 SendLine("Setting version: {0}", newversion);
-                CintDynEntity cdSolUpd = cdSolution.Clone(true);
+                var cdSolUpd = cdSolution.Clone(true);
                 cdSolUpd.AddProperty("version", newversion.ToString());
                 cdSolUpd.Save();
             }

@@ -323,9 +323,9 @@ namespace Innofactor.Crm.Shuffle.Builder
 
             var collec = (Dictionary<string, string>)currentNode.Tag;
 
-            foreach (string key in collec.Keys)
+            foreach (var key in collec.Keys)
             {
-                XmlAttribute attr = parentXmlNode.OwnerDocument.CreateAttribute(key);
+                var attr = parentXmlNode.OwnerDocument.CreateAttribute(key);
                 attr.Value = collec[key];
                 newNode.Attributes.Append(attr);
             }
@@ -337,7 +337,7 @@ namespace Innofactor.Crm.Shuffle.Builder
                 others.Add(childNode);
             }
 
-            foreach (TreeNode otherNode in others)
+            foreach (var otherNode in others)
             {
                 AddXmlNode(otherNode, newNode);
             }
@@ -367,7 +367,7 @@ namespace Innofactor.Crm.Shuffle.Builder
         /// </summary>
         private void ManageMenuDisplay()
         {
-            TreeNode selectedNode = tvDefinition.SelectedNode;
+            var selectedNode = tvDefinition.SelectedNode;
 
             //toolStripButtonDelete.Enabled = selectedNode != null && selectedNode.Text != "ShuffleDefinition";
             //toolStripButtonMoveUp.Enabled = selectedNode != null && selectedNode.Parent != null &&
@@ -851,7 +851,7 @@ namespace Innofactor.Crm.Shuffle.Builder
             }
             else
             {
-                string nodeText = ClickedTag;
+                var nodeText = ClickedTag;
                 updateNode = TreeNodeHelper.AddChildNode(tvDefinition.SelectedNode, nodeText);
                 HandleNodeSelection(updateNode);
             }
@@ -909,7 +909,7 @@ namespace Innofactor.Crm.Shuffle.Builder
                 }
                 if (format)
                 {
-                    XDocument doc = XDocument.Parse(xml);
+                    var doc = XDocument.Parse(xml);
                     xml = doc.ToString();
                 }
             }
@@ -918,12 +918,12 @@ namespace Innofactor.Crm.Shuffle.Builder
 
         private void MoveNodeDown(TreeNode node)
         {
-            TreeNode nextnode = node.NextNode;
+            var nextnode = node.NextNode;
             if (nextnode != null)
             {
-                int idxBegin = node.Index;
-                int idxEnd = nextnode.Index;
-                TreeNode tnmNodeParent = node.Parent;
+                var idxBegin = node.Index;
+                var idxEnd = nextnode.Index;
+                var tnmNodeParent = node.Parent;
                 if (tnmNodeParent != null)
                 {
                     node.Remove();
@@ -938,12 +938,12 @@ namespace Innofactor.Crm.Shuffle.Builder
 
         private void MoveNodeUp(TreeNode node)
         {
-            TreeNode prevnode = node.PrevNode;
+            var prevnode = node.PrevNode;
             if (prevnode != null)
             {
-                int idxBegin = node.Index;
-                int idxEnd = prevnode.Index;
-                TreeNode tnmNodeParent = node.Parent;
+                var idxBegin = node.Index;
+                var idxEnd = prevnode.Index;
+                var tnmNodeParent = node.Parent;
                 if (tnmNodeParent != null)
                 {
                     node.Remove();
@@ -967,7 +967,7 @@ namespace Innofactor.Crm.Shuffle.Builder
             XmlNode rootNode = doc.CreateElement("root");
             doc.AppendChild(rootNode);
             TreeNodeHelper.AddXmlNode(node, rootNode);
-            XDocument xdoc = XDocument.Parse(rootNode.InnerXml);
+            var xdoc = XDocument.Parse(rootNode.InnerXml);
             var comment = xdoc.ToString();
             if (node.Nodes != null && node.Nodes.Count > 0)
             {

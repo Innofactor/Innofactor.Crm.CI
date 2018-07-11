@@ -46,7 +46,7 @@ namespace Cinteros.Crm.Utils.Shuffle
             {
                 foreach (var attribute in match.Attribute)
                 {
-                    string matchdisplay = attribute.Display;
+                    var matchdisplay = attribute.Display;
                     if (string.IsNullOrEmpty(matchdisplay))
                     {
                         matchdisplay = attribute.Name;
@@ -83,9 +83,9 @@ namespace Cinteros.Crm.Utils.Shuffle
 
         private static void ReplaceUpdateInfo(CintDynEntity cdEntity)
         {
-            List<string> removeAttr = new List<string>();
-            List<KeyValuePair<string, object>> newAttr = new List<KeyValuePair<string, object>>();
-            foreach (KeyValuePair<string, object> attr in cdEntity.Attributes)
+            var removeAttr = new List<string>();
+            var newAttr = new List<KeyValuePair<string, object>>();
+            foreach (var attr in cdEntity.Attributes)
             {
                 if (attr.Key == "createdby")
                 {
@@ -112,7 +112,7 @@ namespace Cinteros.Crm.Utils.Shuffle
                     removeAttr.Add("createdon");
                 }
             }
-            foreach (string key in removeAttr)
+            foreach (var key in removeAttr)
             {
                 cdEntity.Attributes.Remove(key);
             }
@@ -125,12 +125,12 @@ namespace Cinteros.Crm.Utils.Shuffle
         private CintDynEntityCollection GetAllRecordsForMatching(List<string> allattributes, CintDynEntity cdEntity)
         {
             log.StartSection(MethodBase.GetCurrentMethod().Name);
-            QueryExpression qMatch = new QueryExpression(cdEntity.Name);
+            var qMatch = new QueryExpression(cdEntity.Name);
             qMatch.ColumnSet = new ColumnSet(allattributes.ToArray());
 #if DEBUG
             log.Log("Retrieving all records for {0}:\n{1}", cdEntity.Name, CintQryExp.ConvertToFetchXml(qMatch, crmsvc));
 #endif
-            CintDynEntityCollection matches = CintDynEntity.RetrieveMultiple(crmsvc, qMatch, log);
+            var matches = CintDynEntity.RetrieveMultiple(crmsvc, qMatch, log);
             SendLine("Pre-retrieved {0} records for matching", matches.Count);
             log.EndSection();
             return matches;
@@ -180,7 +180,7 @@ namespace Cinteros.Crm.Utils.Shuffle
             }
             else
             {
-                QueryExpression qMatch = new QueryExpression(cdEntity.Name);
+                var qMatch = new QueryExpression(cdEntity.Name);
                 // We need to be able to see if any attributes have changed, so lets make sure matching records have all the attributes that will be updated
                 qMatch.ColumnSet = new ColumnSet(allattributes.ToArray());
 
@@ -250,14 +250,14 @@ namespace Cinteros.Crm.Utils.Shuffle
         private Tuple<int, int, int, int, int, EntityReferenceCollection> ImportDataBlock(DataBlock block, CintDynEntityCollection cEntities)
         {
             log.StartSection("ImportDataBlock");
-            int created = 0;
-            int updated = 0;
-            int skipped = 0;
-            int deleted = 0;
-            int failed = 0;
-            EntityReferenceCollection references = new EntityReferenceCollection();
+            var created = 0;
+            var updated = 0;
+            var skipped = 0;
+            var deleted = 0;
+            var failed = 0;
+            var references = new EntityReferenceCollection();
 
-            string name = block.Name;
+            var name = block.Name;
             log.Log("Block: {0}", name);
             SendStatus(name, null);
             SendLine();
@@ -285,7 +285,7 @@ namespace Cinteros.Crm.Utils.Shuffle
 
                 if (delete == DeleteTypes.All && (matchattributes.Count == 0))
                 {   // All records shall be deleted, no match attribute defined, so just get all and delete all
-                    string entity = block.Entity;
+                    var entity = block.Entity;
                     var qDelete = new QueryExpression(entity);
                     qDelete.ColumnSet.AddColumn(crmsvc.PrimaryAttribute(entity, log));
                     var deleterecords = CintDynEntity.RetrieveMultiple(crmsvc, qDelete, log);
@@ -312,17 +312,17 @@ namespace Cinteros.Crm.Utils.Shuffle
                         i++;
                     }
                 }
-                int totalRecords = cEntities.Count;
+                var totalRecords = cEntities.Count;
                 i = 1;
                 CintDynEntityCollection cAllRecordsToMatch = null;
-                foreach (CintDynEntity cdEntity in cEntities)
+                foreach (var cdEntity in cEntities)
                 {
-                    string unique = cdEntity.Id.ToString();
+                    var unique = cdEntity.Id.ToString();
                     SendStatus(-1, -1, totalRecords, i);
                     try
                     {
-                        Guid oldid = cdEntity.Id;
-                        Guid newid = Guid.Empty;
+                        var oldid = cdEntity.Id;
+                        var newid = Guid.Empty;
 
                         ReplaceGuids(cdEntity, includeid);
                         ReplaceUpdateInfo(cdEntity);
@@ -359,7 +359,7 @@ namespace Cinteros.Crm.Utils.Shuffle
                                 var matches = GetMatchingRecords(cdEntity, matchattributes, updateattributes, preretrieveall, ref cAllRecordsToMatch);
                                 if (delete == DeleteTypes.All || (matches.Count == 1 && delete == DeleteTypes.Existing))
                                 {
-                                    foreach (CintDynEntity cdMatch in matches)
+                                    foreach (var cdMatch in matches)
                                     {
                                         SendLine("{0:000} Deleting existing: {1}", i, unique);
                                         try
@@ -447,16 +447,16 @@ namespace Cinteros.Crm.Utils.Shuffle
                             {
                                 throw new ArgumentOutOfRangeException("Attributes", cdEntity.Attributes.Count, "Invalid Attribute count for intersect object");
                             }
-                            string intersect = block.IntersectName;
+                            var intersect = block.IntersectName;
                             if (string.IsNullOrEmpty(intersect))
                             {
                                 intersect = cdEntity.Name;
                             }
 
-                            EntityReference ref1 = (EntityReference)cdEntity.Attributes.ElementAt(0).Value;
-                            EntityReference ref2 = (EntityReference)cdEntity.Attributes.ElementAt(1).Value;
-                            CintDynEntity party1 = CintDynEntity.InitFromNameAndId(ref1.LogicalName, ref1.Id, crmsvc, log);
-                            CintDynEntity party2 = CintDynEntity.InitFromNameAndId(ref2.LogicalName, ref2.Id, crmsvc, log);
+                            var ref1 = (EntityReference)cdEntity.Attributes.ElementAt(0).Value;
+                            var ref2 = (EntityReference)cdEntity.Attributes.ElementAt(1).Value;
+                            var party1 = CintDynEntity.InitFromNameAndId(ref1.LogicalName, ref1.Id, crmsvc, log);
+                            var party2 = CintDynEntity.InitFromNameAndId(ref2.LogicalName, ref2.Id, crmsvc, log);
                             try
                             {
                                 party1.Associate(party2, intersect);
@@ -500,7 +500,7 @@ namespace Cinteros.Crm.Utils.Shuffle
 
         private void ReplaceGuids(CintDynEntity cdEntity, bool includeid)
         {
-            foreach (KeyValuePair<string, object> prop in cdEntity.Attributes)
+            foreach (var prop in cdEntity.Attributes)
             {
                 if (prop.Value is Guid && guidmap.ContainsKey((Guid)prop.Value))
                 {
@@ -524,7 +524,7 @@ namespace Cinteros.Crm.Utils.Shuffle
         private bool SaveEntity(CintDynEntity cdNewEntity, CintDynEntity cdMatchEntity, bool updateInactiveRecord, bool updateIdentical, int pos, string identifier)
         {
             log.StartSection("SaveEntity " + pos.ToString("000 ") + identifier);
-            bool recordSaved = false;
+            var recordSaved = false;
             if (string.IsNullOrWhiteSpace(identifier))
             {
                 identifier = cdNewEntity.ToString();
@@ -533,7 +533,7 @@ namespace Cinteros.Crm.Utils.Shuffle
             var newState = cdNewEntity.Property<OptionSetValue>("statecode", null);
             var newStatus = cdNewEntity.Property<OptionSetValue>("statuscode", null);
             var newActive = newState != null ? CintEntity.GetActiveStates(cdNewEntity.Name).Contains(newState.Value) : true;
-            bool nowActive = true;
+            var nowActive = true;
             if ((newState == null) != (newStatus == null))
             {
                 throw new InvalidDataException("When setting status of the record, both statecode and statuscode must be present");

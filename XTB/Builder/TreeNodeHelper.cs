@@ -33,7 +33,7 @@ namespace Innofactor.Crm.Shuffle.Builder.AppCode
             {
                 node = new TreeNode(xmlNode.Name);
                 node.Name = xmlNode.Name;
-                Dictionary<string, string> attributes = new Dictionary<string, string>();
+                var attributes = new Dictionary<string, string>();
 
                 if (xmlNode.NodeType == XmlNodeType.Comment)
                 {
@@ -296,7 +296,7 @@ namespace Innofactor.Crm.Shuffle.Builder.AppCode
         {
             if (node != null)
             {
-                string tooltip = GetNodeXml(node);
+                var tooltip = GetNodeXml(node);
                 node.ToolTipText = tooltip;
                 if (node.Parent != null)
                 {
@@ -318,7 +318,7 @@ namespace Innofactor.Crm.Shuffle.Builder.AppCode
             var tooltip = "";
             try
             {
-                XDocument xdoc = XDocument.Parse(rootNode.InnerXml);
+                var xdoc = XDocument.Parse(rootNode.InnerXml);
                 tooltip = xdoc.ToString();
             }
             catch
@@ -340,16 +340,16 @@ namespace Innofactor.Crm.Shuffle.Builder.AppCode
                 else
                 {
                     newNode = parentXmlNode.OwnerDocument.CreateElement(currentNode.Name);
-                    foreach (string key in collec.Keys)
+                    foreach (var key in collec.Keys)
                     {
                         if (key == "#text")
                         {
-                            XmlText newText = parentXmlNode.OwnerDocument.CreateTextNode(collec[key]);
+                            var newText = parentXmlNode.OwnerDocument.CreateTextNode(collec[key]);
                             newNode.AppendChild(newText);
                         }
                         else
                         {
-                            XmlAttribute attr = parentXmlNode.OwnerDocument.CreateAttribute(key);
+                            var attr = parentXmlNode.OwnerDocument.CreateAttribute(key);
                             attr.Value = collec[key];
                             newNode.Attributes.Append(attr);
                         }
@@ -362,7 +362,7 @@ namespace Innofactor.Crm.Shuffle.Builder.AppCode
                         others.Add(childNode);
                     }
 
-                    foreach (TreeNode otherNode in others)
+                    foreach (var otherNode in others)
                     {
                         AddXmlNode(otherNode, newNode);
                     }

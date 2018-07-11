@@ -21,7 +21,7 @@ namespace Innofactor.Crm.Shuffle.Builder.Controls
         {
             if (!string.IsNullOrWhiteSpace(txtTimeout.Text))
             {
-                int timeout = 0;
+                var timeout = 0;
                 if (!int.TryParse(txtTimeout.Text, out timeout))
                 {
                     MessageBox.Show("Timeout must be numeric");
