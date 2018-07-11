@@ -167,7 +167,6 @@
     <Content Include="Extension\VstsTaskSdk\Strings\resources.resjson\zh-CN\resources.resjson" />
     <Content Include="Extension\VstsTaskSdk\Strings\resources.resjson\zh-TW\resources.resjson" />
     <None Include="Extension\ApplyVersionToAssemblies\task.json" />
-    <None Include="Extension\CopyLibToTasks.cmd" />
     <Content Include="Extension\MinifyJS\MinifyJS.ps1" />
     <None Include="Extension\MinifyJS\task.json" />
     <None Include="Extension\PackExtension.cmd" />
