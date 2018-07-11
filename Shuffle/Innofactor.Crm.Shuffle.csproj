@@ -142,7 +142,7 @@
     </PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PreBuildEvent>"$(Registry:HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Microsoft SDKs\Windows\v8.1A\@InstallationFolder)bin\NETFX 4.5.1 Tools\xsd.exe" /c /f /n:Cinteros.Crm.Utils.Shuffle.Types /o:"$(ProjectDir)\Resources" "$(ProjectDir)\Resources\ShuffleDefinition.xsd"</PreBuildEvent>
+    <PreBuildEvent>rem "$(Registry:HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Microsoft SDKs\Windows\v8.1A\@InstallationFolder)bin\NETFX 4.5.1 Tools\xsd.exe" /c /f /n:Cinteros.Crm.Utils.Shuffle.Types /o:"$(ProjectDir)\Resources" "$(ProjectDir)\Resources\ShuffleDefinition.xsd"</PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
