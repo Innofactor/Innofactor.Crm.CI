@@ -31,8 +31,10 @@ namespace Innofactor.Crm.Shuffle.Builder.AppCode
             TreeNode node = null;
             if (xmlNode is XmlElement || xmlNode is XmlComment)
             {
-                node = new TreeNode(xmlNode.Name);
-                node.Name = xmlNode.Name;
+                node = new TreeNode(xmlNode.Name)
+                {
+                    Name = xmlNode.Name
+                };
                 var attributes = new Dictionary<string, string>();
 
                 if (xmlNode.NodeType == XmlNodeType.Comment)
@@ -182,22 +184,26 @@ namespace Innofactor.Crm.Shuffle.Builder.AppCode
 
         private static void AddLinkSeparator(ShuffleBuilder tree)
         {
-            var sep = new Label();
-            sep.AutoSize = true;
-            sep.Dock = DockStyle.Left;
-            sep.Text = "|";
+            var sep = new Label
+            {
+                AutoSize = true,
+                Dock = DockStyle.Left,
+                Text = "|"
+            };
             tree.gbNodeQuickActions.Controls.Add(sep);
             sep.BringToFront();
         }
 
         private static void AddLinkFromCapability(ShuffleBuilder tree, string name, string tag = null, bool alignright = false)
         {
-            var link = new LinkLabel();
-            link.AutoSize = true;
-            link.Dock = alignright ? DockStyle.Right : DockStyle.Left;
-            link.TabIndex = tree.gbNodeQuickActions.Controls.Count;
-            link.TabStop = true;
-            link.Text = name;
+            var link = new LinkLabel
+            {
+                AutoSize = true,
+                Dock = alignright ? DockStyle.Right : DockStyle.Left,
+                TabIndex = tree.gbNodeQuickActions.Controls.Count,
+                TabStop = true,
+                Text = name
+            };
             var tagstr = tag ?? name;
             if (!string.IsNullOrEmpty(tagstr))
             {
@@ -251,8 +257,10 @@ namespace Innofactor.Crm.Shuffle.Builder.AppCode
 
         internal static TreeNode AddChildNode(TreeNode parentNode, string name)
         {
-            var childNode = new TreeNode(name);
-            childNode.Tag = new Dictionary<string, string>();
+            var childNode = new TreeNode(name)
+            {
+                Tag = new Dictionary<string, string>()
+            };
             childNode.Name = childNode.Text.Replace(" ", "");
             if (name == "#comment")
             {

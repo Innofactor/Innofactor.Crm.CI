@@ -3,7 +3,7 @@
 # Get variables from task
 $AssemblyFile = Get-VstsInput -Name assembly -Require
 $KeyFile = Get-VstsInput -Name key
-$Level = Get-VstsInput -Name key
+$Level = Get-VstsInput -Name level
 $scriptPath = split-path -parent $MyInvocation.MyCommand.Definition
 
 Write-Verbose "Script Path       : $scriptPath"

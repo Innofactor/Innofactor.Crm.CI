@@ -2,7 +2,7 @@
 {
     using Cinteros.Crm.Utils.CI.Cmdlets.Structure;
     using Cinteros.Crm.Utils.CI.Cmdlets.Vendor;
-    using Cinteros.Crm.Utils.Common;
+    using Cinteros.Crm.Utils.Common.Interfaces;
     using System;
     using System.Collections.Generic;
     using System.IO;
@@ -54,7 +54,7 @@
         protected override void ProcessRecord()
         {
             var files = GetWebResourcesFromDisk();
-            UpdateWebResources(files, Container);
+            UpdateWebResources(container, files);
         }
 
         #endregion Protected Methods
@@ -154,7 +154,7 @@
             return resourcefiles;
         }
 
-        private void UpdateWebResources(List<string> files, CintContainer container)
+        private void UpdateWebResources(IContainable container, List<string> files)
         {
             WriteObject(string.Format("Updating {0} webresources", files.Count));
 

@@ -28,24 +28,18 @@
 
         #region Public Methods
 
-        public void Debug(string msg)
-        {
+        public void Debug(string msg) =>
             WriteLineWithColor(ConsoleColor.Gray, "[DEBUG] " + msg);
-        }
 
-        public void DebugFormat(string format, params object[] args)
-        {
+        public void DebugFormat(string format, params object[] args) =>
             WriteLineWithColor(ConsoleColor.Gray, "[DEBUG] " + string.Format(format, args));
-        }
 
         public void EndProgress()
         {
         }
 
-        public void Error(string msg)
-        {
+        public void Error(string msg) =>
             WriteLineWithColor(ConsoleColor.Red, "[ERROR] " + msg);
-        }
 
         public void ErrorException(string msg, Exception ex)
         {
@@ -53,10 +47,8 @@
             WriteLineWithColor(ConsoleColor.Red, "Exception: " + ex);
         }
 
-        public void ErrorFormat(string format, params object[] args)
-        {
+        public void ErrorFormat(string format, params object[] args) =>
             WriteLineWithColor(ConsoleColor.Red, "[ERROR] " + string.Format(format, args));
-        }
 
         public void Finish(bool successful)
         {
@@ -80,24 +72,18 @@
             }
         }
 
-        public void Info(string msg)
-        {
+        public void Info(string msg) =>
             WriteLineWithColor(ConsoleColor.White, " [INFO] " + msg);
-        }
 
-        public void InfoFormat(string format, params object[] args)
-        {
+        public void InfoFormat(string format, params object[] args) =>
             WriteLineWithColor(ConsoleColor.White, " [INFO] " + string.Format(format, args));
-        }
 
         public void Progress(int progress, int overall)
         {
         }
 
-        public void Warn(string msg)
-        {
+        public void Warn(string msg) =>
             WriteLineWithColor(ConsoleColor.Yellow, " [WARN] " + msg);
-        }
 
         public void WarnException(string msg, Exception ex)
         {
@@ -105,10 +91,8 @@
             WriteLineWithColor(ConsoleColor.Yellow, "Exception: " + ex);
         }
 
-        public void WarnFormat(string format, params object[] args)
-        {
+        public void WarnFormat(string format, params object[] args) =>
             WriteLineWithColor(ConsoleColor.Yellow, " [WARN] " + string.Format(format, args));
-        }
 
         #endregion Public Methods
 

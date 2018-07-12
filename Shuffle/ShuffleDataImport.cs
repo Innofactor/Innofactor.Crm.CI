@@ -125,8 +125,10 @@
         private CintDynEntityCollection GetAllRecordsForMatching(List<string> allattributes, CintDynEntity cdEntity)
         {
             log.StartSection(MethodBase.GetCurrentMethod().Name);
-            var qMatch = new QueryExpression(cdEntity.Name);
-            qMatch.ColumnSet = new ColumnSet(allattributes.ToArray());
+            var qMatch = new QueryExpression(cdEntity.Name)
+            {
+                ColumnSet = new ColumnSet(allattributes.ToArray())
+            };
 #if DEBUG
             log.Log("Retrieving all records for {0}:\n{1}", cdEntity.Name, CintQryExp.ConvertToFetchXml(qMatch, crmsvc));
 #endif
@@ -180,9 +182,11 @@
             }
             else
             {
-                var qMatch = new QueryExpression(cdEntity.Name);
-                // We need to be able to see if any attributes have changed, so lets make sure matching records have all the attributes that will be updated
-                qMatch.ColumnSet = new ColumnSet(allattributes.ToArray());
+                var qMatch = new QueryExpression(cdEntity.Name)
+                {
+                    // We need to be able to see if any attributes have changed, so lets make sure matching records have all the attributes that will be updated
+                    ColumnSet = new ColumnSet(allattributes.ToArray())
+                };
 
                 foreach (var matchattr in matchattributes)
                 {

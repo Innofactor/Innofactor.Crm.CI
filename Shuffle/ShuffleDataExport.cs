@@ -203,9 +203,11 @@
 
                 var type = GetAttributeType(attribute, entityName);
 
-                var cond = new ConditionExpression();
-                cond.AttributeName = attribute;
-                cond.Operator = Microsoft.Xrm.Sdk.Query.ConditionOperator.In;
+                var cond = new ConditionExpression
+                {
+                    AttributeName = attribute,
+                    Operator = Microsoft.Xrm.Sdk.Query.ConditionOperator.In
+                };
 
                 var ids = new List<object>();
                 var parentcoll = blocks.ContainsKey(block) ? blocks[block] : null;
@@ -426,12 +428,16 @@
         {
             log.StartSection(MethodBase.GetCurrentMethod().Name + " " + entityName + "." + attribute);
             AttributeTypeCode? type = null;
-            var eqe = new EntityQueryExpression();
-            eqe.Properties = new MetadataPropertiesExpression();
+            var eqe = new EntityQueryExpression
+            {
+                Properties = new MetadataPropertiesExpression()
+            };
             eqe.Properties.PropertyNames.Add("Attributes");
             eqe.Criteria.Conditions.Add(new MetadataConditionExpression("LogicalName", MetadataConditionOperator.Equals, entityName));
-            var aqe = new AttributeQueryExpression();
-            aqe.Properties = new MetadataPropertiesExpression("LogicalName", "AttributeType");
+            var aqe = new AttributeQueryExpression
+            {
+                Properties = new MetadataPropertiesExpression("LogicalName", "AttributeType")
+            };
             eqe.AttributeQuery = aqe;
             var req = new RetrieveMetadataChangesRequest()
             {

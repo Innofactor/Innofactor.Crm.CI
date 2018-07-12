@@ -4,6 +4,7 @@
 // BLOG: http://mscrmtools.blogspot.com
 
 using Cinteros.Crm.Utils.Common;
+using Cinteros.Crm.Utils.Common.Interfaces;
 using Microsoft.Crm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Query;
 using System;
@@ -30,7 +31,7 @@ namespace Cinteros.Crm.Utils.CI.Cmdlets.Vendor
             return System.Text.Encoding.UTF8.GetString(b);
         }
 
-        internal static void AddToSolution(this CintContainer container, CintDynEntityCollection resources, string solutionUniqueName)
+        internal static void AddToSolution(this IContainable container, CintDynEntityCollection resources, string solutionUniqueName)
         {
             foreach (var resource in resources)
             {
@@ -50,7 +51,7 @@ namespace Cinteros.Crm.Utils.CI.Cmdlets.Vendor
         /// Creates the provided web resource
         /// </summary>
         /// <param name="webResource">Web resource to create</param>
-        internal static Guid CreateWebResource(this CintContainer container, CintDynEntity webResource)
+        internal static Guid CreateWebResource(this IContainable container, CintDynEntity webResource)
         {
             try
             {
@@ -66,7 +67,7 @@ namespace Cinteros.Crm.Utils.CI.Cmdlets.Vendor
         /// Deletes the provided web resource
         /// </summary>
         /// <param name="webResource">Web resource to delete</param>
-        internal static void DeleteWebResource(this CintContainer container, CintDynEntity webResource)
+        internal static void DeleteWebResource(this IContainable container, CintDynEntity webResource)
         {
             try
             {
@@ -78,7 +79,7 @@ namespace Cinteros.Crm.Utils.CI.Cmdlets.Vendor
             }
         }
 
-        internal static bool HasDependencies(this CintContainer container, Guid webresourceId)
+        internal static bool HasDependencies(this IContainable container, Guid webresourceId)
         {
             var request = new RetrieveDependenciesForDeleteRequest
             {
@@ -90,7 +91,7 @@ namespace Cinteros.Crm.Utils.CI.Cmdlets.Vendor
             return response.EntityCollection.Entities.Count != 0;
         }
 
-        internal static void PublishWebResources(this CintContainer container, CintDynEntityCollection resources)
+        internal static void PublishWebResources(this IContainable container, CintDynEntityCollection resources)
         {
             try
             {
@@ -119,7 +120,7 @@ namespace Cinteros.Crm.Utils.CI.Cmdlets.Vendor
         /// </summary>
         /// <param name="webresourceId">Web resource unique identifier</param>
         /// <returns>Web resource</returns>
-        internal static CintDynEntity RetrieveWebResource(this CintContainer container, Guid webresourceId)
+        internal static CintDynEntity RetrieveWebResource(this IContainable container, Guid webresourceId)
         {
             try
             {
@@ -136,7 +137,7 @@ namespace Cinteros.Crm.Utils.CI.Cmdlets.Vendor
         /// </summary>
         /// <param name="name">Web resource unique name</param>
         /// <returns>Web resource</returns>
-        internal static CintDynEntity RetrieveWebResource(this CintContainer container, string name)
+        internal static CintDynEntity RetrieveWebResource(this IContainable container, string name)
         {
             try
             {
@@ -164,7 +165,7 @@ namespace Cinteros.Crm.Utils.CI.Cmdlets.Vendor
         /// Retrieves all web resources that are customizable
         /// </summary>
         /// <returns>List of web resources</returns>
-        internal static CintDynEntityCollection RetrieveWebResources(this CintContainer container, Guid solutionId, List<int> types, bool hideMicrosoftWebresources)
+        internal static CintDynEntityCollection RetrieveWebResources(this IContainable container, Guid solutionId, List<int> types, bool hideMicrosoftWebresources)
         {
             try
             {
@@ -216,15 +217,16 @@ namespace Cinteros.Crm.Utils.CI.Cmdlets.Vendor
                 }
                 else
                 {
-                    var qba = new QueryByAttribute("solutioncomponent") { ColumnSet = new ColumnSet(true) };
+                    var qba = new QueryByAttribute("solutioncomponent")
+                    {
+                        ColumnSet = new ColumnSet(true)
+                    };
                     qba.Attributes.AddRange(new[] { "solutionid", "componenttype" });
                     qba.Values.AddRange(new object[] { solutionId, 61 });
 
                     var components = CintDynEntity.RetrieveMultiple(container, qba);
 
-                    var list =
-                        components.Select(component => component.Property("objectid", Guid.Empty).ToString("B"))
-                            .ToList();
+                    var list = components.Select(component => component.Property("objectid", Guid.Empty).ToString("B")).ToList();
 
                     if (list.Count > 0)
                     {
@@ -279,7 +281,7 @@ namespace Cinteros.Crm.Utils.CI.Cmdlets.Vendor
         /// Updates the provided web resource
         /// </summary>
         /// <param name="wr">Web resource to update</param>
-        internal static void UpdateWebResource(this CintContainer container, CintDynEntity wr)
+        internal static void UpdateWebResource(this IContainable container, CintDynEntity wr)
         {
             try
             {

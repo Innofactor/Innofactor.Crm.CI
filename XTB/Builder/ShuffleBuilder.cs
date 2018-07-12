@@ -466,7 +466,7 @@ namespace Innofactor.Crm.Shuffle.Builder
                     }
                     else if (args.Result is EntityCollection solutions)
                     {
-                        this.Solutions = solutions;
+                        Solutions = solutions;
                         callback?.Invoke();
                     }
                 }
@@ -585,7 +585,7 @@ namespace Innofactor.Crm.Shuffle.Builder
             if (node != null)
             {
                 TreeNodeHelper.AddContextMenu(node, this);
-                this.deleteToolStripMenuItem.Text = "Delete " + node.Name;
+                deleteToolStripMenuItem.Text = "Delete " + node.Name;
                 var collec = (Dictionary<string, string>)node.Tag;
 
                 switch (node.Name)

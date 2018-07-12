@@ -91,7 +91,7 @@ namespace Innofactor.Crm.Shuffle.Runner
                     {
                         if (rbExport.Checked)
                         {
-                            var export = Shuffler.QuickExport(definition, type, ';', ShuffleEventHandler, container, definitionpath);
+                            var export = Shuffler.QuickExport(container, definition, type, ';', ShuffleEventHandler, definitionpath);
                             if (export != null)
                             {
                                 export.Save(txtData.Text);
@@ -106,7 +106,7 @@ namespace Innofactor.Crm.Shuffle.Runner
                                 AddLogText("Loading data from: " + txtData.Text);
                                 data = ShuffleHelper.LoadDataFile(txtData.Text);
                             }
-                            var importresult = Shuffler.QuickImport(definition, data, ShuffleEventHandler, container, definitionpath);
+                            var importresult = Shuffler.QuickImport(container, definition, data, ShuffleEventHandler, definitionpath);
                             AddLogText("---");
                             AddLogText(string.Format("Created: {0}", importresult.Item1));
                             AddLogText(string.Format("Updated: {0}", importresult.Item2));
@@ -231,7 +231,7 @@ namespace Innofactor.Crm.Shuffle.Runner
                     {
                         lbLog.Items.Add(text);
                     }
-                    lbLog.SelectedIndex = this.lbLog.Items.Count - 1;
+                    lbLog.SelectedIndex = lbLog.Items.Count - 1;
                 };
                 if (InvokeRequired)
                 {
