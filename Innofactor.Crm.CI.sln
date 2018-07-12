@@ -93,13 +93,18 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WhoAmI", "WhoAmI", "{D45FC0
 		Extension\Implementation\WhoAmI\WhoAmI.ps1 = Extension\Implementation\WhoAmI\WhoAmI.ps1
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Innofactor.Crm.CI.OutObfuscatedAssembly", "CI.OutObfuscatedAssembly\Innofactor.Crm.CI.OutObfuscatedAssembly.csproj", "{A8F00F15-936D-40CE-9C4D-EB4554EE9601}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Cmdlets", "Cmdlets", "{07B43341-393E-4B76-8410-C2068E8D5519}"
+	ProjectSection(SolutionItems) = preProject
+		Cmdlets\XrmCmdletBase.cs = Cmdlets\XrmCmdletBase.cs
+	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Innofactor.Crm.CI.FindCrmUser", "CI.FindCrmUser\Innofactor.Crm.CI.FindCrmUser.csproj", "{37B302D4-5C3B-4B80-BBE7-42D044BDAED8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Innofactor.Crm.CI.FindCrmUser", "Cmdlets\FindCrmUser\Innofactor.Crm.CI.FindCrmUser.csproj", "{37B302D4-5C3B-4B80-BBE7-42D044BDAED8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Innofactor.Crm.CI.UpdateCrmResouces", "CI.UpdateCrmResouces\Innofactor.Crm.CI.UpdateCrmResouces.csproj", "{DA437681-4734-40BF-A1EB-82F8C5E50C76}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Innofactor.Crm.CI.OutObfuscatedAssembly", "Cmdlets\OutObfuscatedAssembly\Innofactor.Crm.CI.OutObfuscatedAssembly.csproj", "{A8F00F15-936D-40CE-9C4D-EB4554EE9601}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Innofactor.Crm.CI.Shuffle", "CI.Shuffle\Innofactor.Crm.CI.Shuffle.csproj", "{EAB7A869-E290-4262-B61E-B41AC221D45E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Innofactor.Crm.CI.Shuffle", "Cmdlets\Shuffle\Innofactor.Crm.CI.Shuffle.csproj", "{EAB7A869-E290-4262-B61E-B41AC221D45E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Innofactor.Crm.CI.UpdateCrmResouces", "Cmdlets\UpdateCrmResouces\Innofactor.Crm.CI.UpdateCrmResouces.csproj", "{DA437681-4734-40BF-A1EB-82F8C5E50C76}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -115,22 +120,22 @@ Global
 		{13AE5564-5C72-4A70-8AC5-00D227E8200A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{13AE5564-5C72-4A70-8AC5-00D227E8200A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{13AE5564-5C72-4A70-8AC5-00D227E8200A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A8F00F15-936D-40CE-9C4D-EB4554EE9601}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A8F00F15-936D-40CE-9C4D-EB4554EE9601}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A8F00F15-936D-40CE-9C4D-EB4554EE9601}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A8F00F15-936D-40CE-9C4D-EB4554EE9601}.Release|Any CPU.Build.0 = Release|Any CPU
 		{37B302D4-5C3B-4B80-BBE7-42D044BDAED8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{37B302D4-5C3B-4B80-BBE7-42D044BDAED8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{37B302D4-5C3B-4B80-BBE7-42D044BDAED8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{37B302D4-5C3B-4B80-BBE7-42D044BDAED8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DA437681-4734-40BF-A1EB-82F8C5E50C76}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DA437681-4734-40BF-A1EB-82F8C5E50C76}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DA437681-4734-40BF-A1EB-82F8C5E50C76}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DA437681-4734-40BF-A1EB-82F8C5E50C76}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A8F00F15-936D-40CE-9C4D-EB4554EE9601}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A8F00F15-936D-40CE-9C4D-EB4554EE9601}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A8F00F15-936D-40CE-9C4D-EB4554EE9601}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A8F00F15-936D-40CE-9C4D-EB4554EE9601}.Release|Any CPU.Build.0 = Release|Any CPU
 		{EAB7A869-E290-4262-B61E-B41AC221D45E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{EAB7A869-E290-4262-B61E-B41AC221D45E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EAB7A869-E290-4262-B61E-B41AC221D45E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EAB7A869-E290-4262-B61E-B41AC221D45E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DA437681-4734-40BF-A1EB-82F8C5E50C76}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA437681-4734-40BF-A1EB-82F8C5E50C76}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA437681-4734-40BF-A1EB-82F8C5E50C76}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA437681-4734-40BF-A1EB-82F8C5E50C76}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -147,6 +152,10 @@ Global
 		{95C277DC-ECE5-43BA-900A-E9F48AD9EFEE} = {E8AF99D7-7E0B-4C33-99BD-35B5D03ED1FC}
 		{ACFE418F-9CA1-48E0-AB05-0425DDA75E5A} = {E8AF99D7-7E0B-4C33-99BD-35B5D03ED1FC}
 		{D45FC0C5-0C0E-49BA-BA1F-CDD9EC06B9D5} = {E8AF99D7-7E0B-4C33-99BD-35B5D03ED1FC}
+		{37B302D4-5C3B-4B80-BBE7-42D044BDAED8} = {07B43341-393E-4B76-8410-C2068E8D5519}
+		{A8F00F15-936D-40CE-9C4D-EB4554EE9601} = {07B43341-393E-4B76-8410-C2068E8D5519}
+		{EAB7A869-E290-4262-B61E-B41AC221D45E} = {07B43341-393E-4B76-8410-C2068E8D5519}
+		{DA437681-4734-40BF-A1EB-82F8C5E50C76} = {07B43341-393E-4B76-8410-C2068E8D5519}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {ED295346-E5B5-4006-855E-1100CEB0F456}

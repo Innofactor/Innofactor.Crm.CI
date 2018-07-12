@@ -106,7 +106,7 @@
     <Compile Include="Structure\ShuffleLogger.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Shuffle\Innofactor.Crm.Shuffle.csproj">
+    <ProjectReference Include="..\..\Shuffle\Innofactor.Crm.Shuffle.csproj">
       <Project>{c381e1b6-63d1-4f5f-9d9b-b275f3cc6687}</Project>
       <Name>Innofactor.Crm.Shuffle</Name>
     </ProjectReference>
