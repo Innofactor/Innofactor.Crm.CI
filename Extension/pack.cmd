@@ -16,12 +16,12 @@ if EXIST "%extpath%UpdateAssembly\ps_modules" (del "%extpath%UpdateAssembly\ps_m
 if EXIST "%extpath%UpdateWebResources\ps_modules" (del "%extpath%UpdateWebResources\ps_modules" /F /S /Q)
 if EXIST "%extpath%WhoAmI\ps_modules" (del "%extpath%WhoAmI\ps_modules" /F /S /Q)
 
-xcopy "%dllpath%" "%extpath%ObfuscateAssembly\ps_modules\DevUtils.CI\"
-xcopy "%dllpath%" "%extpath%ShuffleExport\ps_modules\DevUtils.CI\"
-xcopy "%dllpath%" "%extpath%ShuffleImport\ps_modules\DevUtils.CI\"
-xcopy "%dllpath%" "%extpath%UpdateAssembly\ps_modules\DevUtils.CI\"
-xcopy "%dllpath%" "%extpath%UpdateWebResources\ps_modules\DevUtils.CI\"
-xcopy "%dllpath%" "%extpath%WhoAmI\ps_modules\DevUtils.CI\"
+xcopy "%~dp0..\Cmdlets\OutObfuscatedAssembly\bin\Release\*.dll" "%extpath%ObfuscateAssembly\ps_modules\DevUtils.CI\"
+xcopy "%~dp0..\Cmdlets\Shuffle\bin\Release\*.dll%" "%extpath%ShuffleExport\ps_modules\DevUtils.CI\"
+xcopy "%~dp0..\Cmdlets\Shuffle\bin\Release\*.dll%" "%extpath%ShuffleImport\ps_modules\DevUtils.CI\"
+xcopy "%~dp0..\Cmdlets\UpdateCrmAssembly\bin\Release\*.dll%" "%extpath%UpdateAssembly\ps_modules\DevUtils.CI\"
+xcopy "%~dp0..\Cmdlets\UpdateCrmResouces\bin\Release\*.dll%" "%extpath%UpdateWebResources\ps_modules\DevUtils.CI\"
+xcopy "%~dp0..\Cmdlets\FindCrmUser\bin\Release\*.dll%" "%extpath%WhoAmI\ps_modules\DevUtils.CI\"
 
 xcopy "%dllpath%.config" "%extpath%ObfuscateAssembly\ps_modules\DevUtils.CI\"
 xcopy "%dllpath%.config" "%extpath%ShuffleExport\ps_modules\DevUtils.CI\"

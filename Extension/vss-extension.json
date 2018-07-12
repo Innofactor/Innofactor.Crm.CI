@@ -71,32 +71,32 @@
   },
   "files": [
     {
-      "path": "Images",
+      "path": "documentation\\images",
       "addressable": true
     },
     {
-      "path": "ApplyVersionToAssemblies"
+      "path": "implementation\\ApplyVersionToAssemblies"
     },
     {
-      "path": "ObfuscateAssembly"
+      "path": "implementation\\ObfuscateAssembly"
     },
     {
-      "path": "ShuffleExport"
+      "path": "implementation\\ShuffleExport"
     },
     {
-      "path": "ShuffleImport"
+      "path": "implementation\\ShuffleImport"
     },
     {
-      "path": "UpdateAssembly"
+      "path": "implementation\\UpdateAssembly"
     },
     {
-      "path": "UpdateWebResources"
+      "path": "implementation\\UpdateWebResources"
     },
     {
-      "path": "MinifyJS"
+      "path": "implementation\\MinifyJS"
     },
     {
-      "path": "WhoAmI"
+      "path": "implementation\\WhoAmI"
     }
   ],
   "contributions": [

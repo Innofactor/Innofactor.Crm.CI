@@ -39,8 +39,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Implementation", "Implement
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ApplyVersionToAssemblies", "ApplyVersionToAssemblies", "{5291F186-0784-4D8E-A422-2AB762EB2C57}"
 	ProjectSection(SolutionItems) = preProject
-		Extension\Implementation\ApplyVersionToAssemblies\ApplyVersionToAssemblies.ps1 = Extension\Implementation\ApplyVersionToAssemblies\ApplyVersionToAssemblies.ps1
 		Extension\Implementation\ApplyVersionToAssemblies\icon.png = Extension\Implementation\ApplyVersionToAssemblies\icon.png
+		Extension\Implementation\ApplyVersionToAssemblies\script.ps1 = Extension\Implementation\ApplyVersionToAssemblies\script.ps1
 		Extension\Implementation\ApplyVersionToAssemblies\task.json = Extension\Implementation\ApplyVersionToAssemblies\task.json
 	EndProjectSection
 EndProject
@@ -48,49 +48,49 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MinifyJS", "MinifyJS", "{4F
 	ProjectSection(SolutionItems) = preProject
 		Extension\Implementation\MinifyJS\gulpfile.js = Extension\Implementation\MinifyJS\gulpfile.js
 		Extension\Implementation\MinifyJS\icon.png = Extension\Implementation\MinifyJS\icon.png
-		Extension\Implementation\MinifyJS\MinifyJS.ps1 = Extension\Implementation\MinifyJS\MinifyJS.ps1
+		Extension\Implementation\MinifyJS\script.ps1 = Extension\Implementation\MinifyJS\script.ps1
 		Extension\Implementation\MinifyJS\task.json = Extension\Implementation\MinifyJS\task.json
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ObfuscateAssembly", "ObfuscateAssembly", "{D13604D0-7015-417C-8986-4FDC0577CF79}"
 	ProjectSection(SolutionItems) = preProject
-		Extension\Implementation\ObfuscateAssembly\ObfuscateAssembly.ps1 = Extension\Implementation\ObfuscateAssembly\ObfuscateAssembly.ps1
+		Extension\Implementation\ObfuscateAssembly\script.ps1 = Extension\Implementation\ObfuscateAssembly\script.ps1
 		Extension\Implementation\ObfuscateAssembly\task.json = Extension\Implementation\ObfuscateAssembly\task.json
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ShuffleExport", "ShuffleExport", "{AB4F79C0-6CE4-48E0-B805-C00E3BBDA20C}"
 	ProjectSection(SolutionItems) = preProject
 		Extension\Implementation\ShuffleExport\icon.png = Extension\Implementation\ShuffleExport\icon.png
-		Extension\Implementation\ShuffleExport\ShuffleExport.ps1 = Extension\Implementation\ShuffleExport\ShuffleExport.ps1
+		Extension\Implementation\ShuffleExport\script.ps1 = Extension\Implementation\ShuffleExport\script.ps1
 		Extension\Implementation\ShuffleExport\task.json = Extension\Implementation\ShuffleExport\task.json
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ShuffleImport", "ShuffleImport", "{D3B95C48-A075-4FD7-8B80-319CC9A65D90}"
 	ProjectSection(SolutionItems) = preProject
 		Extension\Implementation\ShuffleImport\icon.png = Extension\Implementation\ShuffleImport\icon.png
-		Extension\Implementation\ShuffleImport\ShuffleImport.ps1 = Extension\Implementation\ShuffleImport\ShuffleImport.ps1
+		Extension\Implementation\ShuffleImport\script.ps1 = Extension\Implementation\ShuffleImport\script.ps1
 		Extension\Implementation\ShuffleImport\task.json = Extension\Implementation\ShuffleImport\task.json
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UpdateAssembly", "UpdateAssembly", "{95C277DC-ECE5-43BA-900A-E9F48AD9EFEE}"
 	ProjectSection(SolutionItems) = preProject
 		Extension\Implementation\UpdateAssembly\icon.png = Extension\Implementation\UpdateAssembly\icon.png
+		Extension\Implementation\UpdateAssembly\script.ps1 = Extension\Implementation\UpdateAssembly\script.ps1
 		Extension\Implementation\UpdateAssembly\task.json = Extension\Implementation\UpdateAssembly\task.json
-		Extension\Implementation\UpdateAssembly\UpdateAssembly.ps1 = Extension\Implementation\UpdateAssembly\UpdateAssembly.ps1
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UpdateWebResources", "UpdateWebResources", "{ACFE418F-9CA1-48E0-AB05-0425DDA75E5A}"
 	ProjectSection(SolutionItems) = preProject
 		Extension\Implementation\UpdateWebResources\icon.png = Extension\Implementation\UpdateWebResources\icon.png
+		Extension\Implementation\UpdateWebResources\script.ps1 = Extension\Implementation\UpdateWebResources\script.ps1
 		Extension\Implementation\UpdateWebResources\task.json = Extension\Implementation\UpdateWebResources\task.json
-		Extension\Implementation\UpdateWebResources\UpdateWebResources.ps1 = Extension\Implementation\UpdateWebResources\UpdateWebResources.ps1
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WhoAmI", "WhoAmI", "{D45FC0C5-0C0E-49BA-BA1F-CDD9EC06B9D5}"
 	ProjectSection(SolutionItems) = preProject
 		Extension\Implementation\WhoAmI\icon.png = Extension\Implementation\WhoAmI\icon.png
+		Extension\Implementation\WhoAmI\script.ps1 = Extension\Implementation\WhoAmI\script.ps1
 		Extension\Implementation\WhoAmI\task.json = Extension\Implementation\WhoAmI\task.json
-		Extension\Implementation\WhoAmI\WhoAmI.ps1 = Extension\Implementation\WhoAmI\WhoAmI.ps1
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Cmdlets", "Cmdlets", "{07B43341-393E-4B76-8410-C2068E8D5519}"
@@ -105,6 +105,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Innofactor.Crm.CI.Shuffle", "Cmdlets\Shuffle\Innofactor.Crm.CI.Shuffle.csproj", "{EAB7A869-E290-4262-B61E-B41AC221D45E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Innofactor.Crm.CI.UpdateCrmResouces", "Cmdlets\UpdateCrmResouces\Innofactor.Crm.CI.UpdateCrmResouces.csproj", "{DA437681-4734-40BF-A1EB-82F8C5E50C76}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Innofactor.Crm.CI.UpdateCrmAssembly", "Cmdlets\UpdateCrmAssembly\Innofactor.Crm.CI.UpdateCrmAssembly.csproj", "{5A43B8FF-DE9F-4A30-857A-1619F51D8D6C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -136,6 +138,10 @@ Global
 		{DA437681-4734-40BF-A1EB-82F8C5E50C76}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DA437681-4734-40BF-A1EB-82F8C5E50C76}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DA437681-4734-40BF-A1EB-82F8C5E50C76}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5A43B8FF-DE9F-4A30-857A-1619F51D8D6C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5A43B8FF-DE9F-4A30-857A-1619F51D8D6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5A43B8FF-DE9F-4A30-857A-1619F51D8D6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5A43B8FF-DE9F-4A30-857A-1619F51D8D6C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -156,6 +162,7 @@ Global
 		{A8F00F15-936D-40CE-9C4D-EB4554EE9601} = {07B43341-393E-4B76-8410-C2068E8D5519}
 		{EAB7A869-E290-4262-B61E-B41AC221D45E} = {07B43341-393E-4B76-8410-C2068E8D5519}
 		{DA437681-4734-40BF-A1EB-82F8C5E50C76} = {07B43341-393E-4B76-8410-C2068E8D5519}
+		{5A43B8FF-DE9F-4A30-857A-1619F51D8D6C} = {07B43341-393E-4B76-8410-C2068E8D5519}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {ED295346-E5B5-4006-855E-1100CEB0F456}
