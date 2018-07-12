@@ -18,4 +18,3 @@ Import-Module $DevUtilsCI
 Write-Verbose "Imported DevUtils.CI"
 
 Update-CrmAssembly -DLL $AssemblyFile -ConnectionString $ConnectionString -UM $UpdateManaged
-

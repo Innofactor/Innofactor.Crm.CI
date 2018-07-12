@@ -5,7 +5,8 @@ $DefinitionFile = Get-VstsInput -Name definitionFile -Require
 $DataFile = Get-VstsInput -Name dataFile
 $ConnectionString = Get-VstsInput -Name crmConnectionString -Require
 
-if ([string]::IsNullOrEmpty($DataFile) -or ($DataFile -eq $env:BUILD_SOURCESDIRECTORY) -or ($DataFile -eq $env:SYSTEM_ARTIFACTSDIRECTORY)) {
+if ([string]::IsNullOrEmpty($DataFile) -or ($DataFile -eq $env:BUILD_SOURCESDIRECTORY) -or ($DataFile -eq $env:SYSTEM_ARTIFACTSDIRECTORY)) 
+{
 	Write-Verbose "Setting default data file"
 	$DataFile = [io.path]::ChangeExtension($DefinitionFile, ".data.xml")
 }
@@ -28,11 +29,13 @@ Write-Verbose "Importing DevUtils.CI: $DevUtilsCI"
 Import-Module $DevUtilsCI
 Write-Verbose "Imported DevUtils.CI"
 
-if (Test-Path $DataFile) {
+if (Test-Path $DataFile) 
+{
 	Write-Host "Loading data file"
 	[xml]$Data = Get-Content $DataFile -Encoding UTF8
 }
-else {
+else 
+{
 	Write-Verbose "Data file does not exist"
 	$Data = $null
 }
@@ -46,5 +49,3 @@ Write-Host "Updated: " $imp.Updated
 Write-Host "Skipped: " $imp.Skipped
 Write-Host "Deleted: " $imp.Deleted
 Write-Host "Failed : " $imp.Failed
-
-

@@ -46,7 +46,7 @@
   ],
   "execution": {
     "PowerShell3": {
-      "target": "ShuffleImport.ps1"
+      "target": "script.ps1"
     }
   }
 }

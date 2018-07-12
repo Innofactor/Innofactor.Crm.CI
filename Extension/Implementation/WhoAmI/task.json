@@ -30,7 +30,7 @@
   ],
   "execution": {
     "PowerShell3": {
-      "target": "WhoAmI.ps1",
+      "target": "script.ps1",
       "argumentFormat": "$(crmConnectionString)"
     }
   }

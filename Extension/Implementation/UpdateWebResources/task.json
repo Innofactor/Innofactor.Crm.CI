@@ -70,7 +70,7 @@
   ],
   "execution": {
     "PowerShell3": {
-      "target": "UpdateWebResources.ps1"
+      "target": "script.ps1"
     }
   }
 }

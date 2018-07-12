@@ -6,7 +6,8 @@ $DataFile = Get-VstsInput -Name dataFile
 $SetVersion = Get-VstsInput -Name setVersion -AsBool
 $ConnectionString = Get-VstsInput -Name crmConnectionString -Require
 
-if (!$DataFile -or ($DataFile = $env:BUILD_SOURCESDIRECTORY)) {
+if (!$DataFile -or ($DataFile = $env:BUILD_SOURCESDIRECTORY)) 
+{
 	Write-Verbose "Setting default data file"
 	$DataFile = [io.path]::ChangeExtension($DefinitionFile, ".data.xml")
 }
@@ -21,7 +22,8 @@ Write-Verbose "Data File      : $DataFile"
 Write-Verbose "Set Version    : $SetVersion"
 Write-Verbose "Connection String: $ConnectionString"
 
-if ($SetVersion -and (Get-Content $DefinitionFile | Select-String "{ShuffleVar:version}" -Quiet)) {
+if ($SetVersion -and (Get-Content $DefinitionFile | Select-String "{ShuffleVar:version}" -Quiet)) 
+{
 	Write-Verbose "Definition contains version placeholder"
 	$versionFile = "version.txt"
 	if ($env:AGENT_BUILDDIRECTORY) {
@@ -35,7 +37,8 @@ if ($SetVersion -and (Get-Content $DefinitionFile | Select-String "{ShuffleVar:v
 	Write-Host "Loading fixed definition from $definitionFixed"
 	[xml]$Definition = Get-Content $definitionFixed
 }
-else {
+else 
+{
 	Write-Host "Loading definition from $DefinitionFile"
 	[xml]$Definition = Get-Content $DefinitionFile
 }
@@ -50,16 +53,18 @@ Write-Host "Starting export"
 
 [xml]$exp = Export-CrmShuffle -ConnectionString $ConnectionString -Definition $Definition -Folder $definitionPath -Type "SimpleWithValue"
 
-if ($definitionFixed) {
+if ($definitionFixed) 
+{
 	Write-Verbose "Removing fixed definition file"
 	Remove-Item $definitionFixed
 }
 
-if (!$exp) {
+if (!$exp) 
+{
 	Write-Host "No data file result"
 }
-else {
+else 
+{
 	Write-Host "Writing export result to $DataFile"
 	[xml]$exp.Save($DataFile)
 }
-

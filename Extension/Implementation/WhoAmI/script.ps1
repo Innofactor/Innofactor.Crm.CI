@@ -17,13 +17,11 @@ $executingUser = Find-CrmUser -ConnectionString $ConnectionString -Verbose
 
 if($executingUser)
 { 
-Write-Host "Ping Succeeded userId: " $executingUser.UserId
-Write-Host "BusinessUnitId: " $executingUser.BusinessUnitId
-Write-Host "OrganizationId: " $executingUser.OrganizationId
+	Write-Host "Ping Succeeded userId: " $executingUser.UserId
+	Write-Host "BusinessUnitId: " $executingUser.BusinessUnitId
+	Write-Host "OrganizationId: " $executingUser.OrganizationId
 }
 else
 {
-Write-Host "Ping Failed"
+	Write-Host "Ping Failed"
 }
-
-

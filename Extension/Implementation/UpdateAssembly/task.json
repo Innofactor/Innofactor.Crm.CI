@@ -54,7 +54,7 @@
   ],
   "execution": {
     "PowerShell3": {
-      "target": "UpdateAssembly.ps1"
+      "target": "script.ps1"
     }
   }
 }

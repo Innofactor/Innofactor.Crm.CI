@@ -29,7 +29,7 @@
   ],
   "execution": {
     "PowerShell3": {
-      "target": "MinifyJS.ps1"
+      "target": "script.ps1"
     }
   }
 }

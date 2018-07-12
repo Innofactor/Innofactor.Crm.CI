@@ -43,7 +43,7 @@
   "instanceNameFormat": "Apply Build Version to assemblies",
   "execution": {
     "PowerShell3": {
-      "target": "ApplyVersionToAssemblies.ps1"
+      "target": "script.ps1"
     }
   }
 }
