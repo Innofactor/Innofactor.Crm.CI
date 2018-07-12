@@ -14,7 +14,7 @@
   "version": {
     "Major": "9",
     "Minor": "0",
-    "Patch": "1"
+    "Patch": "2"
   },
   "minimumAgentVersion": "1.95.0",
   "groups": [
@@ -40,7 +40,7 @@
       "label": "Obfuscation",
       "defaultValue": "",
       "required": true,
-      "helpMarkDown": "Level of assembly obfuscation — please consider using `Recommended` level for Microsoft Dynamics CRM assemblies — it will combined reasonable protection with maximum possible speed and size of the assembly",
+      "helpMarkDown": "Level of assembly obfuscation ï¿½ please consider using `Recommended` level for Microsoft Dynamics CRM assemblies ï¿½ it will combined reasonable protection with maximum possible speed and size of the assembly",
       "options": {
         "0": "Recommended",
         "1": "Minimum",
