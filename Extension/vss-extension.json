@@ -2,7 +2,7 @@
   "manifestVersion": 1,
   "id": "cinteros-devutils-ci-build-tasks",
   "name": "DevOps for Microsoft Dynamics 365",
-  "version": "9.0.9",
+  "version": "9.0.18",
   "publisher": "InnofactorSE",
   "targets": [
     {
@@ -71,32 +71,11 @@
   },
   "files": [
     {
-      "path": "documentation\\images",
+      "path": "documentation",
       "addressable": true
     },
     {
-      "path": "implementation\\ApplyVersionToAssemblies"
-    },
-    {
-      "path": "implementation\\ObfuscateAssembly"
-    },
-    {
-      "path": "implementation\\ShuffleExport"
-    },
-    {
-      "path": "implementation\\ShuffleImport"
-    },
-    {
-      "path": "implementation\\UpdateAssembly"
-    },
-    {
-      "path": "implementation\\UpdateWebResources"
-    },
-    {
-      "path": "implementation\\MinifyJS"
-    },
-    {
-      "path": "implementation\\WhoAmI"
+      "path": "implementation"
     }
   ],
   "contributions": [
@@ -107,7 +86,7 @@
         "ms.vss-distributed-task.tasks"
       ],
       "properties": {
-        "name": "ApplyVersionToAssemblies"
+        "name": "implementation/ApplyVersionToAssemblies"
       }
     },
     {
@@ -117,7 +96,7 @@
         "ms.vss-distributed-task.tasks"
       ],
       "properties": {
-        "name": "ObfuscateAssembly"
+        "name": "implementation/ObfuscateAssembly"
       }
     },
     {
@@ -127,7 +106,7 @@
         "ms.vss-distributed-task.tasks"
       ],
       "properties": {
-        "name": "ShuffleExport"
+        "name": "implementation/ShuffleExport"
       }
     },
     {
@@ -137,7 +116,7 @@
         "ms.vss-distributed-task.tasks"
       ],
       "properties": {
-        "name": "ShuffleImport"
+        "name": "implementation/ShuffleImport"
       }
     },
     {
@@ -147,7 +126,7 @@
         "ms.vss-distributed-task.tasks"
       ],
       "properties": {
-        "name": "UpdateAssembly"
+        "name": "implementation/UpdateAssembly"
       }
     },
     {
@@ -157,7 +136,7 @@
         "ms.vss-distributed-task.tasks"
       ],
       "properties": {
-        "name": "UpdateWebResources"
+        "name": "implementation/UpdateWebResources"
       }
     },
     {
@@ -167,7 +146,7 @@
         "ms.vss-distributed-task.tasks"
       ],
       "properties": {
-        "name": "MinifyJS"
+        "name": "implementation/MinifyJS"
       }
     },
     {
@@ -177,7 +156,7 @@
         "ms.vss-distributed-task.tasks"
       ],
       "properties": {
-        "name": "WhoAmI"
+        "name": "implementation/WhoAmI"
       }
     }
   ]
