@@ -97,7 +97,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WhoAmI", "WhoAmI", "{D45FC0
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Innofactor.Crm.CI.OutObfuscatedAssembly", "CI.OutObfuscatedAssembly\Innofactor.Crm.CI.OutObfuscatedAssembly.csproj", "{A8F00F15-936D-40CE-9C4D-EB4554EE9601}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Innofactor.Crm.CI.FindCrmUser", "Innofactor.Crm.CI.FindCrmUser\Innofactor.Crm.CI.FindCrmUser.csproj", "{37B302D4-5C3B-4B80-BBE7-42D044BDAED8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Innofactor.Crm.CI.FindCrmUser", "CI.FindCrmUser\Innofactor.Crm.CI.FindCrmUser.csproj", "{37B302D4-5C3B-4B80-BBE7-42D044BDAED8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
