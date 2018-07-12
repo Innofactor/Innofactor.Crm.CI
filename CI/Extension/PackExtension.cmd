@@ -1,10 +1,10 @@
-rem @echo off
+@echo off
 
 rem ===============================================================================
 echo Assembling...
 
 set dllpath=%~dp0..\bin\Release\*.dll
-set extpath=%~dp0
+set extpath=%~dp0\Implementation\
 
 echo Looking for: %dllpath%
 echo Copying to : %extpath%
@@ -30,14 +30,14 @@ xcopy "%dllpath%.config" "%extpath%UpdateAssembly\ps_modules\DevUtils.CI\"
 xcopy "%dllpath%.config" "%extpath%UpdateWebResources\ps_modules\DevUtils.CI\"
 xcopy "%dllpath%.config" "%extpath%WhoAmI\ps_modules\DevUtils.CI\"
 
-xcopy "%extpath%VstsTaskSdk" "%extpath%ApplyVersionToAssemblies\ps_modules\VstsTaskSdk\" /S /Y
-xcopy "%extpath%VstsTaskSdk" "%extpath%MinifyJS\ps_modules\VstsTaskSdk\" /S /Y
-xcopy "%extpath%VstsTaskSdk" "%extpath%ObfuscateAssembly\ps_modules\VstsTaskSdk\" /S /Y
-xcopy "%extpath%VstsTaskSdk" "%extpath%ShuffleExport\ps_modules\VstsTaskSdk\" /S /Y
-xcopy "%extpath%VstsTaskSdk" "%extpath%ShuffleImport\ps_modules\VstsTaskSdk\" /S /Y
-xcopy "%extpath%VstsTaskSdk" "%extpath%UpdateAssembly\ps_modules\VstsTaskSdk\" /S /Y
-xcopy "%extpath%VstsTaskSdk" "%extpath%UpdateWebResources\ps_modules\VstsTaskSdk\" /S /Y
-xcopy "%extpath%VstsTaskSdk" "%extpath%WhoAmI\ps_modules\VstsTaskSdk\" /S /Y
+xcopy "%extpath%..\VstsTaskSdk" "%extpath%ApplyVersionToAssemblies\ps_modules\VstsTaskSdk\" /S /Y
+xcopy "%extpath%..\VstsTaskSdk" "%extpath%MinifyJS\ps_modules\VstsTaskSdk\" /S /Y
+xcopy "%extpath%..\VstsTaskSdk" "%extpath%ObfuscateAssembly\ps_modules\VstsTaskSdk\" /S /Y
+xcopy "%extpath%..\VstsTaskSdk" "%extpath%ShuffleExport\ps_modules\VstsTaskSdk\" /S /Y
+xcopy "%extpath%..\VstsTaskSdk" "%extpath%ShuffleImport\ps_modules\VstsTaskSdk\" /S /Y
+xcopy "%extpath%..\VstsTaskSdk" "%extpath%UpdateAssembly\ps_modules\VstsTaskSdk\" /S /Y
+xcopy "%extpath%..\VstsTaskSdk" "%extpath%UpdateWebResources\ps_modules\VstsTaskSdk\" /S /Y
+xcopy "%extpath%..\VstsTaskSdk" "%extpath%WhoAmI\ps_modules\VstsTaskSdk\" /S /Y
 
 rem ===============================================================================
 echo Packing!
