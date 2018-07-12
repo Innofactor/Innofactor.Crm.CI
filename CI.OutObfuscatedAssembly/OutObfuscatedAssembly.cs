@@ -1,7 +1,8 @@
-﻿namespace Cinteros.Crm.Utils.CI
+﻿namespace Innofactor.Crm.CI
 {
     using Confuser.Core;
     using Confuser.Core.Project;
+    using Innofactor.Crm.CI.Structure;
     using System;
     using System.IO;
     using System.Management.Automation;
@@ -40,7 +41,7 @@
             {
                 var parameters = new ConfuserParameters
                 {
-                    Logger = new ConsoleLogger(),
+                    Logger = new ConfuserLogger(),
                     Project = new ConfuserProject()
                 };
 

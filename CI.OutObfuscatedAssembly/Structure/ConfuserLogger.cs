@@ -1,9 +1,9 @@
-﻿namespace Cinteros.Crm.Utils.CI
+﻿namespace Innofactor.Crm.CI.Structure
 {
     using Confuser.Core;
     using System;
 
-    internal class ConsoleLogger : ILogger
+    internal class ConfuserLogger : ILogger
     {
         #region Private Fields
 
@@ -13,7 +13,7 @@
 
         #region Public Constructors
 
-        public ConsoleLogger()
+        public ConfuserLogger()
         {
             begin = DateTime.Now;
         }

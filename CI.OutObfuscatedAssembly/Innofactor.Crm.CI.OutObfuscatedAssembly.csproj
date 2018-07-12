@@ -60,7 +60,7 @@
   <ItemGroup>
     <Compile Include="OutObfuscatedAssembly.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ProxyLogger.cs" />
+    <Compile Include="Structure\ConfuserLogger.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
