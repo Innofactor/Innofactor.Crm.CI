@@ -254,4 +254,4 @@ paket-files/
 # My own
 ps_modules/
 VSIX/
-/CI/Extension/pat.txt
+pat.txt

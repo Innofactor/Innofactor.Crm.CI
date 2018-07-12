@@ -14,6 +14,88 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Innofactor.Crm.XTB.Shuffle", "XTB\Innofactor.Crm.XTB.Shuffle.csproj", "{13AE5564-5C72-4A70-8AC5-00D227E8200A}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Extension", "Extension", "{6FCD8972-7DD1-4AA7-83DA-4C2B453AB24F}"
+	ProjectSection(SolutionItems) = preProject
+		Extension\icon128x128.png = Extension\icon128x128.png
+		Extension\icon512x512.png = Extension\icon512x512.png
+		Extension\pack.cmd = Extension\pack.cmd
+		Extension\pat.txt = Extension\pat.txt
+		Extension\vss-extension.json = Extension\vss-extension.json
+		Extension\WebResourcePatternSample.txt = Extension\WebResourcePatternSample.txt
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentation", "{365AD6B4-4F10-4E84-B2DB-C6B806EBD775}"
+	ProjectSection(SolutionItems) = preProject
+		Extension\Documentation\overview.md = Extension\Documentation\overview.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "images", "images", "{6EDCE3AB-10F8-4CE2-A99B-723652CE6142}"
+	ProjectSection(SolutionItems) = preProject
+		Extension\Documentation\images\assembly.png = Extension\Documentation\images\assembly.png
+		Extension\Documentation\images\export.png = Extension\Documentation\images\export.png
+		Extension\Documentation\images\minify.png = Extension\Documentation\images\minify.png
+		Extension\Documentation\images\resources.png = Extension\Documentation\images\resources.png
+		Extension\Documentation\images\tasks.png = Extension\Documentation\images\tasks.png
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Implementation", "Implementation", "{E8AF99D7-7E0B-4C33-99BD-35B5D03ED1FC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ApplyVersionToAssemblies", "ApplyVersionToAssemblies", "{5291F186-0784-4D8E-A422-2AB762EB2C57}"
+	ProjectSection(SolutionItems) = preProject
+		Extension\Implementation\ApplyVersionToAssemblies\ApplyVersionToAssemblies.ps1 = Extension\Implementation\ApplyVersionToAssemblies\ApplyVersionToAssemblies.ps1
+		Extension\Implementation\ApplyVersionToAssemblies\icon.png = Extension\Implementation\ApplyVersionToAssemblies\icon.png
+		Extension\Implementation\ApplyVersionToAssemblies\task.json = Extension\Implementation\ApplyVersionToAssemblies\task.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MinifyJS", "MinifyJS", "{4F0084A2-CC58-48D8-817A-0813A283195D}"
+	ProjectSection(SolutionItems) = preProject
+		Extension\Implementation\MinifyJS\gulpfile.js = Extension\Implementation\MinifyJS\gulpfile.js
+		Extension\Implementation\MinifyJS\icon.png = Extension\Implementation\MinifyJS\icon.png
+		Extension\Implementation\MinifyJS\MinifyJS.ps1 = Extension\Implementation\MinifyJS\MinifyJS.ps1
+		Extension\Implementation\MinifyJS\task.json = Extension\Implementation\MinifyJS\task.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ObfuscateAssembly", "ObfuscateAssembly", "{D13604D0-7015-417C-8986-4FDC0577CF79}"
+	ProjectSection(SolutionItems) = preProject
+		Extension\Implementation\ObfuscateAssembly\ObfuscateAssembly.ps1 = Extension\Implementation\ObfuscateAssembly\ObfuscateAssembly.ps1
+		Extension\Implementation\ObfuscateAssembly\task.json = Extension\Implementation\ObfuscateAssembly\task.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ShuffleExport", "ShuffleExport", "{AB4F79C0-6CE4-48E0-B805-C00E3BBDA20C}"
+	ProjectSection(SolutionItems) = preProject
+		Extension\Implementation\ShuffleExport\icon.png = Extension\Implementation\ShuffleExport\icon.png
+		Extension\Implementation\ShuffleExport\ShuffleExport.ps1 = Extension\Implementation\ShuffleExport\ShuffleExport.ps1
+		Extension\Implementation\ShuffleExport\task.json = Extension\Implementation\ShuffleExport\task.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ShuffleImport", "ShuffleImport", "{D3B95C48-A075-4FD7-8B80-319CC9A65D90}"
+	ProjectSection(SolutionItems) = preProject
+		Extension\Implementation\ShuffleImport\icon.png = Extension\Implementation\ShuffleImport\icon.png
+		Extension\Implementation\ShuffleImport\ShuffleImport.ps1 = Extension\Implementation\ShuffleImport\ShuffleImport.ps1
+		Extension\Implementation\ShuffleImport\task.json = Extension\Implementation\ShuffleImport\task.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UpdateAssembly", "UpdateAssembly", "{95C277DC-ECE5-43BA-900A-E9F48AD9EFEE}"
+	ProjectSection(SolutionItems) = preProject
+		Extension\Implementation\UpdateAssembly\icon.png = Extension\Implementation\UpdateAssembly\icon.png
+		Extension\Implementation\UpdateAssembly\task.json = Extension\Implementation\UpdateAssembly\task.json
+		Extension\Implementation\UpdateAssembly\UpdateAssembly.ps1 = Extension\Implementation\UpdateAssembly\UpdateAssembly.ps1
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UpdateWebResources", "UpdateWebResources", "{ACFE418F-9CA1-48E0-AB05-0425DDA75E5A}"
+	ProjectSection(SolutionItems) = preProject
+		Extension\Implementation\UpdateWebResources\icon.png = Extension\Implementation\UpdateWebResources\icon.png
+		Extension\Implementation\UpdateWebResources\task.json = Extension\Implementation\UpdateWebResources\task.json
+		Extension\Implementation\UpdateWebResources\UpdateWebResources.ps1 = Extension\Implementation\UpdateWebResources\UpdateWebResources.ps1
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WhoAmI", "WhoAmI", "{D45FC0C5-0C0E-49BA-BA1F-CDD9EC06B9D5}"
+	ProjectSection(SolutionItems) = preProject
+		Extension\Implementation\WhoAmI\icon.png = Extension\Implementation\WhoAmI\icon.png
+		Extension\Implementation\WhoAmI\task.json = Extension\Implementation\WhoAmI\task.json
+		Extension\Implementation\WhoAmI\WhoAmI.ps1 = Extension\Implementation\WhoAmI\WhoAmI.ps1
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,6 +117,19 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{365AD6B4-4F10-4E84-B2DB-C6B806EBD775} = {6FCD8972-7DD1-4AA7-83DA-4C2B453AB24F}
+		{6EDCE3AB-10F8-4CE2-A99B-723652CE6142} = {365AD6B4-4F10-4E84-B2DB-C6B806EBD775}
+		{E8AF99D7-7E0B-4C33-99BD-35B5D03ED1FC} = {6FCD8972-7DD1-4AA7-83DA-4C2B453AB24F}
+		{5291F186-0784-4D8E-A422-2AB762EB2C57} = {E8AF99D7-7E0B-4C33-99BD-35B5D03ED1FC}
+		{4F0084A2-CC58-48D8-817A-0813A283195D} = {E8AF99D7-7E0B-4C33-99BD-35B5D03ED1FC}
+		{D13604D0-7015-417C-8986-4FDC0577CF79} = {E8AF99D7-7E0B-4C33-99BD-35B5D03ED1FC}
+		{AB4F79C0-6CE4-48E0-B805-C00E3BBDA20C} = {E8AF99D7-7E0B-4C33-99BD-35B5D03ED1FC}
+		{D3B95C48-A075-4FD7-8B80-319CC9A65D90} = {E8AF99D7-7E0B-4C33-99BD-35B5D03ED1FC}
+		{95C277DC-ECE5-43BA-900A-E9F48AD9EFEE} = {E8AF99D7-7E0B-4C33-99BD-35B5D03ED1FC}
+		{ACFE418F-9CA1-48E0-AB05-0425DDA75E5A} = {E8AF99D7-7E0B-4C33-99BD-35B5D03ED1FC}
+		{D45FC0C5-0C0E-49BA-BA1F-CDD9EC06B9D5} = {E8AF99D7-7E0B-4C33-99BD-35B5D03ED1FC}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {ED295346-E5B5-4006-855E-1100CEB0F456}

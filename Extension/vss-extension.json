@@ -2,7 +2,7 @@
   "manifestVersion": 1,
   "id": "cinteros-devutils-ci-build-tasks",
   "name": "DevOps for Microsoft Dynamics 365",
-  "version": "9.0.7",
+  "version": "9.0.9",
   "publisher": "InnofactorSE",
   "targets": [
     {
@@ -21,32 +21,33 @@
     "Dynamics CRM",
     "CRM",
     "Shuffle",
-    "CRM 365"
+    "CRM 365",
+    "Obfuscation"
   ],
   "icons": {
-    "default": "Images/InnofactorIcon128.png",
-    "large": "Images/InnofactorIcon512.png"
+    "default": "icon128x128.png",
+    "large": "icon512x512.png"
   },
   "screenshots": [
     {
-      "path": "Images/Tasks.png"
+      "path": "documentation/images/tasks.png"
     },
     {
-      "path": "Images/Minify.png"
+      "path": "documentation/images/minify.png"
     },
     {
-      "path": "Images/WebResources.png"
+      "path": "documentation/images/resources.png"
     },
     {
-      "path": "Images/Assembly.png"
+      "path": "documentation/images/assembly.png"
     },
     {
-      "path": "Images/Export.png"
+      "path": "documentation/images/export.png"
     }
   ],
   "content": {
     "details": {
-      "path": "overview.md"
+      "path": "documentation/overview.md"
     }
   },
   "links": {
@@ -77,6 +78,9 @@
       "path": "ApplyVersionToAssemblies"
     },
     {
+      "path": "ObfuscateAssembly"
+    },
+    {
       "path": "ShuffleExport"
     },
     {
@@ -104,6 +108,16 @@
       ],
       "properties": {
         "name": "ApplyVersionToAssemblies"
+      }
+    },
+    {
+      "id": "ObfuscateAssembly",
+      "type": "ms.vss-distributed-task.task",
+      "targets": [
+        "ms.vss-distributed-task.tasks"
+      ],
+      "properties": {
+        "name": "ObfuscateAssembly"
       }
     },
     {

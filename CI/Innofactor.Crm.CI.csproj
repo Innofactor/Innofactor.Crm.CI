@@ -131,70 +131,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Extension\ApplyVersionToAssemblies\icon.png" />
-    <Content Include="Extension\icon_128x128.png" />
-    <Content Include="Extension\Images\Assembly.png" />
-    <Content Include="Extension\Images\Export.png" />
-    <Content Include="Extension\Images\InnofactorIcon128.png" />
-    <Content Include="Extension\Images\InnofactorIcon512.png" />
-    <Content Include="Extension\Images\Minify.png" />
-    <Content Include="Extension\Images\Tasks.png" />
-    <Content Include="Extension\Images\WebResources.png" />
-    <Content Include="Extension\MinifyJS\gulpfile.js" />
-    <Content Include="Extension\WhoAmI\icon.png" />
     <None Include="app.config" />
-    <None Include="Extension\ObfuscateAssembly\ObfuscateAssembly.ps1" />
-    <None Include="Extension\ObfuscateAssembly\task.json" />
-    <None Include="Extension\overview.md" />
-    <None Include="Extension\WebResourcePatternSample.txt" />
-    <Content Include="Extension\ApplyVersionToAssemblies\ApplyVersionToAssemblies.ps1" />
-    <Content Include="Extension\MinifyJS\icon.png" />
-    <Content Include="Extension\ShuffleExport\icon.png" />
-    <Content Include="Extension\ShuffleExport\ShuffleExport.ps1" />
-    <Content Include="Extension\ShuffleImport\icon.png" />
-    <Content Include="Extension\ShuffleImport\ShuffleImport.ps1" />
-    <Content Include="Extension\UpdateAssembly\icon.png" />
-    <Content Include="Extension\UpdateWebResources\icon.png" />
-    <Content Include="Extension\VstsTaskSdk\Minimatch.dll" />
-    <Content Include="Extension\VstsTaskSdk\Strings\resources.resjson\de-de\resources.resjson" />
-    <Content Include="Extension\VstsTaskSdk\Strings\resources.resjson\en-US\resources.resjson" />
-    <Content Include="Extension\VstsTaskSdk\Strings\resources.resjson\es-es\resources.resjson" />
-    <Content Include="Extension\VstsTaskSdk\Strings\resources.resjson\fr-fr\resources.resjson" />
-    <Content Include="Extension\VstsTaskSdk\Strings\resources.resjson\it-IT\resources.resjson" />
-    <Content Include="Extension\VstsTaskSdk\Strings\resources.resjson\ja-jp\resources.resjson" />
-    <Content Include="Extension\VstsTaskSdk\Strings\resources.resjson\ko-KR\resources.resjson" />
-    <Content Include="Extension\VstsTaskSdk\Strings\resources.resjson\ru-RU\resources.resjson" />
-    <Content Include="Extension\VstsTaskSdk\Strings\resources.resjson\zh-CN\resources.resjson" />
-    <Content Include="Extension\VstsTaskSdk\Strings\resources.resjson\zh-TW\resources.resjson" />
-    <None Include="Extension\ApplyVersionToAssemblies\task.json" />
-    <Content Include="Extension\MinifyJS\MinifyJS.ps1" />
-    <None Include="Extension\MinifyJS\task.json" />
-    <None Include="Extension\PackExtension.cmd" />
-    <None Include="Extension\ShuffleExport\task.json" />
-    <None Include="Extension\ShuffleImport\task.json" />
-    <None Include="Extension\UpdateAssembly\task.json" />
-    <None Include="Extension\UpdateWebResources\task.json" />
-    <None Include="Extension\vss-extension.json" />
-    <None Include="Extension\VstsTaskSdk\FindFunctions.ps1" />
-    <None Include="Extension\VstsTaskSdk\InputFunctions.ps1" />
-    <None Include="Extension\VstsTaskSdk\LegacyFindFunctions.ps1" />
-    <None Include="Extension\VstsTaskSdk\lib.json" />
-    <None Include="Extension\VstsTaskSdk\LocalizationFunctions.ps1" />
-    <None Include="Extension\VstsTaskSdk\LoggingCommandFunctions.ps1" />
-    <None Include="Extension\VstsTaskSdk\LongPathFunctions.ps1" />
-    <None Include="Extension\VstsTaskSdk\OutFunctions.ps1" />
-    <None Include="Extension\VstsTaskSdk\ServerOMFunctions.ps1" />
-    <None Include="Extension\VstsTaskSdk\ToolFunctions.ps1" />
-    <None Include="Extension\VstsTaskSdk\TraceFunctions.ps1" />
-    <None Include="Extension\VstsTaskSdk\VstsTaskSdk.psd1" />
-    <None Include="Extension\VstsTaskSdk\VstsTaskSdk.psm1" />
-    <None Include="Extension\WhoAmI\task.json" />
-    <None Include="Extension\WhoAmI\WhoAmI.ps1" />
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
-    <Content Include="Extension\UpdateWebResources\UpdateWebResources.ps1" />
-    <Content Include="Extension\UpdateAssembly\UpdateAssembly.ps1" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />
