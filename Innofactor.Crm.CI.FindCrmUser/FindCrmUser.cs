@@ -1,12 +1,11 @@
 ﻿namespace Cinteros.Crm.Utils.CI.Cmdlets
 {
-    using Cinteros.Crm.Utils.CI.Cmdlets.Structure;
     using Microsoft.Crm.Sdk.Messages;
     using System.Management.Automation;
 
     [Cmdlet(VerbsCommon.Find, "CrmUser")]
     [OutputType(typeof(WhoAmIResponse))]
-    public class FindCrmUser : XrmCommandBase
+    public class FindCrmUser : XrmCmdletBase
     {
         #region Protected Methods
 
@@ -16,13 +15,13 @@
 
             WriteVerbose(string.Format("Invoking Organization Service"));
 
-            var response = (container.Service.Execute(new WhoAmIRequest()) as WhoAmIResponse);
+            var response = (Service.Execute(new WhoAmIRequest()) as WhoAmIResponse);
 
             WriteObject(response);
 
-            WriteVerbose(string.Format("OrganizationId: {0}", response.OrganizationId));
-            WriteVerbose(string.Format("BusinessUnitId: {0}", response.BusinessUnitId));
-            WriteVerbose(string.Format("UserId: {0}", response.UserId));
+            WriteVerbose($"OrganizationId: {response.OrganizationId}");
+            WriteVerbose($"BusinessUnitId: {response.BusinessUnitId}");
+            WriteVerbose($"UserId: {response.UserId}");
         }
 
         #endregion Protected Methods

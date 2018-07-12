@@ -3,20 +3,12 @@
 
 namespace Cinteros.Crm.Utils.CI
 {
-    using Cinteros.Crm.Utils.Common;
-    using Cinteros.Crm.Utils.Common.Interfaces;
     using Microsoft.Xrm.Tooling.Connector;
     using System.Management.Automation;
     using System.Net;
 
     public abstract class XrmCmdletBase : Cmdlet
     {
-        #region Protected Fields
-
-        protected IContainable container;
-
-        #endregion Protected Fields
-
         #region Private Fields
 
         private int DefaultTime = 120;
@@ -29,15 +21,33 @@ namespace Cinteros.Crm.Utils.CI
         /// <para type="description">The connectionstring to the crm organization (see https://msdn.microsoft.com/en-us/library/mt608573.aspx ).</para>
         /// </summary>
         [Parameter(Mandatory = true)]
-        public string ConnectionString { get; set; }
+        public string ConnectionString
+        {
+            get;
+            set;
+        }
 
         /// <summary>
         /// <para type="description">Timeout in seconds</para>
         /// </summary>
         [Parameter(Mandatory = false)]
-        public int Timeout { get; set; }
+        public int Timeout
+        {
+            get;
+            set;
+        }
 
         #endregion Public Properties
+
+        #region Protected Properties
+
+        protected CrmServiceClient Service
+        {
+            get;
+            private set;
+        }
+
+        #endregion Protected Properties
 
         #region Protected Methods
 
@@ -47,35 +57,27 @@ namespace Cinteros.Crm.Utils.CI
             SetSecurityProtocol();
             WriteDebug("Connecting to CRM");
             WriteVerbose("Creating CrmServiceClient with: " + ConnectionString);
-            var client = new CrmServiceClient(ConnectionString);
-            if (client == null)
+            Service = new CrmServiceClient(ConnectionString);
+            if (Service == null)
             {
                 throw new PSArgumentException("Connection not established", "ConnectionString");
             }
-            if (client.OrganizationServiceProxy == null)
+            if (Service.OrganizationServiceProxy == null)
             {
-                throw new PSArgumentException("Connection not established. Last CRM error message:\n" + client.LastCrmError, "ConnectionString");
+                throw new PSArgumentException("Connection not established. Last CRM error message:\n" + Service.LastCrmError, "ConnectionString");
             }
             if (Timeout == 0)
             {
-                client.OrganizationServiceProxy.Timeout = new System.TimeSpan(0, 0, DefaultTime);
+                Service.OrganizationServiceProxy.Timeout = new System.TimeSpan(0, 0, DefaultTime);
             }
             else
             {
-                client.OrganizationServiceProxy.Timeout = new System.TimeSpan(0, 0, Timeout);
+                Service.OrganizationServiceProxy.Timeout = new System.TimeSpan(0, 0, Timeout);
             }
-            container = new CintContainer(new CrmServiceProxy(client.OrganizationServiceProxy), CommandRuntime.ToString(), true);
         }
 
-        protected override void EndProcessing()
-        {
+        protected override void EndProcessing() =>
             base.EndProcessing();
-
-            if (container != null)
-            {
-                (container as CintContainer)?.Dispose();
-            }
-        }
 
         #endregion Protected Methods
 
