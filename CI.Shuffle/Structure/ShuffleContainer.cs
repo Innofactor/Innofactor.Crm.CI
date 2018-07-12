@@ -4,7 +4,6 @@
     using Cinteros.Crm.Utils.Common.Interfaces;
     using Microsoft.Xrm.Sdk.Client;
     using Microsoft.Xrm.Tooling.Connector;
-    using System;
 
     internal class ShuffleContainer : IContainable
     {
@@ -25,7 +24,7 @@
 
         #region Public Properties
 
-        public ILoggable Logger => throw new NotImplementedException();
+        public ILoggable Logger => new ShuffleLogger();
 
         public IServicable Service => new CrmServiceProxy(service);
 
