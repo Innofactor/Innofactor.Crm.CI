@@ -72,6 +72,9 @@
   </xs:element>
 
   <xs:complexType name="Blocks">
+    <xs:annotation>
+      <xs:documentation>Add your DataBlock and SolutionBlock nodes here.</xs:documentation>
+    </xs:annotation>
     <xs:sequence minOccurs="1">
       <xs:choice minOccurs="1" maxOccurs="unbounded">
         <xs:element name="SolutionBlock" type="SolutionBlock" minOccurs="1" maxOccurs="unbounded"/>
@@ -81,6 +84,9 @@
   </xs:complexType>
 
   <xs:complexType name="SolutionBlock">
+    <xs:annotation>
+      <xs:documentation>This block contains definitions for export/import of a CRM Solution.</xs:documentation>
+    </xs:annotation>
     <xs:sequence minOccurs="1">
       <xs:element minOccurs="0" maxOccurs="1" name="Export" type="SolutionBlockExport" />
       <xs:element minOccurs="0" maxOccurs="1" name="Import" type="SolutionBlockImport" />
@@ -91,6 +97,9 @@
   </xs:complexType>
 
   <xs:complexType name="SolutionBlockExport">
+    <xs:annotation>
+      <xs:documentation>Options for export of a solution from source environment.</xs:documentation>
+    </xs:annotation>    
     <xs:sequence>
       <xs:element name="Settings" minOccurs="0" maxOccurs="1">
         <xs:complexType>
@@ -113,11 +122,20 @@
   </xs:complexType>
 
   <xs:complexType name="SolutionBlockImport">
+    <xs:annotation>
+      <xs:documentation>Options for import of a solution to target environment</xs:documentation>
+    </xs:annotation>
     <xs:sequence>
       <xs:element name="PreRequisites" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>PreRequisites can declare that certain solutions of certain versions must be installed to be able to import this solution.</xs:documentation>
+        </xs:annotation>
         <xs:complexType>
           <xs:sequence>
             <xs:element maxOccurs="unbounded" name="Solution">
+              <xs:annotation>
+                <xs:documentation>PreRequisite solution details.</xs:documentation>
+              </xs:annotation>
               <xs:complexType>
                 <xs:attribute name="Name" type="xs:string" use="required" />
                 <xs:attribute name="Comparer" type="SolutionVersionComparers" use="required" />
@@ -163,9 +181,15 @@
   </xs:complexType>
 
   <xs:complexType name="DataBlockExport">
+    <xs:annotation>
+      <xs:documentation>Define what data to export.</xs:documentation>
+    </xs:annotation>
     <xs:choice minOccurs="1" maxOccurs="1">
       <xs:sequence>
         <xs:element minOccurs="0" maxOccurs="unbounded" name="Filter">
+          <xs:annotation>
+            <xs:documentation>Filter data to export. Multiple filters are AND'ed.</xs:documentation>
+          </xs:annotation>
           <xs:complexType>
             <xs:attribute name="Attribute" type="xs:string" use="required" />
             <xs:attribute name="Operator" type="ConditionOperator" use="required" />
@@ -174,15 +198,24 @@
           </xs:complexType>
         </xs:element>
         <xs:element minOccurs="0" maxOccurs="unbounded" name="Sort">
+          <xs:annotation>
+            <xs:documentation>Attributes to sort exported data by in the resulting data file.</xs:documentation>
+          </xs:annotation>
           <xs:complexType>
             <xs:attribute name="Attribute" type="xs:string" use="required" />
             <xs:attribute name="Type" type="SortTypes" use="optional" default="Asc" />
           </xs:complexType>
         </xs:element>
         <xs:element name="Attributes">
+          <xs:annotation>
+            <xs:documentation>Define which attributes from the exported entity to include in the data file.</xs:documentation>
+          </xs:annotation>
           <xs:complexType>
             <xs:sequence>
               <xs:element maxOccurs="unbounded" name="Attribute">
+                <xs:annotation>
+                  <xs:documentation>Attribute to include in the data file. If IncludeNull is specified, attribute will be included in the file even if the value is null.</xs:documentation>
+                </xs:annotation>
                 <xs:complexType>
                   <xs:attribute name="Name" type="xs:string" use="required" />
                   <xs:attribute name="IncludeNull" type="xs:boolean" default="false" use="optional" />
@@ -198,6 +231,9 @@
   </xs:complexType>
 
   <xs:complexType name="DataBlockImport">
+    <xs:annotation>
+      <xs:documentation>Define how data shall be imported.</xs:documentation>
+    </xs:annotation>
     <xs:sequence>
       <xs:element name="Match" minOccurs="0">
         <xs:annotation>
