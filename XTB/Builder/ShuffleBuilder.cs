@@ -381,8 +381,10 @@ namespace Innofactor.Crm.Shuffle.Builder
 
         private static TreeNode AddChildNode(TreeNode parentNode, string name)
         {
-            var childNode = new TreeNode(name);
-            childNode.Tag = new Dictionary<string, string>();
+            var childNode = new TreeNode(name)
+            {
+                Tag = new Dictionary<string, string>()
+            };
             childNode.Name = childNode.Text.Replace(" ", "");
             var e3 = new TreeNodeMouseClickEventArgs(childNode, MouseButtons.Left, 1, 0, 0);
             parentNode.Nodes.Add(childNode);
@@ -579,7 +581,7 @@ namespace Innofactor.Crm.Shuffle.Builder
                 return;
             }
 
-            UserControl ctrl = null;
+            ControlBase ctrl = null;
             if (node != null)
             {
                 TreeNodeHelper.AddContextMenu(node, this);
