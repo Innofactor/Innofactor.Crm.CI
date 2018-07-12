@@ -1,6 +1,6 @@
-﻿namespace Cinteros.Crm.Utils.CI
+﻿namespace Innofactor.Crm.CI
 {
-    using Cinteros.Crm.Utils.CI.Cmdlets.Vendor;
+    using Innofactor.Crm.CI.Vendor;
     using System;
     using System.Collections.Generic;
     using System.IO;

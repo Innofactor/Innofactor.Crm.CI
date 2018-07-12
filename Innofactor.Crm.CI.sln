@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26228.12
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Innofactor.Crm.CI", "CI\Innofactor.Crm.CI.csproj", "{2CE10812-D7D7-40F2-94E4-63A3E7E345AC}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Innofactor.Crm.Shuffle", "Shuffle\Innofactor.Crm.Shuffle.csproj", "{C381E1B6-63D1-4F5F-9D9B-B275F3CC6687}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F8BB4722-8B8D-43B3-AB98-50E18E031574}"
@@ -101,16 +99,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Innofactor.Crm.CI.FindCrmUs
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Innofactor.Crm.CI.UpdateCrmResouces", "CI.UpdateCrmResouces\Innofactor.Crm.CI.UpdateCrmResouces.csproj", "{DA437681-4734-40BF-A1EB-82F8C5E50C76}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Innofactor.Crm.CI.Shuffle", "CI.Shuffle\Innofactor.Crm.CI.Shuffle.csproj", "{EAB7A869-E290-4262-B61E-B41AC221D45E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{2CE10812-D7D7-40F2-94E4-63A3E7E345AC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2CE10812-D7D7-40F2-94E4-63A3E7E345AC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2CE10812-D7D7-40F2-94E4-63A3E7E345AC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2CE10812-D7D7-40F2-94E4-63A3E7E345AC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C381E1B6-63D1-4F5F-9D9B-B275F3CC6687}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C381E1B6-63D1-4F5F-9D9B-B275F3CC6687}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C381E1B6-63D1-4F5F-9D9B-B275F3CC6687}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -131,6 +127,10 @@ Global
 		{DA437681-4734-40BF-A1EB-82F8C5E50C76}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DA437681-4734-40BF-A1EB-82F8C5E50C76}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DA437681-4734-40BF-A1EB-82F8C5E50C76}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EAB7A869-E290-4262-B61E-B41AC221D45E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EAB7A869-E290-4262-B61E-B41AC221D45E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EAB7A869-E290-4262-B61E-B41AC221D45E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EAB7A869-E290-4262-B61E-B41AC221D45E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

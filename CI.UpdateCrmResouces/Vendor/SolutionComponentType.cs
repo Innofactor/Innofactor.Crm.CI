@@ -3,7 +3,7 @@
 // CODEPLEX: http://xrmtoolbox.codeplex.com
 // BLOG: http://mscrmtools.blogspot.com
 
-namespace Cinteros.Crm.Utils.CI.Cmdlets.Vendor
+namespace Innofactor.Crm.CI.Vendor
 {
     public static class SolutionComponentType
     {

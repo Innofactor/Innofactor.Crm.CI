@@ -1,4 +1,4 @@
-﻿namespace Cinteros.Crm.Utils.CI.Cmdlets
+﻿namespace Innofactor.Crm.CI.Cmdlets
 {
     using Microsoft.Crm.Sdk.Messages;
     using System.Management.Automation;
