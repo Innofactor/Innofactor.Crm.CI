@@ -27,16 +27,16 @@ From [CRM Saturday](http://crmsaturday.com) in Madrid 2017-06-03 describing the 
 # Screenshots
 
 ## Available tasks
-![Tasks](Images/Tasks.png)
+![Tasks](tmages/tasks.png)
 
 ## Minify example
-![Minify task](Images/Minify.png)
+![Minify task](images/minify.png)
 
 ## Update Web Resources example
-![Update Web Resources task](Images/WebResources.png)
+![Update Web Resources task](images/resources.png)
 
 ## Update Assembly example
-![Update Assembly task](Images/Assembly.png)
+![Update Assembly task](images/assembly.png)
 
 ## Export using the Shuffle
-![Shuffle Export task](Images/Export.png)
+![Shuffle Export task](images/export.png)
