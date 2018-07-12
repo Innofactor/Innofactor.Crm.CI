@@ -1,8 +1,6 @@
-﻿namespace Cinteros.Crm.Utils.CI.Cmdlets
+﻿namespace Cinteros.Crm.Utils.CI
 {
-    using Cinteros.Crm.Utils.CI.Cmdlets.Structure;
     using Cinteros.Crm.Utils.CI.Cmdlets.Vendor;
-    using Cinteros.Crm.Utils.Common.Interfaces;
     using System;
     using System.Collections.Generic;
     using System.IO;
@@ -12,7 +10,7 @@
 
     [Cmdlet(VerbsData.Update, "CrmResources")]
     [OutputType(typeof(XmlDocument))]
-    public class UpdateCrmResouces : XrmCommandBase
+    public class UpdateCrmResouces : XrmCmdletBase
     {
         #region Public Properties
 
@@ -54,7 +52,7 @@
         protected override void ProcessRecord()
         {
             var files = GetWebResourcesFromDisk();
-            UpdateWebResources(container, files);
+            UpdateWebResources(files);
         }
 
         #endregion Protected Methods
@@ -154,7 +152,7 @@
             return resourcefiles;
         }
 
-        private void UpdateWebResources(IContainable container, List<string> files)
+        private void UpdateWebResources(List<string> files)
         {
             WriteObject(string.Format("Updating {0} webresources", files.Count));
 
@@ -170,12 +168,12 @@
                 progress.PercentComplete = (fileno * 50) / files.Count;
                 WriteProgress(progress);
 
-                var wr = WebResourceManager.RetrieveWebResource(container, crmpath);
+                var wr = WebResourceManager.RetrieveWebResource(Service, crmpath);
                 if (wr == null)
                 {
                     throw new ArgumentOutOfRangeException("file", crmpath, $"{crmpath} does not exist in target CRM. Make sure it is uploaded before updating.");
                 }
-                if (wr.Property("ismanaged", false))
+                if (wr.Attributes["ismanaged"] as bool? ?? false)
                 {
                     if (!UpdateManaged)
                     {
@@ -191,11 +189,11 @@
                 progress.PercentComplete = (fileno * 50) / files.Count;
                 WriteProgress(progress);
                 var filecontent = Convert.ToBase64String(File.ReadAllBytes(file));
-                if (filecontent != wr.Property("content", string.Empty))
+                if (filecontent != wr.Attributes["content"] as string)
                 {
-                    var updatewr = wr.Clone(true);
-                    updatewr.AddProperty("content", filecontent);
-                    updatewr.Save();
+                    var updatewr = wr;
+                    updatewr.Attributes.Add("content", filecontent);
+                    Service.Update(updatewr);
                     WriteObject($"Updated {wr}");
                     updatecount++;
                 }

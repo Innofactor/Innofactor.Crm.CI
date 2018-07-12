@@ -3,10 +3,10 @@
 // CODEPLEX: http://xrmtoolbox.codeplex.com
 // BLOG: http://mscrmtools.blogspot.com
 
-using Cinteros.Crm.Utils.Common;
-using Cinteros.Crm.Utils.Common.Interfaces;
 using Microsoft.Crm.Sdk.Messages;
+using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
+using Microsoft.Xrm.Tooling.Connector;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,9 +31,9 @@ namespace Cinteros.Crm.Utils.CI.Cmdlets.Vendor
             return System.Text.Encoding.UTF8.GetString(b);
         }
 
-        internal static void AddToSolution(this IContainable container, CintDynEntityCollection resources, string solutionUniqueName)
+        internal static void AddToSolution(this CrmServiceClient service, EntityCollection resources, string solutionUniqueName)
         {
-            foreach (var resource in resources)
+            foreach (var resource in resources.Entities)
             {
                 var request = new AddSolutionComponentRequest
                 {
@@ -43,7 +43,7 @@ namespace Cinteros.Crm.Utils.CI.Cmdlets.Vendor
                     SolutionUniqueName = solutionUniqueName
                 };
 
-                container.Service.Execute(request);
+                service.Execute(request);
             }
         }
 
@@ -51,11 +51,11 @@ namespace Cinteros.Crm.Utils.CI.Cmdlets.Vendor
         /// Creates the provided web resource
         /// </summary>
         /// <param name="webResource">Web resource to create</param>
-        internal static Guid CreateWebResource(this IContainable container, CintDynEntity webResource)
+        internal static Guid CreateWebResource(this CrmServiceClient service, Entity webResource)
         {
             try
             {
-                return webResource.Create();
+                return service.Create(webResource);
             }
             catch (Exception error)
             {
@@ -67,11 +67,11 @@ namespace Cinteros.Crm.Utils.CI.Cmdlets.Vendor
         /// Deletes the provided web resource
         /// </summary>
         /// <param name="webResource">Web resource to delete</param>
-        internal static void DeleteWebResource(this IContainable container, CintDynEntity webResource)
+        internal static void DeleteWebResource(this CrmServiceClient service, Entity webResource)
         {
             try
             {
-                webResource.Delete();
+                service.Delete(webResource.LogicalName, webResource.Id);
             }
             catch (Exception error)
             {
@@ -79,7 +79,7 @@ namespace Cinteros.Crm.Utils.CI.Cmdlets.Vendor
             }
         }
 
-        internal static bool HasDependencies(this IContainable container, Guid webresourceId)
+        internal static bool HasDependencies(this CrmServiceClient service, Guid webresourceId)
         {
             var request = new RetrieveDependenciesForDeleteRequest
             {
@@ -87,17 +87,17 @@ namespace Cinteros.Crm.Utils.CI.Cmdlets.Vendor
                 ObjectId = webresourceId
             };
 
-            var response = (RetrieveDependenciesForDeleteResponse)container.Service.Execute(request);
+            var response = (RetrieveDependenciesForDeleteResponse)service.Execute(request);
             return response.EntityCollection.Entities.Count != 0;
         }
 
-        internal static void PublishWebResources(this IContainable container, CintDynEntityCollection resources)
+        internal static void PublishWebResources(this CrmServiceClient service, EntityCollection resources)
         {
             try
             {
                 var idsXml = string.Empty;
 
-                foreach (var resource in resources)
+                foreach (var resource in resources.Entities)
                 {
                     idsXml += string.Format("<webresource>{0}</webresource>", resource.Id.ToString("B"));
                 }
@@ -107,7 +107,7 @@ namespace Cinteros.Crm.Utils.CI.Cmdlets.Vendor
                     ParameterXml = string.Format("<importexportxml><webresources>{0}</webresources></importexportxml>", idsXml)
                 };
 
-                container.Service.Execute(pxReq1);
+                service.Execute(pxReq1);
             }
             catch (Exception error)
             {
@@ -120,11 +120,11 @@ namespace Cinteros.Crm.Utils.CI.Cmdlets.Vendor
         /// </summary>
         /// <param name="webresourceId">Web resource unique identifier</param>
         /// <returns>Web resource</returns>
-        internal static CintDynEntity RetrieveWebResource(this IContainable container, Guid webresourceId)
+        internal static Entity RetrieveWebResource(this CrmServiceClient service, Guid webresourceId)
         {
             try
             {
-                return CintDynEntity.Retrieve(container, "webresource", webresourceId, new ColumnSet(true));
+                return service.Retrieve("webresource", webresourceId, new ColumnSet(true));
             }
             catch (Exception error)
             {
@@ -137,7 +137,7 @@ namespace Cinteros.Crm.Utils.CI.Cmdlets.Vendor
         /// </summary>
         /// <param name="name">Web resource unique name</param>
         /// <returns>Web resource</returns>
-        internal static CintDynEntity RetrieveWebResource(this IContainable container, string name)
+        internal static Entity RetrieveWebResource(this CrmServiceClient service, string name)
         {
             try
             {
@@ -146,14 +146,14 @@ namespace Cinteros.Crm.Utils.CI.Cmdlets.Vendor
                 qba.Values.Add(name);
                 qba.ColumnSet = new ColumnSet(true);
 
-                var collection = CintDynEntity.RetrieveMultiple(container, qba);
+                var collection = service.RetrieveMultiple(qba);
 
-                if (collection.Count > 1)
+                if (collection.Entities.Count > 1)
                 {
                     throw new Exception(string.Format("there are more than one web resource with name '{0}'", name));
                 }
 
-                return collection.FirstOrDefault();
+                return collection.Entities.FirstOrDefault();
             }
             catch (Exception error)
             {
@@ -165,7 +165,7 @@ namespace Cinteros.Crm.Utils.CI.Cmdlets.Vendor
         /// Retrieves all web resources that are customizable
         /// </summary>
         /// <returns>List of web resources</returns>
-        internal static CintDynEntityCollection RetrieveWebResources(this IContainable container, Guid solutionId, List<int> types, bool hideMicrosoftWebresources)
+        internal static EntityCollection RetrieveWebResources(this CrmServiceClient service, Guid solutionId, List<int> types, bool hideMicrosoftWebresources)
         {
             try
             {
@@ -213,7 +213,7 @@ namespace Cinteros.Crm.Utils.CI.Cmdlets.Vendor
                         qe.Criteria.Filters.First().Conditions.Add(new ConditionExpression("webresourcetype", ConditionOperator.In, types.ToArray()));
                     }
 
-                    return CintDynEntity.RetrieveMultiple(container, qe);
+                    return service.RetrieveMultiple(qe);
                 }
                 else
                 {
@@ -224,9 +224,12 @@ namespace Cinteros.Crm.Utils.CI.Cmdlets.Vendor
                     qba.Attributes.AddRange(new[] { "solutionid", "componenttype" });
                     qba.Values.AddRange(new object[] { solutionId, 61 });
 
-                    var components = CintDynEntity.RetrieveMultiple(container, qba);
+                    var components = service.RetrieveMultiple(qba);
 
-                    var list = components.Select(component => component.Property("objectid", Guid.Empty).ToString("B")).ToList();
+                    var list = components.Entities
+                        .Select(x => x.Attributes["objectid"])
+                        .Where(x => x != null)
+                        .Select(x => ((Guid)x).ToString("B")).ToList();
 
                     if (list.Count > 0)
                     {
@@ -265,10 +268,10 @@ namespace Cinteros.Crm.Utils.CI.Cmdlets.Vendor
                             qe.Criteria.Filters.First().Conditions.Add(new ConditionExpression("webresourcetype", ConditionOperator.In, types.ToArray()));
                         }
 
-                        return CintDynEntity.RetrieveMultiple(container, qe);
+                        return service.RetrieveMultiple(qe);
                     }
 
-                    return new CintDynEntityCollection();
+                    return new EntityCollection();
                 }
             }
             catch (Exception error)
@@ -281,7 +284,7 @@ namespace Cinteros.Crm.Utils.CI.Cmdlets.Vendor
         /// Updates the provided web resource
         /// </summary>
         /// <param name="wr">Web resource to update</param>
-        internal static void UpdateWebResource(this IContainable container, CintDynEntity wr)
+        internal static void UpdateWebResource(this CrmServiceClient service, Entity wr)
         {
             try
             {
@@ -289,11 +292,11 @@ namespace Cinteros.Crm.Utils.CI.Cmdlets.Vendor
 
                 if (!script.Contains("webresourceid"))
                 {
-                    var existingEntity = container.RetrieveWebResource(script.Property("name", ""));
+                    var existingEntity = service.RetrieveWebResource(script.Attributes["name"] as string);
 
                     if (existingEntity == null)
                     {
-                        script.Id = container.CreateWebResource(script);
+                        script.Id = service.CreateWebResource(script);
                     }
                     else
                     {
@@ -301,20 +304,20 @@ namespace Cinteros.Crm.Utils.CI.Cmdlets.Vendor
 
                         if (!script.Contains("displayname") && existingEntity.Contains("displayname"))
                         {
-                            script.AddProperty("displayname", existingEntity.Property("displayname", ""));
+                            script.Attributes.Add("displayname", existingEntity.Attributes["displayname"]);
                         }
 
                         if (!script.Contains("description") && existingEntity.Contains("description"))
                         {
-                            script.AddProperty("description", existingEntity.Property("description", ""));
+                            script.Attributes.Add("description", existingEntity.Attributes["description"]);
                         }
 
-                        script.Save();
+                        service.Update(script);
                     }
                 }
                 else
                 {
-                    script.Save();
+                    service.Update(script);
                 }
             }
             catch (Exception error)
