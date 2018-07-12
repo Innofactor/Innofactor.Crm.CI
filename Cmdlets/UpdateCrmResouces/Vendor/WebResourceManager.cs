@@ -11,7 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Innofactor.Crm.CI.Vendor
+namespace Innofactor.Crm.CI.Cmdlets.Vendor
 {
     /// <summary>
     /// Class that manages action on web resources

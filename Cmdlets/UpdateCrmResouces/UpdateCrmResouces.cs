@@ -1,6 +1,6 @@
-﻿namespace Innofactor.Crm.CI
+﻿namespace Innofactor.Crm.CI.Cmdlets
 {
-    using Innofactor.Crm.CI.Vendor;
+    using Innofactor.Crm.CI.Cmdlets.Vendor;
     using System;
     using System.Collections.Generic;
     using System.IO;

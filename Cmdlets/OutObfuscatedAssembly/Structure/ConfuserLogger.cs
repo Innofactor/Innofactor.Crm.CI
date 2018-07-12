@@ -1,4 +1,4 @@
-﻿namespace Innofactor.Crm.CI.Structure
+﻿namespace Innofactor.Crm.CI.Cmdlets.Structure
 {
     using Confuser.Core;
     using System;

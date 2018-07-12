@@ -1,4 +1,4 @@
-﻿namespace Innofactor.Crm.CI.Structure
+﻿namespace Innofactor.Crm.CI.Cmdlets.Structure
 {
     public class ShuffleImportResult
     {

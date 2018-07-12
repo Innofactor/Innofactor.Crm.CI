@@ -1,4 +1,4 @@
-﻿namespace Innofactor.Crm.CI.Cmdlets
+﻿namespace Innofactor.Crm.CI.Cmdlets.Cmdlets
 {
     using Microsoft.Crm.Sdk.Messages;
     using System.Management.Automation;

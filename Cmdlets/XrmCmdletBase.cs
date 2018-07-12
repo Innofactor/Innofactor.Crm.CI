@@ -1,7 +1,7 @@
 ﻿// Heavily inspired by Wael Hamze xrm-ci-framework
 // https://github.com/WaelHamze/xrm-ci-framework/blob/master/CRM365/Xrm.Framework.CI/Xrm.Framework.CI.PowerShell.Cmdlets/XrmCommandBase.cs
 
-namespace Innofactor.Crm.CI
+namespace Innofactor.Crm.CI.Cmdlets
 {
     using Microsoft.Xrm.Tooling.Connector;
     using System.Management.Automation;

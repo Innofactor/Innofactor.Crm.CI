@@ -1,7 +1,7 @@
-﻿namespace Innofactor.Crm.CI
+﻿namespace Innofactor.Crm.CI.Cmdlets
 {
     using Cinteros.Crm.Utils.Shuffle;
-    using Innofactor.Crm.CI.Structure;
+    using Innofactor.Crm.CI.Cmdlets.Structure;
     using System;
     using System.Management.Automation;
     using System.Xml;
