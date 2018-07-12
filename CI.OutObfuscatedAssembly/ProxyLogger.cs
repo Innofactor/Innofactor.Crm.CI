@@ -1,4 +1,4 @@
-﻿namespace Cinteros.Crm.Utils.CI.Cmdlets.Structure
+﻿namespace Cinteros.Crm.Utils.CI
 {
     using Confuser.Core;
     using System;
