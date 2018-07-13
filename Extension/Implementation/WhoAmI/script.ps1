@@ -8,10 +8,10 @@ Write-Verbose "Script Path      : $scriptPath"
 Write-Verbose "Connection String: $ConnectionString"
 
 #Load DevUtils.CI
-$DevUtilsCI = $scriptPath + "\ps_modules\DevUtils.CI\Innofactor.Crm.CI.dll"
-Write-Verbose "Importing DevUtils.CI: $DevUtilsCI" 
-Import-Module $DevUtilsCI
-Write-Verbose "Imported DevUtils.CI"
+$CI = $scriptPath + "\ps_modules\CI\Innofactor.Crm.CI.dll"
+Write-Verbose "Importing CI module from: $CI" 
+Import-Module $CI
+Write-Verbose "CI module was successfully imported"
 
 $executingUser = Find-CrmUser -ConnectionString $ConnectionString -Verbose
 

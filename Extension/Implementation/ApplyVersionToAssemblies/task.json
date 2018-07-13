@@ -17,6 +17,13 @@
     "Patch": "16"
   },
   "minimumAgentVersion": "1.95.0",
+  "groups": [
+    {
+      "name": "advanced",
+      "displayName": "Advanced",
+      "isExpanded": false
+    }
+  ],
   "inputs": [
     {
       "name": "versionType",
@@ -38,6 +45,15 @@
       "visibleRule": "versionType = file",
       "required": false,
       "helpMarkDown": "Text file with version information. Revision number will be appended to it."
+    },
+    {
+      "name": "versionMatch",
+      "type": "boolean",
+      "label": "Match CRM SDK major and minor versions",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "Replace first two digits in resulting version with Microsoft Dynamics CRM SDK version found in `packages.config`",
+      "groupName": "advanced"
     }
   ],
   "instanceNameFormat": "Apply Build Version to assemblies",

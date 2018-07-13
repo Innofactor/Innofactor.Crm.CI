@@ -44,10 +44,10 @@ else
 }
 
 #Load DevUtils.CI
-$DevUtilsCI = $scriptPath + "\ps_modules\DevUtils.CI\Innofactor.Crm.CI.dll"
-Write-Verbose "Importing DevUtils.CI: $DevUtilsCI" 
-Import-Module $DevUtilsCI
-Write-Verbose "Imported DevUtils.CI"
+$CI = $scriptPath + "\ps_modules\CI\Innofactor.Crm.CI.dll"
+Write-Verbose "Importing CI module from: $CI" 
+Import-Module $CI
+Write-Verbose "CI module was successfully imported"
 
 Write-Host "Starting export"
 

@@ -16,7 +16,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Extension", "Extension", "{
 	ProjectSection(SolutionItems) = preProject
 		Extension\icon128x128.png = Extension\icon128x128.png
 		Extension\icon512x512.png = Extension\icon512x512.png
-		Extension\pack.cmd = Extension\pack.cmd
+		Extension\pack.ps1 = Extension\pack.ps1
 		Extension\vss-extension.json = Extension\vss-extension.json
 		Extension\WebResourcePatternSample.txt = Extension\WebResourcePatternSample.txt
 	EndProjectSection

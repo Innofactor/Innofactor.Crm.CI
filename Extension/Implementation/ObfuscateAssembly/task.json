@@ -4,7 +4,7 @@
   "friendlyName": "Innofactor DevOps: Obfuscate Assembly",
   "description": "Replaces assembly with its obfuscated version",
   "author": "Innofactor Sweden",
-  "helpMarkDown": "",
+  "helpMarkDown": "This task will replace provided assembly with its obfuscated copy",
   "category": "Build",
   "visibility": [
     "Build",
@@ -14,7 +14,7 @@
   "version": {
     "Major": "9",
     "Minor": "0",
-    "Patch": "3"
+    "Patch": "6"
   },
   "minimumAgentVersion": "1.95.0",
   "groups": [
@@ -23,7 +23,7 @@
       "displayName": "Advanced",
       "isExpanded": false
     }
-  ], 
+  ],
   "instanceNameFormat": "Obfuscate Assembly",
   "inputs": [
     {

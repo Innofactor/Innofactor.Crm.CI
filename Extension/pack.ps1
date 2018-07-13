@@ -1,7 +1,6 @@
 Write-Host
 Write-Host
 Write-Host
-
 Write-Host "Assembling extension..."
 
 $Input	= (Get-Item -Path ".\..\Cmdlets\").FullName
@@ -9,7 +8,6 @@ $Temp	  = (Get-Item -Path ".\Implementation\").FullName
 $Output = (Get-Item -Path ".\VSIX\").FullName
 
 Write-Host
-
 Write-Host "Cmdlets will be taken from:       '$Input'"
 Write-Host "Extension will be assemblied in:  '$Temp'"
 Write-Host "Binary result will be stored in:  '$Output'"
@@ -68,13 +66,8 @@ foreach($Folder in $CmdletFolders)
 }
 
 Write-Host
-
 Write-Host "Downloading latest VSTS SDK..."
-
 Save-Module -Name VstsTaskSdk -Path .
-
-Write-Host
-
 Write-Host "Copying required files to:"
 
 for ($i = 0; $i -lt $SourceFolders.Length; $i++)
@@ -84,7 +77,7 @@ for ($i = 0; $i -lt $SourceFolders.Length; $i++)
     Copy-Item -Path ($SourceFolders[$i]) -Filter "*.dll" -Recurse -Destination ($DestinationFolders[$i] + "\CI\") -Container
   }
 
-  Copy-Item -Path ".\VstsTaskSdk" -Recurse -Destination $DestinationFolders[$i] -Container
+  Copy-Item -Path (Get-ChildItem ".\VstsTaskSdk\")[0].FullName -Recurse -Destination ($DestinationFolders[$i] + "\VstsTaskSdk\") -Container
 
   Write-Host " * " $DestinationFolders[$i]
 }
@@ -94,14 +87,13 @@ Remove-Item -Path ".\VstsTaskSdk" -Recurse -Force
 Write-Host
 Write-Host
 Write-Host
-
 Write-Host "Packing extension..."
 
-$Command = "tfx extension publish --manifest-globs .\vss-extension.json --output-path .\VSIX"
+$Arguments = "--manifest-globs .\vss-extension.json --output-path $Output"
 
 if ((Read-Host -Prompt "Update revision? [Y/N]").ToLower() -eq "y")
 {
-  $Command += " --rev-version"
+  $Arguments += " --rev-version"
 }
 
 if ((Read-Host -Prompt "Publish extension? [Y/N]").ToLower() -eq "y")
@@ -116,7 +108,13 @@ if ((Read-Host -Prompt "Publish extension? [Y/N]").ToLower() -eq "y")
     $PAT = Get-Content -Path ".\pat.txt"
   }
 
-  $Command += " --token $PAT"
+  $Arguments += " --token $PAT"
+
+  $Command = "tfx extension publish $Arguments"
+}
+else
+{
+  $Command = "tfx extension create $Arguments"
 }
 
 Invoke-Expression $Command

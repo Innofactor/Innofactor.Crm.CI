@@ -54,8 +54,9 @@ Write-Host "BUILD_BUILDNUMBER: $Env:BUILD_BUILDNUMBER"
 $VersionRegex = "\d+\.\d+\.\d+\.\d+"
 
 # Getting input from UI
-$VersionType = Get-VstsInput -Name versionType -Require
-$VersionFile = Get-VstsInput -Name versionFile
+$VersionType	= Get-VstsInput -Name versionType -Require
+$VersionFile	= Get-VstsInput -Name versionFile
+$VersionMatch	= Get-VstsInput -Name versionMatch -AsBool
 
 # File with resulting version
 $VersionResult = Join-Path $Env:AGENT_BUILDDIRECTORY "version.txt"
@@ -87,7 +88,7 @@ if ($VersionType -eq "file")
 }
 else
 {
-# Get and validate the version data
+	# Get and validate the version data
     $VersionData = [regex]::matches($Env:BUILD_BUILDNUMBER,$VersionRegex)
 
     switch($VersionData.Count)
@@ -106,6 +107,11 @@ else
     }
 
     $NewVersion = $VersionData[0]
+}
+
+if ($VersionMatch)
+{
+
 }
 
 Write-Host "Version: $NewVersion"
