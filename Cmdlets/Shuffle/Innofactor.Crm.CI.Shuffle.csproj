@@ -7,8 +7,8 @@
     <ProjectGuid>{EAB7A869-E290-4262-B61E-B41AC221D45E}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Innofactor.Crm.CI.Shuffle</RootNamespace>
-    <AssemblyName>Innofactor.Crm.CI.Shuffle</AssemblyName>
+    <RootNamespace>Innofactor.Crm.CI.Cmdlets</RootNamespace>
+    <AssemblyName>Innofactor.Crm.CI</AssemblyName>
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />

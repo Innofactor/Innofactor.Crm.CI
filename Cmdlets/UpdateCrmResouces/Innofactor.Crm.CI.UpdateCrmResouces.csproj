@@ -7,8 +7,8 @@
     <ProjectGuid>{DA437681-4734-40BF-A1EB-82F8C5E50C76}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Innofactor.Crm.CI.UpdateCrmResouces</RootNamespace>
-    <AssemblyName>Innofactor.Crm.CI.UpdateCrmResouces</AssemblyName>
+    <RootNamespace>Innofactor.Crm.CI.Cmdlets</RootNamespace>
+    <AssemblyName>Innofactor.Crm.CI</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

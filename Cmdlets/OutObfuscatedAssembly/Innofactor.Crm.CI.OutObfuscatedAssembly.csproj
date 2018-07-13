@@ -7,8 +7,8 @@
     <ProjectGuid>{A8F00F15-936D-40CE-9C4D-EB4554EE9601}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Innofactor.Crm.CI.OutObfuscatedAssembly</RootNamespace>
-    <AssemblyName>Innofactor.Crm.CI.OutObfuscatedAssembly</AssemblyName>
+    <RootNamespace>Innofactor.Crm.CI.Cmdlets</RootNamespace>
+    <AssemblyName>Innofactor.Crm.CI</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
