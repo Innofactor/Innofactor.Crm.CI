@@ -31,24 +31,24 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Confuser.Core">
-      <HintPath>..\packages\ConfuserEx.Final.1.0.0\tools\Confuser.Core.dll</HintPath>
+      <HintPath>..\..\packages\ConfuserEx.Final.1.0.0\tools\Confuser.Core.dll</HintPath>
     </Reference>
     <Reference Include="Confuser.DynCipher">
-      <HintPath>..\packages\ConfuserEx.Final.1.0.0\tools\Confuser.DynCipher.dll</HintPath>
+      <HintPath>..\..\packages\ConfuserEx.Final.1.0.0\tools\Confuser.DynCipher.dll</HintPath>
     </Reference>
     <Reference Include="Confuser.Protections">
-      <HintPath>..\packages\ConfuserEx.Final.1.0.0\tools\Confuser.Protections.dll</HintPath>
+      <HintPath>..\..\packages\ConfuserEx.Final.1.0.0\tools\Confuser.Protections.dll</HintPath>
     </Reference>
     <Reference Include="Confuser.Renamer">
-      <HintPath>..\packages\ConfuserEx.Final.1.0.0\tools\Confuser.Renamer.dll</HintPath>
+      <HintPath>..\..\packages\ConfuserEx.Final.1.0.0\tools\Confuser.Renamer.dll</HintPath>
     </Reference>
     <Reference Include="Confuser.Runtime">
-      <HintPath>..\packages\ConfuserEx.Final.1.0.0\tools\Confuser.Runtime.dll</HintPath>
+      <HintPath>..\..\packages\ConfuserEx.Final.1.0.0\tools\Confuser.Runtime.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Management.Automation, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.PowerShell.5.ReferenceAssemblies.1.1.0\lib\net4\System.Management.Automation.dll</HintPath>
+      <HintPath>..\..\packages\Microsoft.PowerShell.5.ReferenceAssemblies.1.1.0\lib\net4\System.Management.Automation.dll</HintPath>
     </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
