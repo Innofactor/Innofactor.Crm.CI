@@ -85,7 +85,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\XrmCmdletBase.cs">
+    <Compile Include="..\XrmCmdletBase.cs">
       <Link>XrmCmdletBase.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
