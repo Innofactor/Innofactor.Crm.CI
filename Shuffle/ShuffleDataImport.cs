@@ -2,6 +2,7 @@
 {
     using Cinteros.Crm.Utils.Common;
     using Cinteros.Crm.Utils.Shuffle.Types;
+    using Microsoft.Crm.Sdk.Messages;
     using Microsoft.Xrm.Sdk;
     using Microsoft.Xrm.Sdk.Query;
     using System;
@@ -280,7 +281,7 @@
                 }
                 var matchattributes = GetMatchAttributes(block.Import.Match);
                 var updateattributes = !updateidentical ? GetUpdateAttributes(cEntities) : new List<string>();
-                var preretrieveall = (bool)block.Import.Match?.PreRetrieveAll;
+                var preretrieveall = block.Import.Match?.PreRetrieveAll ?? false;
 
                 SendLine();
                 SendLine("Importing block {0} - {1} records ", name, cEntities.Count);
@@ -602,13 +603,36 @@
                 {   // Justering för inaktiverad men ej publicerad vy
                     newStatusValue = 2;
                 }
-                cdNewEntity.SetState(newState.Value, newStatusValue);
-                SendLine("{0:000} SetState: {1}: {2}/{3}", pos, identifier, newState.Value, newStatus.Value);
+                if (cdNewEntity.Name == "duplicaterule")
+                {
+                    if (newStatusValue == 2)
+                    {
+                        cdNewEntity.PublishDuplicateRule();
+                        SendLine("{0:000} Publish Duplicate Rule: {1}", pos, identifier);
+                    }
+                    else
+                    {
+                        cdNewEntity.UnpublishDuplicateRule();
+                        SendLine("{0:000} Unpublish Duplicate Rule: {1}", pos, identifier);
+                    }
+                }
+                else
+                {
+                    cdNewEntity.SetState(newState.Value, newStatusValue);
+                    SendLine("{0:000} SetState: {1}: {2}/{3}", pos, identifier, newState.Value, newStatus.Value);
+                }
+
             }
             log.EndSection();
             return recordSaved;
         }
 
         #endregion Private Methods
+    }
+
+    internal static class DuplicateRuleExt
+    {
+        public static void UnpublishDuplicateRule(this CintDynEntity duplicateRule) => duplicateRule.Container.Service.Execute(new UnpublishDuplicateRuleRequest { DuplicateRuleId = duplicateRule.Id });
+        public static void PublishDuplicateRule(this CintDynEntity duplicateRule) => duplicateRule.Container.Service.Execute(new PublishDuplicateRuleRequest { DuplicateRuleId = duplicateRule.Id });
     }
 }
