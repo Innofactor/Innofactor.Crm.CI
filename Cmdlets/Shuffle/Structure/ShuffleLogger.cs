@@ -47,7 +47,6 @@
             }
 
             cmdlet.WriteVerbose($"Finished {timeString}");
-            //WriteLineWithColor(ConsoleColor.Green, "Finished " + timeString);
         }
 
         public void EndSection() =>
