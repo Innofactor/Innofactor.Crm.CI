@@ -3,8 +3,10 @@
     using Cinteros.Crm.Utils.Common;
     using Cinteros.Crm.Utils.Common.Interfaces;
     using Microsoft.Xrm.Sdk.Client;
-    using Microsoft.Xrm.Tooling.Connector;
 
+    /// <summary>
+    /// Implementation of IContainable for Shuffle
+    /// </summary>
     internal class ShuffleContainer : IContainable
     {
         #region Private Fields
@@ -17,19 +19,17 @@
 
         #region Internal Constructors
 
-        internal ShuffleContainer(CrmServiceClient client)
-        {
-            service = client.OrganizationServiceProxy;
-        }
         internal ShuffleContainer(XrmCmdletBase cmdlet)
         {
             this.cmdlet = cmdlet;
+            service = cmdlet.Service.OrganizationServiceProxy;
         }
+
         #endregion Internal Constructors
 
         #region Public Properties
 
-        public ILoggable Logger => new ShuffleLogger();
+        public ILoggable Logger => new ShuffleLogger(cmdlet);
 
         public IServicable Service => new CrmServiceProxy(service);
 
