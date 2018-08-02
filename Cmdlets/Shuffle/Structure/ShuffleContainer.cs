@@ -11,6 +11,8 @@
 
         private readonly OrganizationServiceProxy service;
 
+        private readonly XrmCmdletBase cmdlet;
+
         #endregion Private Fields
 
         #region Internal Constructors
@@ -19,7 +21,10 @@
         {
             service = client.OrganizationServiceProxy;
         }
-
+        internal ShuffleContainer(XrmCmdletBase cmdlet)
+        {
+            this.cmdlet = cmdlet;
+        }
         #endregion Internal Constructors
 
         #region Public Properties

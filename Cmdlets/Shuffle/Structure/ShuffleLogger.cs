@@ -11,14 +11,15 @@
 
         private readonly DateTime begin;
         private string name;
-
+        private readonly XrmCmdletBase cmdlet;
         #endregion Private Fields
 
         #region Public Constructors
 
-        public ShuffleLogger()
+        public ShuffleLogger(XrmCmdletBase cmdlet)
         {
             begin = DateTime.Now;
+            this.cmdlet = cmdlet;
         }
 
         #endregion Public Constructors
@@ -38,7 +39,7 @@
                 now.Subtract(begin).Seconds);
             if (!string.IsNullOrEmpty(closetext))
             {
-                Console.Title = $"Suffle - {closetext}";
+                Console.Title = $"Shuffle - {closetext}";
             }
 
             WriteLineWithColor(ConsoleColor.Green, "Finished " + timeString);
@@ -94,6 +95,7 @@
 
         private static void WriteLineWithColor(ConsoleColor color, string txt)
         {
+            
             var original = Console.ForegroundColor;
             Console.ForegroundColor = color;
             Console.WriteLine(txt);
