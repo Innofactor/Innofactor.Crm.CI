@@ -2,7 +2,7 @@
   "manifestVersion": 1,
   "id": "cinteros-devutils-ci-build-tasks",
   "name": "DevOps for Microsoft Dynamics 365",
-  "version": "9.0.24",
+  "version": "9.0.32",
   "publisher": "InnofactorSE",
   "targets": [
     {
@@ -52,7 +52,7 @@
   },
   "links": {
     "learn": {
-      "uri": "http://jonasrapp.innofactor.se/2017/04/DevOps-I.html"
+      "uri": "http://jonasrapp.net/2017/04/devops-i/"
     },
     "repository": {
       "uri": "https://github.com/Innofactor/Innofactor.Crm.CI"

@@ -310,7 +310,7 @@ namespace Cinteros.Crm.Utils.Shuffle
                         {
                             if (blocks.ContainsKey(name))
                             {
-                                SendLine("Block already added: {0}", name);
+                                SendLine($"Block already added: {name}");
                             }
                             else
                             {

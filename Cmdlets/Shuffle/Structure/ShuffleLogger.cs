@@ -5,20 +5,25 @@
     using Microsoft.Xrm.Sdk.Query;
     using System;
 
+    /// <summary>
+    /// Implementation of ILoggable for Shuffle
+    /// </summary>
     internal class ShuffleLogger : ILoggable
     {
         #region Private Fields
 
         private readonly DateTime begin;
         private string name;
+        private readonly XrmCmdletBase cmdlet;
 
         #endregion Private Fields
 
         #region Public Constructors
 
-        public ShuffleLogger()
+        public ShuffleLogger(XrmCmdletBase cmdlet)
         {
             begin = DateTime.Now;
+            this.cmdlet = cmdlet;
         }
 
         #endregion Public Constructors
@@ -38,23 +43,22 @@
                 now.Subtract(begin).Seconds);
             if (!string.IsNullOrEmpty(closetext))
             {
-                Console.Title = $"Suffle - {closetext}";
+                Console.Title = $"Shuffle - {closetext}";
             }
 
-            WriteLineWithColor(ConsoleColor.Green, "Finished " + timeString);
+            cmdlet.WriteVerbose($"Finished {timeString}");
         }
 
         public void EndSection() =>
-            WriteLineWithColor(ConsoleColor.Gray, $" [END of {name}]");
+           cmdlet.WriteVerbose($" [END of {name}]");
 
         public void Log(string message) =>
-            WriteLineWithColor(ConsoleColor.White, " [INFO] " + message);
+           cmdlet.WriteDebug($" [INFO] {message}");
 
-        public void Log(Exception ex) =>
-            WriteLineWithColor(ConsoleColor.Red, "Exception: " + ex);
+        public void Log(Exception ex) => cmdlet.WriteDebug(ex.Message);
 
         public void Log(string message, params object[] arg) =>
-            WriteLineWithColor(ConsoleColor.White, " [INFO] " + string.Format(message, arg));
+          cmdlet.WriteVerbose(" [INFO] " + string.Format(message, arg));
 
         public void LogIf(bool condition, string message)
         {
@@ -83,23 +87,10 @@
 
         public void StartSection(string name)
         {
-            WriteLineWithColor(ConsoleColor.Gray, $" [START of {name}]");
-
+            cmdlet.WriteVerbose($" [START of {name}]");
             this.name = name;
         }
 
         #endregion Public Methods
-
-        #region Private Methods
-
-        private static void WriteLineWithColor(ConsoleColor color, string txt)
-        {
-            var original = Console.ForegroundColor;
-            Console.ForegroundColor = color;
-            Console.WriteLine(txt);
-            Console.ForegroundColor = original;
-        }
-
-        #endregion Private Methods
     }
 }
