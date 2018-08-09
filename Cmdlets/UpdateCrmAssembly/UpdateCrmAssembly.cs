@@ -60,7 +60,6 @@
             var file = ReadFile(AssemblyFile);
             WriteVerbose("Loading assembly file");
             var assembly = Assembly.Load(file);
-
             var chunks = assembly.FullName.Split(new string[] { ", ", "Version=", "Culture=", "PublicKeyToken=" }, StringSplitOptions.RemoveEmptyEntries);
             filename = chunks[0];
             fileversion = new Version(chunks[1]);
@@ -114,14 +113,21 @@
 
         private void UpdateAssembly(Entity plugin)
         {
-            WriteVerbose("Reading assembly file " + AssemblyFile);
-            var file = ReadFile(AssemblyFile);
-            WriteVerbose("Adding Base64String to entity");
-            var updateplugin = plugin;
-            updateplugin.Attributes.Add("version", fileversion.ToString());
-            updateplugin.Attributes.Add("content", Convert.ToBase64String(file));
-            WriteObject("Saving updated assembly record");
-            Service.Update(updateplugin);
+            try
+            {
+                WriteVerbose("Reading assembly file " + AssemblyFile);
+                var file = ReadFile(AssemblyFile);
+                WriteVerbose("Adding Base64String to entity");
+                var updateplugin = plugin;
+                updateplugin.Attributes.Add("version", fileversion.ToString());
+                updateplugin.Attributes.Add("content", Convert.ToBase64String(file));
+                WriteObject("Saving updated assembly record");
+                Service.Update(updateplugin);
+            }
+            catch (Exception ex)
+            {
+               WriteError(new ErrorRecord(ex, "UpdateCrmAssembly", ErrorCategory.WriteError,  plugin));
+            }
         }
 
         #endregion Private Methods
