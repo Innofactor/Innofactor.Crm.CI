@@ -7,7 +7,9 @@ using Microsoft.Xrm.Sdk.Metadata;
 using Microsoft.Xrm.Sdk.Query;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Windows.Forms;
 using System.Xml;
 using System.Xml.Linq;
@@ -122,7 +124,10 @@ namespace Innofactor.Crm.Shuffle.Builder
                 fileName = sfd.FileName;
                 EnableControls(false);
                 var doc = GetDefinitionDocument();
-                doc.Save(fileName);
+                using (var sw = new StreamWriter(fileName, false, new UTF8Encoding(true)))
+                {
+                    doc.Save(sw);
+                }
                 MessageBox.Show(this, "ShuffleDefinition saved!", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 EnableControls(true);
             }
