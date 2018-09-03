@@ -11,7 +11,7 @@ namespace Innofactor.Crm.CI.Cmdlets
     {
         #region Private Fields
 
-        private int DefaultTime = 120;
+        private readonly int DefaultTime = 120;
 
         #endregion Private Fields
 
@@ -41,7 +41,7 @@ namespace Innofactor.Crm.CI.Cmdlets
 
         #region Protected Properties
 
-        protected CrmServiceClient Service
+        internal CrmServiceClient Service
         {
             get;
             private set;
@@ -56,7 +56,7 @@ namespace Innofactor.Crm.CI.Cmdlets
             base.BeginProcessing();
             SetSecurityProtocol();
             WriteDebug("Connecting to CRM");
-            WriteVerbose("Creating CrmServiceClient with: " + ConnectionString);
+            WriteVerbose($"Creating CrmServiceClient with: {ConnectionString}");
             Service = new CrmServiceClient(ConnectionString);
             if (Service == null)
             {
@@ -64,7 +64,7 @@ namespace Innofactor.Crm.CI.Cmdlets
             }
             if (Service.OrganizationServiceProxy == null)
             {
-                throw new PSArgumentException("Connection not established. Last CRM error message:\n" + Service.LastCrmError, "ConnectionString");
+                throw new PSArgumentException($"Connection not established. Last CRM error message:\n{Service.LastCrmError}", "ConnectionString");
             }
             if (Timeout == 0)
             {
@@ -85,7 +85,7 @@ namespace Innofactor.Crm.CI.Cmdlets
 
         private void SetSecurityProtocol()
         {
-            WriteVerbose(string.Format("Current Security Protocol: {0}", ServicePointManager.SecurityProtocol));
+            WriteVerbose($"Current Security Protocol: {ServicePointManager.SecurityProtocol}");
             if (!ServicePointManager.SecurityProtocol.HasFlag(SecurityProtocolType.Tls11))
             {
                 ServicePointManager.SecurityProtocol = ServicePointManager.SecurityProtocol ^ SecurityProtocolType.Tls11;
@@ -94,7 +94,7 @@ namespace Innofactor.Crm.CI.Cmdlets
             {
                 ServicePointManager.SecurityProtocol = ServicePointManager.SecurityProtocol ^ SecurityProtocolType.Tls12;
             }
-            WriteVerbose(string.Format("Modified Security Protocol: {0}", ServicePointManager.SecurityProtocol));
+            WriteVerbose($"Modified Security Protocol: {ServicePointManager.SecurityProtocol}");
         }
 
         #endregion Private Methods

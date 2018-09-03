@@ -48,7 +48,7 @@
             try
             {
                 WriteDebug("Exporting");
-                var doc = Shuffler.QuickExport(new ShuffleContainer(Service), Definition, Type, ';', ShuffleListener, Folder, true);
+                var doc = Shuffler.QuickExport(new ShuffleContainer(this), Definition, Type, ';', ShuffleListener, Folder, true);
                 WriteObject(doc);
             }
             catch (Exception ex)
