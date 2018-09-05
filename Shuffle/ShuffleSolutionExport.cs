@@ -1,9 +1,11 @@
 ﻿namespace Cinteros.Crm.Utils.Shuffle
 {
-    using Cinteros.Crm.Utils.Common;
+    using Cinteros.Crm.Utils.Common.Interfaces;
+    using Cinteros.Crm.Utils.Common.Slim;
     using Cinteros.Crm.Utils.Misc;
     using Cinteros.Crm.Utils.Shuffle.Types;
     using Microsoft.Crm.Sdk.Messages;
+    using Microsoft.Xrm.Sdk;
     using Microsoft.Xrm.Sdk.Query;
     using System;
     using System.Collections.Generic;
@@ -14,11 +16,11 @@
     {
         #region Private Methods
 
-        private void ExportSolutionBlock(SolutionBlock block)
+        private void ExportSolutionBlock(IContainable container, SolutionBlock block)
         {
-            log.StartSection("ExportSolutionBlock");
+            container.Logger.StartSection("ExportSolutionBlock");
             var name = block.Name;
-            log.Log("Block: {0}", name);
+            container.Logger.Log("Block: {0}", name);
             var path = block.Path;
             var file = block.File;
             if (string.IsNullOrWhiteSpace(path) && !string.IsNullOrWhiteSpace(definitionpath))
@@ -37,20 +39,20 @@
                 var publish = block.Export.PublishBeforeExport;
                 var targetversion = block.Export.TargetVersion;
 
-                var cdSolution = GetAndVerifySolutionForExport(name);
-                var currentversion = new Version(cdSolution.Property("version", "1.0.0.0"));
+                var cdSolution = GetAndVerifySolutionForExport(container, name);
+                var currentversion = new Version(cdSolution.GetAttribute("version", "1.0.0.0"));
 
-                SendLine("Solution: {0} {1}", name, currentversion);
+                SendLine(container, "Solution: {0} {1}", name, currentversion);
 
                 if (!string.IsNullOrWhiteSpace(setversion))
                 {
-                    SetNewSolutionVersion(setversion, cdSolution, currentversion);
+                    SetNewSolutionVersion(container, setversion, cdSolution, currentversion);
                 }
 
                 if (publish)
                 {
-                    SendLine("Publishing customizations");
-                    crmsvc.Execute(new PublishAllXmlRequest());
+                    SendLine(container, "Publishing customizations");
+                    container.Service.Execute(new PublishAllXmlRequest());
                 }
 
                 var req = new ExportSolutionRequest()
@@ -79,38 +81,38 @@
                 if (type == SolutionTypes.Managed || type == SolutionTypes.Both)
                 {
                     var filename = path + file + "_managed.zip";
-                    SendLine("Exporting solution to: {0}", filename);
+                    SendLine(container, "Exporting solution to: {0}", filename);
                     req.Managed = true;
-                    var exportSolutionResponse = (ExportSolutionResponse)crmsvc.Execute(req);
+                    var exportSolutionResponse = (ExportSolutionResponse)container.Service.Execute(req);
                     var exportXml = exportSolutionResponse.ExportSolutionFile;
                     File.WriteAllBytes(filename, exportXml);
                 }
                 if (type == SolutionTypes.Unmanaged || type == SolutionTypes.Both)
                 {
                     var filename = path + file + ".zip";
-                    SendLine("Exporting solution to: {0}", filename);
+                    SendLine(container, "Exporting solution to: {0}", filename);
                     req.Managed = false;
-                    var exportSolutionResponse = (ExportSolutionResponse)crmsvc.Execute(req);
+                    var exportSolutionResponse = (ExportSolutionResponse)container.Service.Execute(req);
                     var exportXml = exportSolutionResponse.ExportSolutionFile;
                     File.WriteAllBytes(filename, exportXml);
                 }
             }
-            log.EndSection();
+            container.Logger.EndSection();
         }
 
-        private CintDynEntity GetAndVerifySolutionForExport(string name)
+        private Entity GetAndVerifySolutionForExport(IContainable container, string name)
         {
-            var cSolutions = CintDynEntity.RetrieveMultiple(crmsvc, "solution",
+            var cSolutions = container.RetrieveMultiple( "solution",
                 new string[] { "isvisible", "uniquename" },
                 new object[] { true, name },
-                new ColumnSet("solutionid", "friendlyname", "version", "ismanaged"), log);
-            if (cSolutions.Count == 0)
+                new ColumnSet("solutionid", "friendlyname", "version", "ismanaged"));
+            if (cSolutions.Entities.Count == 0)
             {
                 throw new ArgumentOutOfRangeException("SolutionUniqueName", name, "Cannot find solution");
             }
-            if (cSolutions.Count > 1)
+            if (cSolutions.Entities.Count > 1)
             {
-                throw new ArgumentOutOfRangeException("SolutionUniqueName", name, "Found " + cSolutions.Count.ToString() + " matching solutions");
+                throw new ArgumentOutOfRangeException("SolutionUniqueName", name, $"Found {cSolutions.Entities.Count} matching solutions");
             }
             var cdSolution = cSolutions[0];
             return cdSolution;
@@ -118,15 +120,15 @@
 
         /// <summary>Get the current versions for all solutions defined in the definition file</summary>
         /// <remarks>Results will be placed in the public dictionary <c ref="ExistingSolutionVersions">ExistingSolutionVersions</c></remarks>
-        public void GetCurrentVersions()
+        public void GetCurrentVersions(IContainable container)
         {
-            log.StartSection("GetCurrentVersions");
+            container.Logger.StartSection("GetCurrentVersions");
             ExistingSolutionVersions = new Dictionary<string, Version>();
             var xRoot = CintXML.FindChild(definition, "ShuffleDefinition");
             var xBlocks = CintXML.FindChild(xRoot, "Blocks");
             if (xBlocks != null)
             {
-                var solutions = GetExistingSolutions();
+                var solutions = GetExistingSolutions(container);
                 foreach (XmlNode xBlock in xBlocks.ChildNodes)
                 {
                     if (xBlock.NodeType == XmlNodeType.Element)
@@ -141,13 +143,13 @@
                                 if (xmlNode != null)
                                 {
                                     var name = CintXML.GetAttribute(xBlock, "Name");
-                                    log.Log("Getting version for: {0}", name);
-                                    foreach (var solution in solutions)
+                                    container.Logger.Log("Getting version for: {0}", name);
+                                    foreach (var solution in solutions.Entities)
                                     {
-                                        if (name.Equals(solution.Property("uniquename", ""), StringComparison.OrdinalIgnoreCase))
+                                        if (name.Equals(solution.GetAttribute("uniquename", ""), StringComparison.OrdinalIgnoreCase))
                                         {
-                                            ExistingSolutionVersions.Add(name, new Version(solution.Property("version", "1.0.0.0")));
-                                            log.Log("Version found: {0}", ExistingSolutionVersions[name]);
+                                            ExistingSolutionVersions.Add(name, new Version(solution.GetAttribute("version", "1.0.0.0")));
+                                            container.Logger.Log("Version found: {0}", ExistingSolutionVersions[name]);
                                         }
                                     }
                                 }
@@ -156,18 +158,18 @@
                     }
                 }
             }
-            log.EndSection();
+            container.Logger.EndSection();
         }
 
-        private Version IncrementVersion(Version version)
+        private Version IncrementVersion(IContainable container, Version version)
         {
             var verparts = version;
             var newversion = verparts.Major.ToString() + "." + verparts.Minor.ToString() + "." + DateTime.Today.ToString("yyMM") + "." + (verparts.Revision + 1).ToString();
-            log.Log("Increasing {0} to {1}", version, newversion);
+            container.Logger.Log("Increasing {0} to {1}", version, newversion);
             return new Version(newversion);
         }
 
-        private void SetNewSolutionVersion(string setversion, CintDynEntity cdSolution, Version currentversion)
+        private void SetNewSolutionVersion(IContainable container, string setversion, Entity cdSolution, Version currentversion)
         {
             Version newversion;
             if (setversion.Equals("IncrementAll", StringComparison.OrdinalIgnoreCase))
@@ -180,11 +182,11 @@
                         newversion = existingversion;
                     }
                 }
-                newversion = IncrementVersion(newversion);
+                newversion = IncrementVersion(container, newversion);
             }
             else if (setversion.Equals("Increment", StringComparison.OrdinalIgnoreCase))
             {
-                newversion = IncrementVersion(currentversion);
+                newversion = IncrementVersion(container, currentversion);
             }
             else if (setversion.Equals("Current", StringComparison.OrdinalIgnoreCase))
             {
@@ -196,10 +198,10 @@
             }
             if (!currentversion.Equals(newversion))
             {
-                SendLine("Setting version: {0}", newversion);
-                var cdSolUpd = cdSolution.Clone(true);
-                cdSolUpd.AddProperty("version", newversion.ToString());
-                cdSolUpd.Save();
+                SendLine(container, "Setting version: {0}", newversion);
+                var cdSolUpd = cdSolution.CloneId();
+                cdSolUpd.SetAttribute("version", newversion.ToString());
+                container.Save(cdSolUpd);
             }
         }
 

@@ -1,8 +1,10 @@
 ﻿namespace Cinteros.Crm.Utils.Shuffle
 {
     using Cinteros.Crm.Utils.Common;
+    using Cinteros.Crm.Utils.Common.Interfaces;
     using Cinteros.Crm.Utils.Misc;
     using Cinteros.Crm.Utils.Shuffle.Types;
+    using Cinteros.Crm.Utils.Common.Slim;
     using Ionic.Zip;
     using Microsoft.Crm.Sdk.Messages;
     using Microsoft.Xrm.Sdk;
@@ -18,8 +20,9 @@
     {
         #region Private Methods
 
-        private static string ExtractErrorMessage(string message)
+        private static string ExtractErrorMessage(IContainable container, string message)
         {
+            container.StartSection($@"{MethodBase.GetCurrentMethod().DeclaringType.Name}\{MethodBase.GetCurrentMethod().Name}");
             const string fault = "(Fault Detail is equal to Microsoft.Xrm.Sdk.OrganizationServiceFault).: ";
             const string unhandled = "Unhandled Exception: ";
             while (message.Contains(fault))
@@ -45,58 +48,59 @@
                     message = message.Split(':')[0];
                 }
             }
+            container.EndSection();
             return message;
         }
 
-        private SolutionImportConditions CheckIfImportRequired(SolutionBlockImport import, string name, Version thisversion)
+        private SolutionImportConditions CheckIfImportRequired(IContainable container, SolutionBlockImport import, string name, Version thisversion)
         {
-            log.StartSection("CheckIfImportRequired");
+            container.StartSection($@"{MethodBase.GetCurrentMethod().DeclaringType.Name}\{MethodBase.GetCurrentMethod().Name}");
             var result = SolutionImportConditions.Create;
             var overwritesame = import.OverwriteSameVersion;
             var overwritenewer = import.OverwriteNewerVersion;
-            var cSolutions = GetExistingSolutions();
-            foreach (var cdSolution in cSolutions)
+            var cSolutions = GetExistingSolutions(container);
+            foreach (var cdSolution in cSolutions.Entities)
             {
-                if (cdSolution.Property("uniquename", "") == name)
+                if (cdSolution.GetAttribute("uniquename", "") == name)
                 {   // Now we have found the same solution in target environment
                     result = SolutionImportConditions.Update;
-                    var existingversion = new Version(cdSolution.Property("version", "1.0.0.0"));
-                    log.Log("Existing solution has version: {0}", existingversion);
+                    var existingversion = new Version(cdSolution.GetAttribute("version", "1.0.0.0"));
+                    container.Logger.Log("Existing solution has version: {0}", existingversion);
                     var comparison = thisversion.CompareTo(existingversion);
                     if (!overwritesame && comparison == 0)
                     {
                         result = SolutionImportConditions.Skip;
-                        SendLine("Solution {0} {1} already exists in target", name, thisversion);
+                        SendLine(container, "Solution {0} {1} already exists in target", name, thisversion);
                     }
                     else if (!overwritenewer && comparison < 0)
                     {
                         result = SolutionImportConditions.Skip;
-                        SendLine("Existing solution {0} {1} is newer than {2}", name, existingversion, thisversion);
+                        SendLine(container, "Existing solution {0} {1} is newer than {2}", name, existingversion, thisversion);
                     }
                     else if (existingversion == thisversion)
                     {
-                        SendLine("Updating version {0}", thisversion);
+                        SendLine(container, "Updating version {0}", thisversion);
                     }
                     else
                     {
-                        SendLine("Replacing version {0} with {1}", existingversion, thisversion);
+                        SendLine(container, "Replacing version {0} with {1}", existingversion, thisversion);
                     }
                     break;
                 }
             }
-            log.Log("Import Condition: {0}", result);
-            log.EndSection();
+            container.Logger.Log("Import Condition: {0}", result);
+            container.Logger.EndSection();
             return result;
         }
 
-        private bool DoImportSolution(SolutionBlockImport import, string filename, Version version)
+        private bool DoImportSolution(IContainable container, SolutionBlockImport import, string filename, Version version)
         {
-            log.StartSection(MethodBase.GetCurrentMethod().Name);
+            container.StartSection($@"{MethodBase.GetCurrentMethod().DeclaringType.Name}\{MethodBase.GetCurrentMethod().Name}");
             var result = false;
             var activatecode = import.ActivateServersideCode;
             var overwrite = import.OverwriteCustomizations;
             Exception ex = null;
-            SendLine("Importing solution: {0} Version: {1}", filename, version);
+            SendLine(container, "Importing solution: {0} Version: {1}", filename, version);
             var fileBytes = File.ReadAllBytes(filename);
             var impSolReq = new ImportSolutionRequest()
             {
@@ -105,13 +109,13 @@
                 PublishWorkflows = activatecode,
                 ImportJobId = Guid.NewGuid()
             };
-            if (crmsvc is CrmServiceProxy && ((CrmServiceProxy)crmsvc).CrmVersion.Major >= 6)
+            if (container.Service is CrmServiceProxy && ((CrmServiceProxy)container.Service).CrmVersion.Major >= 6)
             {   // CRM 2013 or later, import async
-                result = DoImportSolutionAsync(impSolReq, ref ex);
+                result = DoImportSolutionAsync(container, impSolReq, ref ex);
             }
             else
             {   // Pre CRM 2013, import sync
-                result = DoImportSolutionSync(impSolReq, ref ex);
+                result = DoImportSolutionSync(container, impSolReq, ref ex);
             }
             if (!result && stoponerror)
             {
@@ -124,14 +128,14 @@
                     throw new Exception("Solution import failed");
                 }
             }
-            log.Log("Returning: {0}", result);
-            log.EndSection();
+            container.Logger.Log("Returning: {0}", result);
+            container.Logger.EndSection();
             return result;
         }
 
-        private bool DoImportSolutionAsync(ImportSolutionRequest impSolReq, ref Exception ex)
+        private bool DoImportSolutionAsync(IContainable container, ImportSolutionRequest impSolReq, ref Exception ex)
         {
-            log.StartSection(MethodBase.GetCurrentMethod().Name);
+            container.StartSection($@"{MethodBase.GetCurrentMethod().DeclaringType.Name}\{MethodBase.GetCurrentMethod().Name}");
             // Code cred to Wael Hamze
             // http://waelhamze.com/2013/11/17/asynchronous-solution-import-dynamics-crm-2013/
             var result = false;
@@ -139,43 +143,43 @@
             {
                 Request = impSolReq
             };
-            var asyncResponse = crmsvc.Execute(asyncRequest) as ExecuteAsyncResponse;
+            var asyncResponse = container.Service.Execute(asyncRequest) as ExecuteAsyncResponse;
             var asyncJobId = asyncResponse.AsyncJobId;
             var end = DateTime.MaxValue;
             var importStatus = -1;
             var progress = 0;
             var statustext = "Submitting job";
-            SendLineUpdate("Import status: {0}", statustext);
+            SendLineUpdate(container, "Import status: {0}", statustext);
             while (end >= DateTime.Now)
             {
-                CintDynEntity cdAsyncOperation = null;
+                Entity cdAsyncOperation = null;
                 try
                 {
-                    cdAsyncOperation = CintDynEntity.Retrieve(SystemJob.EntityName, asyncJobId,
-                        new ColumnSet(SystemJob.PrimaryKey, SystemJob.Status, SystemJob.StatusReason, SystemJob.Message, SystemJob.Friendlymessage), crmsvc, log);
+                    cdAsyncOperation = container.Retrieve( SystemJob.EntityName, asyncJobId,
+                        new ColumnSet(SystemJob.PrimaryKey, SystemJob.Status, SystemJob.StatusReason, SystemJob.Message, SystemJob.Friendlymessage));
                 }
                 catch (Exception asyncex)
                 {
                     cdAsyncOperation = null;
-                    log.Log(asyncex);
-                    log.EndSection();   // Ending section started by Retrieve above to prevent indentation inflation
+                    container.Logger.Log(asyncex);
+                    container.Logger.EndSection();   // Ending section started by Retrieve above to prevent indentation inflation
                 }
                 if (cdAsyncOperation != null)
                 {
-                    statustext = cdAsyncOperation.PropertyAsString(SystemJob.StatusReason, "?", false, false);
-                    var newStatus = cdAsyncOperation.Property(SystemJob.StatusReason, new OptionSetValue()).Value;
+                    statustext = cdAsyncOperation.PropertyAsString(SystemJob.StatusReason, "?", false);
+                    var newStatus = cdAsyncOperation.GetAttribute(SystemJob.StatusReason, new OptionSetValue()).Value;
                     if (newStatus != importStatus)
                     {
                         importStatus = newStatus;
                         if (end.Equals(DateTime.MaxValue) && importStatus != (int)SystemJob.StatusReason_OptionSet.Waiting)
                         {
                             end = timeout > 0 ? DateTime.Now.AddMinutes(timeout) : DateTime.Now.AddMinutes(2);
-                            SendLineUpdate("Import job picked up at {0}", DateTime.Now);
-                            log.Log("Timout until: {0}", end.ToString("HH:mm:ss.fff"));
-                            SendLine("Import status: {0}", statustext);
+                            SendLineUpdate(container, "Import job picked up at {0}", DateTime.Now);
+                            container.Logger.Log("Timout until: {0}", end.ToString("HH:mm:ss.fff"));
+                            SendLine(container, "Import status: {0}", statustext);
                         }
-                        SendLineUpdate("Import status: {0}", statustext);
-                        log.Log("Import message:\n{0}", cdAsyncOperation.Property(SystemJob.Message, "<none>"));
+                        SendLineUpdate(container, "Import status: {0}", statustext);
+                        container.Logger.Log("Import message:\n{0}", cdAsyncOperation.GetAttribute(SystemJob.Message, "<none>"));
                         if (importStatus == (int)SystemJob.StatusReason_OptionSet.Succeeded)
                         {   // Succeeded
                             result = true;
@@ -186,29 +190,29 @@
                             || importStatus == (int)SystemJob.StatusReason_OptionSet.Failed
                             || importStatus == (int)SystemJob.StatusReason_OptionSet.Canceled)
                         {   // Error statuses
-                            var friendlymessage = cdAsyncOperation.Property(SystemJob.Friendlymessage, "");
-                            SendLine("Message: {0}", friendlymessage);
+                            var friendlymessage = cdAsyncOperation.GetAttribute(SystemJob.Friendlymessage, "");
+                            SendLine(container, "Message: {0}", friendlymessage);
                             if (friendlymessage == "Access is denied.")
                             {
-                                SendLine("When importing to onprem environment, the async service user must be granted read/write permission to folder:");
-                                SendLine("  C:\\Program Files\\Microsoft Dynamics CRM\\CustomizationImport");
+                                SendLine(container, "When importing to onprem environment, the async service user must be granted read/write permission to folder:");
+                                SendLine(container, "  C:\\Program Files\\Microsoft Dynamics CRM\\CustomizationImport");
                             }
                             else
                             {
-                                var message = cdAsyncOperation.Property(SystemJob.Message, "<none>");
-                                message = ExtractErrorMessage(message);
+                                var message = cdAsyncOperation.GetAttribute(SystemJob.Message, "<none>");
+                                message = ExtractErrorMessage(container, message);
                                 if (!string.IsNullOrWhiteSpace(message) && !message.Equals(friendlymessage, StringComparison.InvariantCultureIgnoreCase))
                                 {
-                                    SendLine("Detailed message: \n{0}", message);
+                                    SendLine(container, "Detailed message: \n{0}", message);
                                 }
                                 else
                                 {
-                                    SendLine("See log file for technical details.");
+                                    SendLine(container, "See log file for technical details.");
                                 }
                             }
                             ex = new Exception(string.Format("Solution Import Failed: {0} - {1}",
-                                cdAsyncOperation.PropertyAsString(SystemJob.Status, "?", false, false),
-                                cdAsyncOperation.PropertyAsString(SystemJob.StatusReason, "?", false, false)));
+                               cdAsyncOperation.PropertyAsString(SystemJob.Status, "?", false),
+                               cdAsyncOperation.PropertyAsString(SystemJob.StatusReason, "?", false)));
                             break;
                         }
                     }
@@ -218,15 +222,15 @@
                 {   // In progress, read percent
                     try
                     {
-                        var job = CintDynEntity.Retrieve(ImportJob.EntityName, impSolReq.ImportJobId, new ColumnSet(ImportJob.Progress), crmsvc, log);
+                        var job = container.Retrieve(ImportJob.EntityName, impSolReq.ImportJobId, new ColumnSet(ImportJob.Progress));
                         if (job != null)
                         {
-                            var newProgress = Convert.ToInt32(Math.Round(job.Property(ImportJob.Progress, 0D)));
+                            var newProgress = Convert.ToInt32(Math.Round(job.GetAttribute(ImportJob.Progress, 0D)));
                             if (newProgress > progress)
                             {
                                 progress = newProgress;
                                 SendStatus(-1, -1, 100, progress);
-                                SendLineUpdate("Import status: {0} - {1}%", statustext, progress);
+                                SendLineUpdate(container, "Import status: {0} - {1}%", statustext, progress);
                             }
                         }
                     }
@@ -234,49 +238,49 @@
                     {   // We probably tried before the job was created
                         if (jobex.Message.ToUpperInvariant().Contains("DOES NOT EXIST"))
                         {
-                            log.Log("Importjob not created yet or already deleted");
+                            container.Logger.Log("Importjob not created yet or already deleted");
                         }
                         else
                         {
-                            log.Log(jobex);
+                            container.Logger.Log(jobex);
                         }
-                        log.EndSection();   // Ending section started by Retrieve above to prevent indentation inflation
+                        container.Logger.EndSection();   // Ending section started by Retrieve above to prevent indentation inflation
                     }
                 }
             }
             if (end < DateTime.Now)
             {
-                SendLine("Import timed out.");
+                SendLine(container, "Import timed out.");
             }
             SendStatus(-1, -1, 100, 0);
-            log.EndSection();
+            container.Logger.EndSection();
             return result;
         }
 
-        private bool DoImportSolutionSync(ImportSolutionRequest impSolReq, ref Exception ex)
+        private bool DoImportSolutionSync(IContainable container, ImportSolutionRequest impSolReq, ref Exception ex)
         {
-            log.StartSection(MethodBase.GetCurrentMethod().Name);
+            container.StartSection($@"{MethodBase.GetCurrentMethod().DeclaringType.Name}\{MethodBase.GetCurrentMethod().Name}");
             bool result;
             try
             {
-                crmsvc.Execute(impSolReq);
+                container.Service.Execute(impSolReq);
             }
             catch (Exception e)
             {
                 ex = e;
-                SendLine("Error during import: {0}", ex.Message);
+                SendLine(container, "Error during import: {0}", ex.Message);
             }
             finally
             {
-                result = ReadAndLogSolutionImportJobStatus(impSolReq.ImportJobId);
+                result = ReadAndLogSolutionImportJobStatus(container, impSolReq.ImportJobId);
             }
-            log.EndSection();
+            container.Logger.EndSection();
             return result;
         }
 
-        private Version ExtractVersionFromSolutionZip(string filename)
+        private Version ExtractVersionFromSolutionZip(IContainable container, string filename)
         {
-            log.StartSection("ExtractVersionFromSolutionZip");
+            container.StartSection($@"{MethodBase.GetCurrentMethod().DeclaringType.Name}\{MethodBase.GetCurrentMethod().Name}");
             using (var zip = ZipFile.Read(filename))
             {
                 zip["solution.xml"].Extract(definitionpath, ExtractExistingFileAction.OverwriteSilently);
@@ -304,14 +308,14 @@
                 throw new XmlException("Cannot find element Version");
             }
             var version = new Version(xVersion.InnerText);
-            log.Log("Version {0} extracted", version);
-            log.EndSection();
+            container.Logger.Log("Version {0} extracted", version);
+            container.Logger.EndSection();
             return version;
         }
 
-        private string GetSolutionFilename(SolutionBlock block)
+        private string GetSolutionFilename(IContainable container, SolutionBlock block)
         {
-            log.StartSection("GetSolutionFilename");
+            container.StartSection($@"{MethodBase.GetCurrentMethod().DeclaringType.Name}\{MethodBase.GetCurrentMethod().Name}");
             var file = block.File;
             if (string.IsNullOrWhiteSpace(file))
             {
@@ -345,32 +349,32 @@
                     filename = filename.Replace("%" + de.Key.ToString() + "%", de.Value.ToString());
                 }
             }
-            log.Log("Filename: {0}", filename);
-            log.EndSection();
+            container.Logger.Log("Filename: {0}", filename);
+            container.Logger.EndSection();
             return filename;
         }
 
-        private ItemImportResult ImportSolutionBlock(SolutionBlock block)
+        private ItemImportResult ImportSolutionBlock(IContainable container, SolutionBlock block)
         {
-            log.StartSection("ImportSolutionBlock");
+            container.StartSection($@"{MethodBase.GetCurrentMethod().DeclaringType.Name}\{MethodBase.GetCurrentMethod().Name}");
             var importResult = ItemImportResult.None;
             if (block.Import != null)
             {
                 var name = block.Name;
-                log.Log("Block: {0}", name);
+                container.Logger.Log("Block: {0}", name);
                 SendStatus(name, null);
-                SendLine();
-                SendLine("Importing solution: {0}", name);
+                SendLine(container);
+                SendLine(container, "Importing solution: {0}", name);
 
-                var filename = GetSolutionFilename(block);
-                var version = ExtractVersionFromSolutionZip(filename);
+                var filename = GetSolutionFilename(container, block);
+                var version = ExtractVersionFromSolutionZip(container, filename);
                 try
                 {
-                    ValidatePreReqs(block.Import, version);
-                    var ImportCondition = CheckIfImportRequired(block.Import, name, version);
+                    ValidatePreReqs(container, block.Import, version);
+                    var ImportCondition = CheckIfImportRequired(container, block.Import, name, version);
                     if (ImportCondition != SolutionImportConditions.Skip)
                     {
-                        if (DoImportSolution(block.Import, filename, version))
+                        if (DoImportSolution(container, block.Import, filename, version))
                         {
                             if (ImportCondition == SolutionImportConditions.Create)
                             {
@@ -384,24 +388,24 @@
                         else
                         {
                             importResult = ItemImportResult.Failed;
-                            log.Log("Failed during import");
+                            container.Logger.Log("Failed during import");
                         }
                         var publish = block.Import.PublishAll;
                         if (publish)
                         {
-                            SendLine("Publishing customizations");
-                            crmsvc.Execute(new PublishAllXmlRequest());
+                            SendLine(container, "Publishing customizations");
+                            container.Service.Execute(new PublishAllXmlRequest());
                         }
                     }
                     else
                     {
                         importResult = ItemImportResult.Skipped;
-                        log.Log("Skipped due to import condition");
+                        container.Logger.Log("Skipped due to import condition");
                     }
                 }
                 catch (Exception ex)
                 {
-                    log.Log(ex);
+                    container.Logger.Log(ex);
                     importResult = ItemImportResult.Failed;
                     if (stoponerror)
                     {
@@ -409,29 +413,29 @@
                     }
                 }
             }
-            log.EndSection();
+            container.Logger.EndSection();
             return importResult;
         }
 
-        private bool ReadAndLogSolutionImportJobStatus(Guid jobid)
+        private bool ReadAndLogSolutionImportJobStatus(IContainable container, Guid jobid)
         {
-            log.StartSection("ReadAndLogSolutionImportJobStatus " + jobid);
+            container.StartSection($@"{MethodBase.GetCurrentMethod().DeclaringType.Name}\{MethodBase.GetCurrentMethod().Name} - {jobid}");
             var success = false;
-            var job = CintDynEntity.Retrieve("importjob", jobid, new ColumnSet("startedon", "completedon", "progress", "data"), crmsvc, log);
+            var job = container.Retrieve("importjob", jobid, new ColumnSet("startedon", "completedon", "progress", "data"));
             if (job != null)
             {
                 var name = "?";
                 var result = "?";
                 var err = "";
-                var start = job.Property("startedon", DateTime.MinValue);
-                var complete = job.Property("completedon", DateTime.MinValue);
+                var start = job.GetAttribute("startedon", DateTime.MinValue);
+                var complete = job.GetAttribute("completedon", DateTime.MinValue);
                 var time = complete != null && start != null ? complete.Subtract(start) : new TimeSpan();
-                var prog = job.Property<double>("progress", 0);
+                var prog = job.GetAttribute<double>("progress", 0);
                 if (job.Contains("data", true))
                 {
                     var doc = new XmlDocument();
-                    var data = job.Property("data", "");
-                    log.Log("Job data length: {0}", data.Length);
+                    var data = job.GetAttribute("data", "");
+                    container.Logger.Log("Job data length: {0}", data.Length);
                     if (!string.IsNullOrWhiteSpace(data))
                     {
                         doc.LoadXml(data);
@@ -445,40 +449,40 @@
                 }
                 if (prog >= 100 && result == "success")
                 {
-                    SendLine("Solution {0} imported in {1}", name, time);
-                    log.Log("Result: {0}\nError:  {1}\nTime:   {2}", result, err, time);
+                    SendLine(container, "Solution {0} imported in {1}", name, time);
+                    container.Logger.Log("Result: {0}\nError:  {1}\nTime:   {2}", result, err, time);
                     success = true;
                 }
                 else
                 {
-                    SendLine("Solution: {0}", name);
-                    SendLine("Result:   {0}", result);
-                    SendLine("Error:    {0}", err);
-                    SendLine("Progress: {0}", prog);
-                    SendLine("Time:     {0}", time);
+                    SendLine(container, "Solution: {0}", name);
+                    SendLine(container, "Result:   {0}", result);
+                    SendLine(container, "Error:    {0}", err);
+                    SendLine(container, "Progress: {0}", prog);
+                    SendLine(container, "Time:     {0}", time);
                 }
             }
-            log.Log("Returning: {0}", success);
-            log.EndSection();
+            container.Logger.Log("Returning: {0}", success);
+            container.Logger.EndSection();
             return success;
         }
 
-        private void ValidatePreReqs(SolutionBlockImport import, Version thisversion)
+        private void ValidatePreReqs(IContainable container, SolutionBlockImport import, Version thisversion)
         {
             if (import.PreRequisites == null)
             {
-                log.Log("No prereqs for solution import");
+                container.Logger.Log("No prereqs for solution import");
                 return;
             }
-            log.StartSection("ValidatePreReqs");
-            var cSolutions = GetExistingSolutions();
+            container.Logger.StartSection("ValidatePreReqs");
+            var cSolutions = GetExistingSolutions(container);
             foreach (var prereq in import.PreRequisites)
             {
                 var valid = false;
                 var name = prereq.Name;
                 var comparer = prereq.Comparer;
                 var version = new Version();
-                log.Log("Prereq: {0} {1} {2}", name, comparer, version);
+                container.Logger.Log("Prereq: {0} {1} {2}", name, comparer, version);
 
                 if (comparer == SolutionVersionComparers.eqthis || comparer == SolutionVersionComparers.gethis)
                 {
@@ -490,11 +494,11 @@
                     version = new Version(prereq.Version.Replace('*', '0'));
                 }
 
-                foreach (var cdSolution in cSolutions)
+                foreach (var cdSolution in cSolutions.Entities)
                 {
-                    if (cdSolution.Property("uniquename", "") == name)
+                    if (cdSolution.GetAttribute("uniquename", "") == name)
                     {
-                        log.Log("Found matching solution");
+                        container.Logger.Log("Found matching solution");
                         switch (comparer)
                         {
                             case SolutionVersionComparers.any:
@@ -502,11 +506,11 @@
                                 break;
 
                             case SolutionVersionComparers.eq:
-                                valid = new Version(cdSolution.Property("version", "1.0.0.0")).Equals(version);
+                                valid = new Version(cdSolution.GetAttribute("version", "1.0.0.0")).Equals(version);
                                 break;
 
                             case SolutionVersionComparers.ge:
-                                valid = new Version(cdSolution.Property("version", "<undefined>")) >= version;
+                                valid = new Version(cdSolution.GetAttribute("version", "<undefined>")) >= version;
                                 break;
 
                             default:
@@ -520,15 +524,15 @@
                 }
                 if (valid)
                 {
-                    SendLine("Prerequisite {0} {1} {2} is satisfied", name, comparer, version);
+                    SendLine(container, "Prerequisite {0} {1} {2} is satisfied", name, comparer, version);
                 }
                 else
                 {
-                    SendLine("Prerequisite {0} {1} {2} is NOT satisfied", name, comparer, version);
+                    SendLine(container, "Prerequisite {0} {1} {2} is NOT satisfied", name, comparer, version);
                     throw new Exception("Prerequisite NOT satisfied (" + name + " " + comparer + " " + version + ")");
                 }
             }
-            log.EndSection();
+            container.Logger.EndSection();
         }
     }
 
