@@ -1,31 +1,9 @@
 ﻿namespace Cinteros.Crm.Utils.Shuffle.Types
 {
-    using Cinteros.Crm.Utils.Common;
+    using Microsoft.Xrm.Sdk;
     using System;
     using System.Collections.Generic;
     using System.Runtime.Serialization;
-
-    /// <summary>Type of serialization for the export and import actions</summary>
-    public enum SerializationType
-    {
-        /// <summary>C#-Serialization of List&lt;Entity&gt;</summary>
-        Full = 1,
-
-        /// <summary>Ad hoc serialization of CintDynEntities</summary>
-        Simple = 2,
-
-        /// <summary>Ad hoc serialization of CintDynEntities, incl name for lookup fields</summary>
-        SimpleWithValue = 3,
-
-        /// <summary>Ad hoc serialization of CintDynEntities, excl guid for lookup fields</summary>
-        SimpleNoId = 4,
-
-        /// <summary>Ad hoc serialization of CintDynEntities in a compact explicit integratable format</summary>
-        Explicit = 5,
-
-        /// <summary>Text file generation from CintDynEntities</summary>
-        Text = 11
-    }
 
     internal enum ItemImportResult
     {
@@ -54,7 +32,7 @@
 
     /// <summary>Dictionary containing Block name and corresponding CintDynEntityCollection</summary>
     [Serializable]
-    public class ShuffleBlocks : Dictionary<string, CintDynEntityCollection>
+    public class ShuffleBlocks : Dictionary<string, EntityCollection>
     {   // Constructor added by suggestion from Code Analysis...
         #region Public Constructors
 
