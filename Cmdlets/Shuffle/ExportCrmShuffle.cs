@@ -1,5 +1,6 @@
 ﻿namespace Innofactor.Crm.CI.Cmdlets
 {
+    using Cinteros.Crm.Utils.Common;
     using Cinteros.Crm.Utils.Shuffle;
     using Cinteros.Crm.Utils.Shuffle.Types;
     using Innofactor.Crm.CI.Cmdlets.Structure;
@@ -37,7 +38,7 @@
             Position = 1,
             HelpMessage = "Provide the type of Shuffle export: Full, Simple, SimpleWithValue, SimpleNoId, Explicit or Text"
         ), Alias("T")]
-        public SerializationType Type { get; set; }
+        public SerializationStyle Type { get; set; }
 
         #endregion Public Properties
 
