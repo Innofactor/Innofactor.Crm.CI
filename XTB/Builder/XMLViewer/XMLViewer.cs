@@ -101,9 +101,9 @@ namespace CSRichTextBoxSyntaxHighlighting
                     "Please check the input Xml. Error:" + xmlException.Message,
                     xmlException);
             }
-            catch
+            catch (Exception ex)
             {
-                throw;
+                throw ex;
             }
         }
 

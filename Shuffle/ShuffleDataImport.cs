@@ -605,7 +605,7 @@
                     }
                     else
                     {
-                        SendLine(container, "{0:000} TEST Skipped: {1} (Identical)", pos, identifier);
+                        SendLine(container, "{0:000} Skipped: {1} (Identical)", pos, identifier);
                     }
                 }
                 else
