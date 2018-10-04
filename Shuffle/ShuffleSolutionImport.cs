@@ -409,7 +409,7 @@
                     importResult = ItemImportResult.Failed;
                     if (stoponerror)
                     {
-                        throw;
+                        throw ex;
                     }
                 }
             }

@@ -231,7 +231,7 @@
             catch (XmlSchemaValidationException ex)
             {
                 log?.Log(ex);
-                throw;
+                throw ex;
             }
         }
 
