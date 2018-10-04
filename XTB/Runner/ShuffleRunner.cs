@@ -1,6 +1,6 @@
 ﻿using Cinteros.Crm.Utils.Common;
 using Cinteros.Crm.Utils.Shuffle;
-using Cinteros.Crm.Utils.Shuffle.Types;
+using Cinteros.Crm.Utils.Common.Slim;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -76,7 +76,7 @@ namespace Innofactor.Crm.Shuffle.Runner
                     shuffeling = true;
                     EnableShuffle();
                     var logpath = Path.Combine(Paths.LogsPath, "ShuffleRunner");
-                    var container = new CintContainer(new CrmServiceProxy(Service), logpath, true);
+                    var container = new PluginContainer(new CrmServiceProxy(Service), logpath, true);
                     var log = container.Logger;
                     var location = System.Reflection.Assembly.GetExecutingAssembly().Location;
                     var verinfo = FileVersionInfo.GetVersionInfo(location);
@@ -119,7 +119,7 @@ namespace Innofactor.Crm.Shuffle.Runner
                     catch (Exception ex)
                     {
                         log.Log(ex);
-                        throw;
+                        throw ex;
                     }
                     finally
                     {
