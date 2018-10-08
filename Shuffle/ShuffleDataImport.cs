@@ -167,7 +167,6 @@
                 EntityCollection matches = null;
                 var allattributes = new List<string>
                 {
-                    //allattributes.Add(entity.PrimaryIdAttribute);
                     container.Entity(entity.LogicalName).PrimaryIdAttribute
                 };
 
