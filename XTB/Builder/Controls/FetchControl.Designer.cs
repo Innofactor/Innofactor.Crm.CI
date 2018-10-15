@@ -54,7 +54,7 @@
             this.btnFXB.Location = new System.Drawing.Point(307, 7);
             this.btnFXB.Name = "btnFXB";
             this.btnFXB.Padding = new System.Windows.Forms.Padding(5);
-            this.btnFXB.Size = new System.Drawing.Size(140, 31);
+            this.btnFXB.Size = new System.Drawing.Size(140, 32);
             this.btnFXB.TabIndex = 2;
             this.btnFXB.Text = "FetchXML Builder";
             this.btnFXB.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -89,7 +89,7 @@
             this.btnFormat.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnFormat.Location = new System.Drawing.Point(197, 7);
             this.btnFormat.Name = "btnFormat";
-            this.btnFormat.Size = new System.Drawing.Size(104, 31);
+            this.btnFormat.Size = new System.Drawing.Size(104, 32);
             this.btnFormat.TabIndex = 4;
             this.btnFormat.Text = "Format XML";
             this.btnFormat.UseVisualStyleBackColor = true;
