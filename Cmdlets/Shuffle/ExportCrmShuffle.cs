@@ -2,6 +2,7 @@
 {
     using Cinteros.Crm.Utils.Common;
     using Cinteros.Crm.Utils.Shuffle;
+    using Cinteros.Crm.Utils.Shuffle.Types;
     using Innofactor.Crm.CI.Cmdlets.Structure;
     using System;
     using System.Management.Automation;
