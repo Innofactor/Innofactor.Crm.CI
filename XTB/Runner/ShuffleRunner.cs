@@ -24,12 +24,12 @@ namespace Innofactor.Crm.Shuffle.Runner
         public ShuffleRunner()
         {
             InitializeComponent();
-            cmbType.Items.Add(SerializationStyle.Simple);
-            cmbType.Items.Add(SerializationStyle.SimpleWithValue);
-            cmbType.Items.Add(SerializationStyle.SimpleNoId);
-            cmbType.Items.Add(SerializationStyle.Explicit);
-            cmbType.Items.Add(SerializationStyle.Text);
-            cmbType.Items.Add(SerializationStyle.Full);
+            cmbType.Items.Add(SerializationType.Simple);
+            cmbType.Items.Add(SerializationType.SimpleWithValue);
+            cmbType.Items.Add(SerializationType.SimpleNoId);
+            cmbType.Items.Add(SerializationType.Explicit);
+            cmbType.Items.Add(SerializationType.Text);
+            cmbType.Items.Add(SerializationType.Full);
             ConnectionUpdated += ShuffleRunner_ConnectionUpdated;
         }
 
@@ -69,7 +69,7 @@ namespace Innofactor.Crm.Shuffle.Runner
         private void btnShuffle_Click(object sender, EventArgs e)
         {
             lbLog.Items.Clear();
-            var type = cmbType.SelectedItem != null ? (SerializationStyle)cmbType.SelectedItem : SerializationStyle.Simple;
+            var type = cmbType.SelectedItem != null ? (SerializationType)cmbType.SelectedItem : SerializationType.Simple;
             WorkAsync(new WorkAsyncInfo("Doing the Shuffle...",
                 (eventargs) =>
                 {
