@@ -161,80 +161,67 @@
 
         private EntityCollection GetMatchingRecords(IContainable container, Entity entity, List<string> matchattributes, List<string> updateattributes, bool preretrieveall, ref EntityCollection cAllRecordsToMatch)
         {
-            try
+            container.Logger.StartSection(MethodBase.GetCurrentMethod().Name);
+            EntityCollection matches = null;
+            var allattributes = new List<string>
             {
-                container.Logger.StartSection(MethodBase.GetCurrentMethod().Name);
-                EntityCollection matches = null;
-                var allattributes = new List<string>
+                //allattributes.Add(entity.PrimaryIdAttribute);
+                container.Entity(entity.LogicalName).PrimaryIdAttribute
+            };
+
+            if (entity.Contains("ownerid"))
+            {
+                allattributes.Add("ownerid");
+            }
+            if (entity.Contains("statecode") || entity.Contains("statuscode"))
+            {
+                allattributes.Add("statecode");
+                allattributes.Add("statuscode");
+            }
+            allattributes = allattributes.Union(matchattributes.Union(updateattributes)).ToList();
+            if (preretrieveall)
+            {
+                if (cAllRecordsToMatch == null)
                 {
-                    //allattributes.Add(entity.PrimaryIdAttribute);
-                    container.Entity(entity.LogicalName).PrimaryIdAttribute
+                    cAllRecordsToMatch = GetAllRecordsForMatching(container, allattributes, entity);
+                }
+                matches = GetMatchingRecordsFromPreRetrieved(container, matchattributes, entity, cAllRecordsToMatch);
+            }
+            else
+            {
+                var qMatch = new QueryExpression(entity.LogicalName)
+                {
+                    // We need to be able to see if any attributes have changed, so lets make sure matching records have all the attributes that will be updated
+                    ColumnSet = new ColumnSet(allattributes.ToArray())
                 };
 
-
-                if (entity.Contains("ownerid"))
+                foreach (var matchattr in matchattributes)
                 {
-                    allattributes.Add("ownerid");
-                }
-                if (entity.Contains("statecode") || entity.Contains("statuscode"))
-                {
-                    allattributes.Add("statecode");
-                    allattributes.Add("statuscode");
-                }
-                allattributes = allattributes.Union(matchattributes.Union(updateattributes)).ToList();
-                if (preretrieveall)
-                {
-                    if (cAllRecordsToMatch == null)
+                    object value = null;
+                    if (entity.Contains(matchattr))
                     {
-                        cAllRecordsToMatch = GetAllRecordsForMatching(container, allattributes, entity);
+                        value = CintEntity.AttributeToBaseType(entity[matchattr]);
                     }
-                    matches = GetMatchingRecordsFromPreRetrieved(container, matchattributes, entity, cAllRecordsToMatch);
-                }
-                else
-                {
-                    var qMatch = new QueryExpression(entity.LogicalName)
+                    else if (matchattr == container.Entity(entity.LogicalName).PrimaryIdAttribute)
                     {
-                        // We need to be able to see if any attributes have changed, so lets make sure matching records have all the attributes that will be updated
-                        ColumnSet = new ColumnSet(allattributes.ToArray())
-                    };
-
-                    foreach (var matchattr in matchattributes)
-                    {
-                        object value = null;
-                        if (entity.Contains(matchattr))
-                        {
-                            value = CintEntity.AttributeToBaseType(entity[matchattr]);
-                        }
-                        else if (matchattr == container.Entity(entity.LogicalName).PrimaryIdAttribute)
-                        {
-                            value = entity.Id;
-                        }
-                        if (value != null)
-                        {
-                            CintQryExp.AppendCondition(qMatch.Criteria, LogicalOperator.And, matchattr, Microsoft.Xrm.Sdk.Query.ConditionOperator.Equal, value);
-                        }
-                        else
-                        {
-                            CintQryExp.AppendCondition(qMatch.Criteria, LogicalOperator.And, matchattr, Microsoft.Xrm.Sdk.Query.ConditionOperator.Null, null);
-                        }
+                        value = entity.Id;
                     }
+                    if (value != null)
+                    {
+                        CintQryExp.AppendCondition(qMatch.Criteria, LogicalOperator.And, matchattr, Microsoft.Xrm.Sdk.Query.ConditionOperator.Equal, value);
+                    }
+                    else
+                    {
+                        CintQryExp.AppendCondition(qMatch.Criteria, LogicalOperator.And, matchattr, Microsoft.Xrm.Sdk.Query.ConditionOperator.Null, null);
+                    }
+                }
 #if DEBUG
-                    container.Logger.Log("Finding matches for {0}:\n{1}", entity, container.Convert(qMatch));
+                container.Logger.Log("Finding matches for {0}:\n{1}", entity, container.Convert(qMatch));
 #endif
-                    matches = container.RetrieveMultiple(qMatch);
-                }
-
-                return matches;
+                matches = container.RetrieveMultiple(qMatch);
             }
-            catch (Exception ex)
-            {
-                container.Logger.Log(ex.ToString());
-            }
-            finally
-            {
-                container.Logger.EndSection();
-            }
-            return null;
+            container.Logger.EndSection();
+            return matches;
         }
 
         private EntityCollection GetMatchingRecordsFromPreRetrieved(IContainable container, List<string> matchattributes, Entity cdEntity, EntityCollection cAllRecordsToMatch)
@@ -311,7 +298,8 @@
                 {   // All records shall be deleted, no match attribute defined, so just get all and delete all
                     var entity = block.Entity;
                     var qDelete = new QueryExpression(entity);
-                    qDelete.ColumnSet.AddColumn(container.Entity(entity).PrimaryIdAttribute);
+                    //qDelete.ColumnSet.AddColumn(crmsvc.PrimaryAttribute(entity, log));
+                    qDelete.ColumnSet.AddColumn(container.Service.PrimaryAttribute(entity, container.Logger));
                     var deleterecords = container.RetrieveMultiple(qDelete);
                     SendLine(container, "Deleting ALL {0} - {1} records", entity, deleterecords.Entities.Count);
                     foreach (var record in deleterecords.Entities)
@@ -330,7 +318,7 @@
                             }
                             else
                             {
-                                throw ex;
+                                throw;
                             }
                         }
                         i++;
@@ -399,7 +387,7 @@
                                             }
                                             else
                                             {
-                                                throw ex;
+                                                throw;
                                             }
                                         }
                                     }
@@ -497,7 +485,7 @@
                                 }
                                 else
                                 {
-                                    throw ex;
+                                    throw;
                                 }
                             }
 
@@ -511,7 +499,7 @@
                         container.Logger.Log(ex);
                         if (stoponerror)
                         {
-                            throw ex;
+                            throw;
                         }
                     }
                     i++;
@@ -552,7 +540,7 @@
             var recordSaved = false;
             if (string.IsNullOrWhiteSpace(identifier))
             {
-                identifier = cdNewEntity.ToStringExt();
+                identifier = cdNewEntity.ToString();
             }
             var newOwner = cdNewEntity.GetAttribute<EntityReference>("ownerid", null);
             var newState = cdNewEntity.GetAttribute<OptionSetValue>("statecode", null);
@@ -605,7 +593,7 @@
                     }
                     else
                     {
-                        SendLine(container, "{0:000} TEST Skipped: {1} (Identical)", pos, identifier);
+                        SendLine(container, "{0:000} Skipped: {1} (Identical)", pos, identifier);
                     }
                 }
                 else
@@ -615,6 +603,7 @@
                 if (newOwner != null && !newOwner.Equals(cdMatchEntity.GetAttribute("ownerid", new EntityReference())))
                 {
                     container.Principal(newOwner).On(cdNewEntity).Assign();
+                    //cdNewEntity.Assign(newOwner);
                     SendLine(container, "{0:000} Assigned: {1} to {2} {3}", pos, identifier, newOwner.LogicalName, string.IsNullOrEmpty(newOwner.Name) ? newOwner.Id.ToString() : newOwner.Name);
                 }
             }
