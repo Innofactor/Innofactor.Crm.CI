@@ -95,13 +95,12 @@
         }
 
         /// <summary>Returns a list of file names that are required for the given ShuffleDefinition</summary>
-        /// <param name="container"></param>
         /// <param name="shuffleDefinition">ShuffleDefinition file</param>
         /// <param name="definitionpath"></param>
         /// <returns>List of files</returns>
-        public static List<string> GetReferencedFiles(IContainable container, string shuffleDefinition, string definitionpath)
+        public static List<string> GetReferencedFiles(string shuffleDefinition, string definitionpath, CRMLogger log)
         {
-            container.Logger.StartSection(MethodBase.GetCurrentMethod().Name);
+            log.StartSection(MethodBase.GetCurrentMethod().Name);
             var result = new List<string>();
             if (File.Exists(shuffleDefinition))
             {
@@ -109,7 +108,7 @@
                 if (DataFileRequired(definition))
                 {
                     var datafile = Path.ChangeExtension(shuffleDefinition, ".data.xml");
-                    container.Logger.Log("Adding data file: {0}", datafile);
+                    log.Log("Adding data file: {0}", datafile);
                     result.Add(datafile);
                 }
                 foreach (var solBlock in definition.Blocks.Items.Where(b => b is SolutionBlock))
@@ -117,17 +116,17 @@
                     var solFile = GetSolutionFilename((SolutionBlock)solBlock, definitionpath);
                     if (!result.Contains(solFile))
                     {
-                        container.Logger.Log("Adding solution file: {0}", solFile);
+                        log.Log("Adding solution file: {0}", solFile);
                         result.Add(solFile);
                     }
                 }
             }
             else
             {
-                container.Logger.Log("Definition file not found");
+                log.Log("Definition file not found");
             }
-            container.Logger.Log("Returning {0} files", result.Count);
-            container.Logger.EndSection();
+            log.Log("Returning {0} files", result.Count);
+            log.EndSection();
             return result;
         }
 
@@ -278,7 +277,7 @@
         {
             var root = CintXML.FindChild(xml, "ShuffleData");
             var sertype = CintXML.GetAttribute(root, "Type");
-            if (sertype == SerializationStyle.Text.ToString())
+            if (sertype == SerializationType.Text.ToString())
             {
                 var xText = CintXML.FindChild(root, "Text");
                 var text = xText.InnerText;
@@ -401,7 +400,7 @@
             var xml = new XmlDocument();
             XmlNode root = xml.CreateElement("ShuffleData");
             xml.AppendChild(root);
-            CintXML.AppendAttribute(root, "Type", SerializationStyle.Text.ToString());
+            CintXML.AppendAttribute(root, "Type", SerializationType.Text.ToString());
             CintXML.AppendAttribute(root, "Delimeter", delimeter.ToString());
             CintXML.AddCDATANode(root, "Text", text);
             return xml;
