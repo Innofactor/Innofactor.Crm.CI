@@ -10,7 +10,11 @@ gulp.task('minify', [], function () {
 
     return gulp.src('*.maxi.js')
         .pipe(strip())
-        .pipe(uglify())
+        .pipe(uglify().on('error', function (uglify) {
+            console.log("An error occurred in minification (uglify) " + uglify.toString());
+            console.error(uglify.message);
+            this.emit('end');
+        }))
         .pipe(rename(pattern))
         .pipe(gulp.dest(''));
 });
