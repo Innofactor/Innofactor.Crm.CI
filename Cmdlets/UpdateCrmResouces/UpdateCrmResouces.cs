@@ -126,7 +126,7 @@
                     WriteWarning(e.Message);
                 }
             }
-
+            WriteVerbose($"Total Resource Files before excluding: {resourcefiles.Count}");
             foreach (var pattern in excludepatterns.Where(p => !string.IsNullOrWhiteSpace(p)))
             {
                 var filepattern = pattern;
@@ -143,6 +143,8 @@
                     WriteObject($"Excluding {files.Count()} files matching \"{filepattern}\"");
                     foreach (var fileToExclude in files)
                     {
+                        if (resourcefiles.Any(x => x.IndexOf(fileToExclude.FullName) >= 0))
+                            WriteVerbose($"Excluding file: {fileToExclude.FullName}");
                         resourcefiles.RemoveAll(x => x.IndexOf(fileToExclude.FullName, StringComparison.InvariantCultureIgnoreCase) >= 0);
                     }
                 }
@@ -151,7 +153,7 @@
                     WriteWarning(e.Message);
                 }
             }
-
+            WriteVerbose($"Total Resource Files after excluding: {resourcefiles.Count}");
             return resourcefiles;
         }
 
