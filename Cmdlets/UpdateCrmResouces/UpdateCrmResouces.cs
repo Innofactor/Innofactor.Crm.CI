@@ -29,19 +29,19 @@
         [Parameter(
             Mandatory = true,
             Position = 1,
-            HelpMessage = "Publisher prefix to add to the webresource path"
+            HelpMessage = "Publisher prefix to add to the web resource path"
         ), Alias("Pre")]
         public string Prefix { get; set; }
 
         [Parameter(
-                                    Mandatory = true,
+            Mandatory = true,
             Position = 0,
-            HelpMessage = "Path to folder with wwebresources"
+            HelpMessage = "Path to folder with web resources"
         ), Alias("R")]
         public string RootFolder { get; set; }
 
         [Parameter(
-            HelpMessage = "Set this to allow updating managed webresources"
+            HelpMessage = "Set this to allow updating managed web resources"
         ), Alias("UM")]
         public bool UpdateManaged { get; set; } = false;
 
@@ -141,7 +141,10 @@
                 {
                     var files = di.GetFiles(filepattern, option);
                     WriteObject($"Excluding {files.Count()} files matching \"{filepattern}\"");
-                    resourcefiles.RemoveAll(file => (files.Select(f => f.FullName).Contains(file)));
+                    foreach (var fileToExclude in files)
+                    {
+                        resourcefiles.RemoveAll(x => x.IndexOf(fileToExclude.FullName, StringComparison.InvariantCultureIgnoreCase) >= 0);
+                    }
                 }
                 catch (DirectoryNotFoundException e)
                 {
