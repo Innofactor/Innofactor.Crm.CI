@@ -200,7 +200,7 @@
                     var updatewr = wr;
                     updatewr.Attributes["content"] = filecontent;
                     Service.Update(updatewr);
-                    WriteObject($"Updated {wr}");
+                    WriteObject($"Updated {crmpath}");
                     updatecount++;
                 }
                 else
