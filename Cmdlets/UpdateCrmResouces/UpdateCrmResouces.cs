@@ -89,6 +89,7 @@
 
         private List<string> GetWebResourcesFromDisk()
         {
+            WriteDebug($"Executing GetWebResourcesFromDisk");
             var patterns = "**\\*.*";
             var includepatterns = new List<string>();
             var excludepatterns = new List<string>();
@@ -159,7 +160,7 @@
 
         private void UpdateWebResources(List<string> files)
         {
-            WriteObject(string.Format("Updating {0} webresources", files.Count));
+            WriteObject($"Updating {files.Count} webresources");
 
             var progress = new ProgressRecord(0, "UpdateWebResources", "Idle");
             var fileno = 0;
@@ -168,7 +169,7 @@
             {
                 fileno++;
                 var crmpath = GetCrmPath(file);
-                WriteVerbose("  " + crmpath);
+                WriteVerbose($"Retrieving {crmpath}");
                 progress.StatusDescription = $"Retrieving {crmpath}";
                 progress.PercentComplete = (fileno * 50) / files.Count;
                 WriteProgress(progress);
@@ -186,7 +187,7 @@
                     }
                     else
                     {
-                        WriteWarning("Updating managed webresource: " + crmpath);
+                        WriteWarning($"Updating managed webresource: {crmpath}");
                     }
                 }
                 fileno++;
@@ -197,14 +198,14 @@
                 if (filecontent != wr.Attributes["content"] as string)
                 {
                     var updatewr = wr;
-                    updatewr.Attributes.Add("content", filecontent);
+                    updatewr.Attributes["content"] = filecontent;
                     Service.Update(updatewr);
                     WriteObject($"Updated {wr}");
                     updatecount++;
                 }
                 else
                 {
-                    WriteVerbose($"No change: {wr}");
+                    WriteVerbose($"No change: {crmpath}");
                 }
             }
             WriteObject($"Successfully updated {updatecount} webresources.");
