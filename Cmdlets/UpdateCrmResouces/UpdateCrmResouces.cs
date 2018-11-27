@@ -66,11 +66,19 @@
             {
                 if (patternpart.StartsWith("!"))
                 {
-                    excludepatterns.Add(patternpart.Substring(1));
+                    var chunk = patternpart.Substring(1).ToLowerInvariant();
+
+                    if (!excludepatterns.Contains(chunk))
+                    {
+                        excludepatterns.Add(chunk);
+                    }
                 }
                 else
                 {
-                    includepatterns.Add(patternpart);
+                    if (!excludepatterns.Contains(patternpart.ToLowerInvariant()))
+                    {
+                        includepatterns.Add(patternpart.ToLowerInvariant());
+                    }
                 }
             }
         }
@@ -145,7 +153,10 @@
                     foreach (var fileToExclude in files)
                     {
                         if (resourcefiles.Any(x => x.IndexOf(fileToExclude.FullName) >= 0))
+                        {
                             WriteVerbose($"Excluding file: {fileToExclude.FullName}");
+                        }
+                            
                         resourcefiles.RemoveAll(x => x.IndexOf(fileToExclude.FullName, StringComparison.InvariantCultureIgnoreCase) >= 0);
                     }
                 }
