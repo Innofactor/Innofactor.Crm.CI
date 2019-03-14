@@ -3,11 +3,11 @@ const strip = require('gulp-strip-debug');
 const uglify = require('gulp-uglify');
 const rename = require("gulp-rename");
 
-gulp.task('minify', [], function () {
+gulp.task('minify', gulp.series(function () {
     var pattern = function (file) {
         file.basename = file.basename.replace('.maxi', '');
     };
-
+    
     return gulp.src('*.maxi.js')
         .pipe(strip())
         .pipe(uglify().on('error', function (uglify) {
@@ -16,5 +16,5 @@ gulp.task('minify', [], function () {
             this.emit('end');
         }))
         .pipe(rename(pattern))
-        .pipe(gulp.dest(''));
-});
+        .pipe(gulp.dest('.'));
+}));
