@@ -3,7 +3,7 @@ const strip = require('gulp-strip-debug');
 const uglify = require('gulp-uglify');
 const rename = require("gulp-rename");
 
-gulp.task('minify', gulp.series(function () {
+function minify() {
     var pattern = function (file) {
         file.basename = file.basename.replace('.maxi', '');
     };
@@ -17,4 +17,5 @@ gulp.task('minify', gulp.series(function () {
         }))
         .pipe(rename(pattern))
         .pipe(gulp.dest('.'));
-}));
+}
+gulp.task(minify);
