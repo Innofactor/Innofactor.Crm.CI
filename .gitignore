@@ -255,3 +255,4 @@ paket-files/
 ps_modules/
 VSIX/
 /CI/Extension/pat.txt
+/codealike.json
