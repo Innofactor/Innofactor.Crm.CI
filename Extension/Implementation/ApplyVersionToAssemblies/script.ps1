@@ -71,12 +71,19 @@ if ($VersionType -eq "file")
         $Base = Get-Content $VersionFile
         Write-Host "Base from file $VersionFile is $Base"
         
-        $RevisionRegex = "\d+"
-        $RevisionData = [regex]::matches($Env:BUILD_BUILDNUMBER,$RevisionRegex)
+		if($localRevisionNumber)
+		{
+			$Revision = $localRevisionNumber;
+	        Write-Host "Revision from local variable is $Revision"
+	}
+		else
+		{
+			$RevisionRegex = "\d+"
+			$RevisionData = [regex]::matches($Env:BUILD_BUILDNUMBER,$RevisionRegex)
         
-        $Revision = $RevisionData[$RevisionData.Count-1]
-        
-        Write-Host "Revision from $Env:BUILD_BUILDNUMBER is $Revision"
+			$Revision = $RevisionData[$RevisionData.Count-1]
+	        Write-Host "Revision from $Env:BUILD_BUILDNUMBER is $Revision"
+        }
 
         $NewVersion = "$Base.$Revision"
     }
