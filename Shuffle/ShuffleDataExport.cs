@@ -1,8 +1,12 @@
 ﻿namespace Cinteros.Crm.Utils.Shuffle
 {
-    using Cinteros.Crm.Utils.Common;
-    using Cinteros.Crm.Utils.Common.Interfaces;
-    using Cinteros.Crm.Utils.Misc;
+    //using Cinteros.Crm.Utils.Common;
+    //using Cinteros.Crm.Utils.Common.Interfaces;
+    //using Cinteros.Crm.Utils.Misc;
+    using Innofactor.Xrm.Utils.Common;
+    using Innofactor.Xrm.Utils.Common.Fluent;
+    using Innofactor.Xrm.Utils.Common.Fluent.Entity;
+    using Innofactor.Xrm.Utils.Common.Fluent.Attribute;
     using Cinteros.Crm.Utils.Shuffle.Types;
     using Microsoft.Xrm.Sdk;
     using Microsoft.Xrm.Sdk.Messages;
@@ -14,6 +18,7 @@
     using System.Linq;
     using System.Reflection;
     using System.Xml;
+    using Innofactor.Xrm.Utils.Common.Extensions;
 
     public partial class Shuffler
     {
@@ -29,9 +34,9 @@
                 var includenull = relation.IncludeNull;
                 var ids = new List<string>();
                 var parentcoll = blocks.ContainsKey(block) ? blocks[block] : null;
-                if (parentcoll != null && parentcoll.Count > 0)
+                if (parentcoll != null && parentcoll.Entities.Count > 0)
                 {
-                    foreach (var parent in parentcoll)
+                    foreach (var parent in parentcoll.Entities)
                     {
                         if (string.IsNullOrEmpty(pkattribute))
                         {
@@ -39,7 +44,7 @@
                         }
                         else
                         {
-                            ids.Add(parent.Property<EntityReference>(pkattribute, new EntityReference()).Id.ToString());
+                            ids.Add(parent.GetAttribute(pkattribute, new EntityReference()).Id.ToString());
                         }
                     }
                 }
@@ -99,9 +104,9 @@
             }
         }
 
-        private static void SelectAttributes(CintDynEntityCollection cExportEntities, List<string> lAttributes, List<string> lNullAttributes)
+        private static void SelectAttributes(EntityCollection cExportEntities, List<string> lAttributes, List<string> lNullAttributes)
         {
-            foreach (var cde in cExportEntities)
+            foreach (var cde in cExportEntities.Entities)
             {
                 var i = 0;
                 var x = new List<string>(cde.Attributes.Keys);
@@ -211,9 +216,9 @@
 
                 var ids = new List<object>();
                 var parentcoll = blocks.ContainsKey(block) ? blocks[block] : null;
-                if (parentcoll != null && parentcoll.Count > 0)
+                if (parentcoll != null && parentcoll.Entities.Count > 0)
                 {
-                    foreach (var parent in parentcoll)
+                    foreach (var parent in parentcoll.Entities)
                     {
                         if (string.IsNullOrEmpty(pkattribute))
                         {
@@ -228,11 +233,11 @@
                         }
                         else if (type == AttributeTypeCode.String)
                         {
-                            ids.Add(parent.Property<EntityReference>(pkattribute, new EntityReference()).Id.ToString());
+                            ids.Add(parent.GetAttribute(pkattribute, new EntityReference()).Id.ToString());
                         }
                         else
                         {
-                            ids.Add(parent.Property<EntityReference>(pkattribute, new EntityReference()).Id);
+                            ids.Add(parent.GetAttribute(pkattribute, new EntityReference()).Id);
                         }
                     }
                 }
@@ -258,11 +263,11 @@
             log.EndSection();
         }
 
-        private CintDynEntityCollection ExportDataBlock(ShuffleBlocks blocks, DataBlock block)
+        private EntityCollection ExportDataBlock(ShuffleBlocks blocks, DataBlock block)
         {
             log.StartSection("ExportDataBlock");
             log.Log("Block: {0}", block.Name);
-            CintDynEntityCollection cExportEntities = null;
+            EntityCollection cExportEntities = null;
 
             if (block.Export != null)
             {
@@ -309,7 +314,8 @@
 #if DEBUG
                     log.Log("FetchXML:\n{0}", fetchxml);
 #endif
-                    cExportEntities = CintDynEntity.RetrieveMultiple(crmsvc, new FetchExpression(fetchxml), log);
+                    cExportEntities = Entity.RetrieveMultiple(crmsvc, new FetchExpression(fetchxml), log);
+                    
                     log.EndSection();
                 }
                 else if (!block.TypeSpecified || block.Type == EntityTypes.Entity)

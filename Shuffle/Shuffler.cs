@@ -7,6 +7,8 @@ namespace Cinteros.Crm.Utils.Shuffle
     using Cinteros.Crm.Utils.Common.Interfaces;
     using Cinteros.Crm.Utils.Misc;
     using Cinteros.Crm.Utils.Shuffle.Types;
+    using Innofactor.Xrm.Utils.Common.Extensions;
+    using Innofactor.Xrm.Utils.Common.Interfaces;
     using Microsoft.Xrm.Sdk;
     using Microsoft.Xrm.Sdk.Client;
     using Microsoft.Xrm.Sdk.Query;
@@ -33,8 +35,9 @@ namespace Cinteros.Crm.Utils.Shuffle
 
         #region Private Fields
 
-        private readonly IServicable crmsvc;
-        private readonly ILoggable log;
+        private IExecutionContainer container;
+        //private readonly IServicable crmsvc;
+        //private readonly ILoggable log;
         private XmlDocument definition;
         private string definitionpath;
         private Dictionary<Guid, Guid> guidmap = null;
@@ -111,7 +114,7 @@ namespace Cinteros.Crm.Utils.Shuffle
         /// <param name="Delimeter">Delimeter to use when exporting to Type: Text</param>
         /// <param name="ShuffleEventHandler">Event handler processing messages from the export. May be null.</param>
         /// <returns>XmlDocument with exported data</returns>
-        public static XmlDocument QuickExport(IContainable container, XmlDocument Definition, SerializationType Type, char Delimeter, EventHandler<ShuffleEventArgs> ShuffleEventHandler) =>
+        public static XmlDocument QuickExport(IExecutionContainer container, XmlDocument Definition, SerializationType Type, char Delimeter, EventHandler<ShuffleEventArgs> ShuffleEventHandler) =>
             QuickExport(container, Definition, Type, Delimeter, ShuffleEventHandler, null);
 
         /// <summary>Export data according to shuffle definition in Definition to format Type</summary>
@@ -122,7 +125,7 @@ namespace Cinteros.Crm.Utils.Shuffle
         /// <param name="ShuffleEventHandler">Event handler processing messages from the export. May be null.</param>
         /// <param name="defpath">Folder path for the shuffle definition file.</param>
         /// <returns>XmlDocument with exported data</returns>
-        public static XmlDocument QuickExport(IContainable container, XmlDocument Definition, SerializationType Type, char Delimeter, EventHandler<ShuffleEventArgs> ShuffleEventHandler, string defpath) =>
+        public static XmlDocument QuickExport(IExecutionContainer container, XmlDocument Definition, SerializationType Type, char Delimeter, EventHandler<ShuffleEventArgs> ShuffleEventHandler, string defpath) =>
             QuickExport(container, Definition, Type, Delimeter, ShuffleEventHandler, defpath, false);
 
         /// <summary>Export data according to shuffle definition in Definition to format Type</summary>
@@ -134,7 +137,7 @@ namespace Cinteros.Crm.Utils.Shuffle
         /// <param name="defpath">Folder path for the shuffle definition file.</param>
         /// <param name="clearRemainingShuffleVars"></param>
         /// <returns>XmlDocument with exported data</returns>
-        public static XmlDocument QuickExport(IContainable container, XmlDocument Definition, SerializationType Type, char Delimeter, EventHandler<ShuffleEventArgs> ShuffleEventHandler, string defpath, bool clearRemainingShuffleVars)
+        public static XmlDocument QuickExport(IExecutionContainer container, XmlDocument Definition, SerializationType Type, char Delimeter, EventHandler<ShuffleEventArgs> ShuffleEventHandler, string defpath, bool clearRemainingShuffleVars)
         {
             container.Logger.StartSection("QuickExport");
             var shuffle = new Shuffler(container);
@@ -157,7 +160,7 @@ namespace Cinteros.Crm.Utils.Shuffle
         /// <param name="Data">Exported data</param>
         /// <param name="ShuffleEventHandler">Event handler processing messages from the import. May be null.</param>
         /// <returns>Tuple with counters for: Created, Updated, Skipped and Failed records and a collection of entityreferences for the created/updated records</returns>
-        public static Tuple<int, int, int, int, int, EntityReferenceCollection> QuickImport(IContainable container, XmlDocument Definition, XmlDocument Data, EventHandler<ShuffleEventArgs> ShuffleEventHandler) =>
+        public static Tuple<int, int, int, int, int, EntityReferenceCollection> QuickImport(IExecutionContainer container, XmlDocument Definition, XmlDocument Data, EventHandler<ShuffleEventArgs> ShuffleEventHandler) =>
             QuickImport(container, Definition, Data, ShuffleEventHandler, null);
 
         /// <summary>Import data in Data according to shuffle definition in Definition</summary>
@@ -167,7 +170,7 @@ namespace Cinteros.Crm.Utils.Shuffle
         /// <param name="ShuffleEventHandler">Event handler processing messages from the import. May be null.</param>
         /// <param name="defpath">Path to definition file, if not standard</param>
         /// <returns>Tuple with counters for: Created, Updated, Skipped and Failed records and a collection of entityreferences for the created/updated records</returns>
-        public static Tuple<int, int, int, int, int, EntityReferenceCollection> QuickImport(IContainable container, XmlDocument Definition, XmlDocument Data, EventHandler<ShuffleEventArgs> ShuffleEventHandler, string defpath) =>
+        public static Tuple<int, int, int, int, int, EntityReferenceCollection> QuickImport(IExecutionContainer container, XmlDocument Definition, XmlDocument Data, EventHandler<ShuffleEventArgs> ShuffleEventHandler, string defpath) =>
             QuickImport(container, Definition, Data, ShuffleEventHandler, defpath, false);
 
         /// <summary>Import data in Data according to shuffle definition in Definition</summary>
@@ -178,7 +181,7 @@ namespace Cinteros.Crm.Utils.Shuffle
         /// <param name="defpath">Path to definition file, if not standard</param>
         /// <param name="clearRemainingShuffleVars"></param>
         /// <returns>Tuple with counters for: Created, Updated, Skipped and Failed records and a collection of entityreferences for the created/updated records</returns>
-        public static Tuple<int, int, int, int, int, EntityReferenceCollection> QuickImport(IContainable container, XmlDocument Definition, XmlDocument Data, EventHandler<ShuffleEventArgs> ShuffleEventHandler, string defpath, bool clearRemainingShuffleVars)
+        public static Tuple<int, int, int, int, int, EntityReferenceCollection> QuickImport(IExecutionContainer container, XmlDocument Definition, XmlDocument Data, EventHandler<ShuffleEventArgs> ShuffleEventHandler, string defpath, bool clearRemainingShuffleVars)
         {
             container.Logger.StartSection("QuickImport");
             var shuffle = new Shuffler(container);
@@ -189,7 +192,7 @@ namespace Cinteros.Crm.Utils.Shuffle
             ShuffleHelper.VerifyShuffleVars(Definition, clearRemainingShuffleVars);
             shuffle.Definition = Definition;
             shuffle.definitionpath = defpath;
-            var blocks = shuffle.Deserialize(Data);
+            var blocks = shuffle.Deserialize(container, Data);
             var result = shuffle.ImportToCRM(blocks);
             container.Logger.EndSection();
             return result;
@@ -200,7 +203,7 @@ namespace Cinteros.Crm.Utils.Shuffle
         /// </summary>
         /// <param name="serialized"></param>
         /// <returns>Optional, only required for SerializationType: Text</returns>
-        public ShuffleBlocks Deserialize(XmlDocument serialized)
+        public ShuffleBlocks Deserialize(IExecutionContainer container, XmlDocument serialized)
         {
             log.StartSection("Deserialize");
             var result = new ShuffleBlocks();
@@ -246,7 +249,7 @@ namespace Cinteros.Crm.Utils.Shuffle
                             log.Log("Block start");
                             if (!string.IsNullOrWhiteSpace(name) && serializedblock != null)
                             {
-                                var cEntities = new CintDynEntityCollection(serializedblock.ToString(), delimeter, crmsvc, log);
+                                var cEntities = new EntityCollection(serializedblock.ToString(), delimeter, crmsvc, log);
                                 result.Add(name, cEntities);
                                 SendLine("Block {0}: {1} records", name, cEntities.Count);
                             }
@@ -277,7 +280,7 @@ namespace Cinteros.Crm.Utils.Shuffle
         /// Export entities from CRM to dictionary of blocks with entities
         /// </summary>
         /// <returns>Blocks with exported entities</returns>
-        public ShuffleBlocks ExportFromCRM()
+        public ShuffleBlocks ExportFromCRM(IExecutionContainer container)
         {
             log.StartSection("ExportFromCRM");
             if (definition == null)
@@ -342,7 +345,7 @@ namespace Cinteros.Crm.Utils.Shuffle
         /// </summary>
         /// <param name="blocks">Blocks with entities to import</param>
         /// <returns>Tuple with counters for: Created, Updated, Skipped and Failed records</returns>
-        public Tuple<int, int, int, int, int, EntityReferenceCollection> ImportToCRM(ShuffleBlocks blocks)
+        public Tuple<int, int, int, int, int, EntityReferenceCollection> ImportToCRM(IExecutionContainer container, ShuffleBlocks blocks)
         {
             log.StartSection("ImportToCRM");
             if (definition == null)
@@ -379,7 +382,7 @@ namespace Cinteros.Crm.Utils.Shuffle
                         var name = datablock.Name;
                         if (!blocks.ContainsKey(name))
                         {
-                            blocks.Add(name, new CintDynEntityCollection());
+                            blocks.Add(name, new EntityCollection());
                         }
                         var dataresult = ImportDataBlock(datablock, blocks[name]);
                         created += dataresult.Item1;
@@ -418,9 +421,9 @@ namespace Cinteros.Crm.Utils.Shuffle
         /// <param name="type"></param>
         /// <param name="delimeter">Optional, only required for SerializationType: Text</param>
         /// <returns></returns>
-        public XmlDocument Serialize(ShuffleBlocks blocks, SerializationType type, char delimeter)
+        public XmlDocument Serialize(IExecutionContainer container, ShuffleBlocks blocks, SerializationType type, char delimeter)
         {
-            log.StartSection("Serialize");
+            container.StartSection("Serialize");
             XmlDocument xml = null;
             if (blocks.Count > 0)
             {
@@ -439,11 +442,11 @@ namespace Cinteros.Crm.Utils.Shuffle
                     case SerializationType.Explicit:
                         foreach (var block in blocks.Keys)
                         {
-                            SendLine("Serializing {0} records in block {1}", blocks[block].Count, block);
+                            SendLine("Serializing {0} records in block {1}", blocks[block].Count(), block);
                             XmlNode xBlock = xml.CreateElement("Block");
                             root.AppendChild(xBlock);
                             CintXML.AppendAttribute(xBlock, "Name", block);
-                            CintXML.AppendAttribute(xBlock, "Count", blocks[block].Count.ToString());
+                            CintXML.AppendAttribute(xBlock, "Count", blocks[block].Count().ToString());
                             var xSerialized = blocks[block].Serialize((SerializationStyle)type);
                             xBlock.AppendChild(xml.ImportNode(xSerialized.ChildNodes[0], true));
                         }
@@ -454,7 +457,7 @@ namespace Cinteros.Crm.Utils.Shuffle
                         var text = new StringBuilder();
                         foreach (var block in blocks.Keys)
                         {
-                            SendLine("Serializing {0} records in block {1}", blocks[block].Count, block);
+                            SendLine("Serializing {0} records in block {1}", blocks[block].Count(), block);
                             text.AppendLine("<<<" + block + ">>>");
                             var serializedblock = blocks[block].ToTextFile(delimeter);
                             text.Append(serializedblock);
@@ -463,7 +466,7 @@ namespace Cinteros.Crm.Utils.Shuffle
                         break;
                 }
             }
-            log.EndSection();
+            container.EndSection();
             return xml;
         }
 
@@ -489,12 +492,13 @@ namespace Cinteros.Crm.Utils.Shuffle
 
         #region Private Methods
 
-        private CintDynEntityCollection GetExistingSolutions()
+        private EntityCollection GetExistingSolutions(IExecutionContainer container)
         {
-            var cSolutions = CintDynEntity.RetrieveMultiple(crmsvc, "solution",
+            
+            var cSolutions = container.RetrieveMultiple("solution",
                 new string[] { "isvisible" },
                 new object[] { true },
-                new ColumnSet("solutionid", "uniquename", "friendlyname", "version", "ismanaged"), log);
+                new ColumnSet("solutionid", "uniquename", "friendlyname", "version", "ismanaged"));
             return cSolutions;
         }
 

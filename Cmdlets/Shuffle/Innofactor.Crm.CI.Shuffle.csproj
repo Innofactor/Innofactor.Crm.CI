@@ -37,6 +37,9 @@
     <Reference Include="Cinteros.Crm.Utils.Misc, Version=9.0.1804.11, Culture=neutral, PublicKeyToken=0b6cd78ab2e51f2b, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Innofactor.Xrm.DevUtils.Common.9.0.1804.11\lib\net452\Cinteros.Crm.Utils.Misc.dll</HintPath>
     </Reference>
+    <Reference Include="Innofactor.Xrm.Utils.Common, Version=1.0.25.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Xrm.Utils.Common.1.0.25\lib\net452\Innofactor.Xrm.Utils.Common.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Crm.Sdk.Proxy, Version=9.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.CrmSdk.CoreAssemblies.9.0.2.4\lib\net452\Microsoft.Crm.Sdk.Proxy.dll</HintPath>
     </Reference>

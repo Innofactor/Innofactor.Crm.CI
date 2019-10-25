@@ -40,6 +40,9 @@
     <Reference Include="ILMerge">
       <HintPath>..\packages\ILMerge.2.14.1208\tools\ILMerge.exe</HintPath>
     </Reference>
+    <Reference Include="Innofactor.Xrm.Utils.Common, Version=1.0.25.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Xrm.Utils.Common.1.0.25\lib\net452\Innofactor.Xrm.Utils.Common.dll</HintPath>
+    </Reference>
     <Reference Include="McTools.Xrm.Connection, Version=1.2018.7.19, Culture=neutral, PublicKeyToken=96037217801d9658, processorArchitecture=MSIL">
       <HintPath>..\packages\MscrmTools.Xrm.Connection.1.2018.7.19\lib\net462\McTools.Xrm.Connection.dll</HintPath>
     </Reference>

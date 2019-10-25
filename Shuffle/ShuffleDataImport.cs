@@ -1,7 +1,11 @@
 ﻿namespace Cinteros.Crm.Utils.Shuffle
 {
-    using Cinteros.Crm.Utils.Common;
+    //using Cinteros.Crm.Utils.Common;
     using Cinteros.Crm.Utils.Shuffle.Types;
+    using Innofactor.Xrm.Utils.Common.Extensions;
+    using Innofactor.Xrm.Utils.Common.Interfaces;
+    using Innofactor.Xrm.Utils.Common.Fluent.Attribute;
+    using Innofactor.Xrm.Utils.Common.Fluent.Entity;
     using Microsoft.Crm.Sdk.Messages;
     using Microsoft.Xrm.Sdk;
     using Microsoft.Xrm.Sdk.Query;
@@ -16,12 +20,13 @@
     {
         #region Private Methods
 
-        private static bool EntityAttributesEqual(List<string> matchattributes, CintDynEntity entity1, CintDynEntity entity2)
+        private static bool EntityAttributesEqual(IExecutionContainer container, List<string> matchattributes, Entity entity1, Entity entity2)
         {
             var match = true;
             foreach (var attr in matchattributes)
             {
                 var srcvalue = "";
+                container.Entity(entity1).Via.
                 if (attr == entity1.PrimaryIdAttribute)
                 {
                     srcvalue = entity1.Id.ToString();
@@ -40,7 +45,7 @@
             return match;
         }
 
-        private static string GetEntityDisplayString(DataBlockImportMatch match, CintDynEntity cdEntity)
+        private static string GetEntityDisplayString(IExecutionContainer container, DataBlockImportMatch match, Entity cdEntity)
         {
             var unique = new List<string>();
             if (match != null && match.Attribute.Length > 0)
@@ -82,7 +87,7 @@
             return string.Join(", ", unique);
         }
 
-        private static void ReplaceUpdateInfo(CintDynEntity cdEntity)
+        private static void ReplaceUpdateInfo(Entity cdEntity)
         {
             var removeAttr = new List<string>();
             var newAttr = new List<KeyValuePair<string, object>>();
@@ -123,9 +128,9 @@
             }
         }
 
-        private CintDynEntityCollection GetAllRecordsForMatching(List<string> allattributes, CintDynEntity cdEntity)
+        private EntityCollection GetAllRecordsForMatching(List<string> allattributes, Entity cdEntity)
         {
-            log.StartSection(MethodBase.GetCurrentMethod().Name);
+            container.StartSection(MethodBase.GetCurrentMethod().Name);
             var qMatch = new QueryExpression(cdEntity.Name)
             {
                 ColumnSet = new ColumnSet(allattributes.ToArray())
@@ -133,7 +138,7 @@
 #if DEBUG
             log.Log("Retrieving all records for {0}:\n{1}", cdEntity.Name, CintQryExp.ConvertToFetchXml(qMatch, crmsvc));
 #endif
-            var matches = CintDynEntity.RetrieveMultiple(crmsvc, qMatch, log);
+            var matches = Entity.RetrieveMultiple(crmsvc, qMatch, log);
             SendLine("Pre-retrieved {0} records for matching", matches.Count);
             log.EndSection();
             return matches;
@@ -157,10 +162,10 @@
             return result;
         }
 
-        private CintDynEntityCollection GetMatchingRecords(CintDynEntity cdEntity, List<string> matchattributes, List<string> updateattributes, bool preretrieveall, ref CintDynEntityCollection cAllRecordsToMatch)
+        private EntityCollection GetMatchingRecords(IExecutionContainer container, Entity cdEntity, List<string> matchattributes, List<string> updateattributes, bool preretrieveall, ref EntityCollection cAllRecordsToMatch)
         {
-            log.StartSection(MethodBase.GetCurrentMethod().Name);
-            CintDynEntityCollection matches = null;
+            container.StartSection(MethodBase.GetCurrentMethod().Name);
+            EntityCollection matches = null;
             var allattributes = new List<string>();
             allattributes.Add(cdEntity.PrimaryIdAttribute);
             if (cdEntity.Contains("ownerid"))
@@ -212,23 +217,23 @@
 #if DEBUG
                 log.Log("Finding matches for {0}:\n{1}", cdEntity, CintQryExp.ConvertToFetchXml(qMatch, crmsvc));
 #endif
-                matches = CintDynEntity.RetrieveMultiple(crmsvc, qMatch, log);
+                matches = Entity.RetrieveMultiple(crmsvc, qMatch, log);
             }
-            log.EndSection();
+            container.EndSection();
             return matches;
         }
 
-        private CintDynEntityCollection GetMatchingRecordsFromPreRetrieved(List<string> matchattributes, CintDynEntity cdEntity, CintDynEntityCollection cAllRecordsToMatch)
+        private EntityCollection GetMatchingRecordsFromPreRetrieved(IExecutionContainer container, List<string> matchattributes, Entity cdEntity, EntityCollection cAllRecordsToMatch)
         {
-            log.StartSection(MethodBase.GetCurrentMethod().Name);
-            log.Log("Searching matches for: {0} {1}", cdEntity.Id, cdEntity);
-            var result = new CintDynEntityCollection();
-            foreach (var cdRecord in cAllRecordsToMatch)
+            container.StartSection(MethodBase.GetCurrentMethod().Name);
+            container.Log("Searching matches for: {0} {1}", cdEntity.Id, cdEntity);
+            var result = new EntityCollection();
+            foreach (var cdRecord in cAllRecordsToMatch.Entities)
             {
                 if (EntityAttributesEqual(matchattributes, cdEntity, cdRecord))
                 {
                     result.Add(cdRecord);
-                    log.Log("Found match: {0} {1}", cdRecord.Id, cdRecord);
+                    container.Log("Found match: {0} {1}", cdRecord.Id, cdRecord);
                 }
             }
             log.Log("Returned matches: {0}", result.Count);
@@ -236,10 +241,10 @@
             return result;
         }
 
-        private List<string> GetUpdateAttributes(CintDynEntityCollection entities)
+        private List<string> GetUpdateAttributes(EntityCollection entities)
         {
             var result = new List<string>();
-            foreach (var entity in entities)
+            foreach (var entity in entities.)
             {
                 foreach (var attribute in entity.Attributes.Keys)
                 {
@@ -252,9 +257,9 @@
             return result;
         }
 
-        private Tuple<int, int, int, int, int, EntityReferenceCollection> ImportDataBlock(DataBlock block, CintDynEntityCollection cEntities)
+        private Tuple<int, int, int, int, int, EntityReferenceCollection> ImportDataBlock(IExecutionContainer container, DataBlock block, EntityCollection cEntities)
         {
-            log.StartSection("ImportDataBlock");
+            container.StartSection("ImportDataBlock");
             var created = 0;
             var updated = 0;
             var skipped = 0;
@@ -284,7 +289,7 @@
                 var preretrieveall = block.Import.Match?.PreRetrieveAll ?? false;
 
                 SendLine();
-                SendLine("Importing block {0} - {1} records ", name, cEntities.Count);
+                SendLine("Importing block {0} - {1} records ", name, cEntities.Count());
 
                 var i = 1;
 
@@ -293,7 +298,7 @@
                     var entity = block.Entity;
                     var qDelete = new QueryExpression(entity);
                     qDelete.ColumnSet.AddColumn(crmsvc.PrimaryAttribute(entity, log));
-                    var deleterecords = CintDynEntity.RetrieveMultiple(crmsvc, qDelete, log);
+                    var deleterecords = Entity.RetrieveMultiple(crmsvc, qDelete, log);
                     SendLine("Deleting ALL {0} - {1} records", entity, deleterecords.Count);
                     foreach (var record in deleterecords)
                     {
@@ -319,7 +324,7 @@
                 }
                 var totalRecords = cEntities.Count;
                 i = 1;
-                CintDynEntityCollection cAllRecordsToMatch = null;
+                EntityCollection cAllRecordsToMatch = null;
                 foreach (var cdEntity in cEntities)
                 {
                     var unique = cdEntity.Id.ToString();
@@ -460,8 +465,8 @@
 
                             var ref1 = (EntityReference)cdEntity.Attributes.ElementAt(0).Value;
                             var ref2 = (EntityReference)cdEntity.Attributes.ElementAt(1).Value;
-                            var party1 = CintDynEntity.InitFromNameAndId(ref1.LogicalName, ref1.Id, crmsvc, log);
-                            var party2 = CintDynEntity.InitFromNameAndId(ref2.LogicalName, ref2.Id, crmsvc, log);
+                            var party1 = Entity.InitFromNameAndId(ref1.LogicalName, ref1.Id, crmsvc, log);
+                            var party2 = Entity.InitFromNameAndId(ref2.LogicalName, ref2.Id, crmsvc, log);
                             try
                             {
                                 party1.Associate(party2, intersect);
@@ -488,7 +493,7 @@
                     {
                         failed++;
                         SendLine("\n*** Error record: {0} ***\n{1}", unique, ex.Message);
-                        log.Log(ex);
+                        container.Log(ex);
                         if (stoponerror)
                         {
                             throw;
@@ -503,7 +508,7 @@
             return new Tuple<int, int, int, int, int, EntityReferenceCollection>(created, updated, skipped, deleted, failed, references);
         }
 
-        private void ReplaceGuids(CintDynEntity cdEntity, bool includeid)
+        private void ReplaceGuids(Entity cdEntity, bool includeid)
         {
             foreach (var prop in cdEntity.Attributes)
             {
@@ -526,9 +531,9 @@
             }
         }
 
-        private bool SaveEntity(CintDynEntity cdNewEntity, CintDynEntity cdMatchEntity, bool updateInactiveRecord, bool updateIdentical, int pos, string identifier)
+        private bool SaveEntity(IExecutionContainer container, Entity cdNewEntity, Entity cdMatchEntity, bool updateInactiveRecord, bool updateIdentical, int pos, string identifier)
         {
-            log.StartSection("SaveEntity " + pos.ToString("000 ") + identifier);
+            container.StartSection("SaveEntity " + pos.ToString("000 ") + identifier);
             var recordSaved = false;
             if (string.IsNullOrWhiteSpace(identifier))
             {
@@ -623,7 +628,7 @@
                 }
 
             }
-            log.EndSection();
+            container.EndSection();
             return recordSaved;
         }
 
@@ -632,7 +637,7 @@
 
     internal static class DuplicateRuleExt
     {
-        public static void UnpublishDuplicateRule(this CintDynEntity duplicateRule) => duplicateRule.Container.Service.Execute(new UnpublishDuplicateRuleRequest { DuplicateRuleId = duplicateRule.Id });
-        public static void PublishDuplicateRule(this CintDynEntity duplicateRule) => duplicateRule.Container.Service.Execute(new PublishDuplicateRuleRequest { DuplicateRuleId = duplicateRule.Id });
+        public static void UnpublishDuplicateRule(this Entity duplicateRule) => duplicateRule.Container.Service.Execute(new UnpublishDuplicateRuleRequest { DuplicateRuleId = duplicateRule.Id });
+        public static void PublishDuplicateRule(this Entity duplicateRule) => duplicateRule.Container.Service.Execute(new PublishDuplicateRuleRequest { DuplicateRuleId = duplicateRule.Id });
     }
 }
