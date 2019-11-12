@@ -26,8 +26,7 @@
             foreach (var attr in matchattributes)
             {
                 var srcvalue = "";
-                container.Entity(entity1).Via.
-                if (attr == entity1.PrimaryIdAttribute)
+                if (attr == container.Entity(entity1.LogicalName).PrimaryIdAttribute)
                 {
                     srcvalue = entity1.Id.ToString();
                 }
@@ -60,9 +59,9 @@
                     var matchvalue = "<null>";
                     if (cdEntity.Contains(matchdisplay, true))
                     {
-                        if (cdEntity.Entity[matchdisplay] is EntityReference)
+                        if (cdEntity[matchdisplay] is EntityReference)
                         {   // Don't use PropertyAsString, that would perform GetRelated that we don't want due to performance
-                            var entref = cdEntity.Property<EntityReference>(matchdisplay, null);
+                            var entref = cdEntity.GetAttribute<EntityReference>(matchdisplay, null);
                             if (!string.IsNullOrEmpty(entref.Name))
                             {
                                 matchvalue = entref.Name;
@@ -131,16 +130,16 @@
         private EntityCollection GetAllRecordsForMatching(List<string> allattributes, Entity cdEntity)
         {
             container.StartSection(MethodBase.GetCurrentMethod().Name);
-            var qMatch = new QueryExpression(cdEntity.Name)
+            var qMatch = new QueryExpression(cdEntity.LogicalName)
             {
                 ColumnSet = new ColumnSet(allattributes.ToArray())
             };
 #if DEBUG
-            log.Log("Retrieving all records for {0}:\n{1}", cdEntity.Name, CintQryExp.ConvertToFetchXml(qMatch, crmsvc));
+            container.Log("Retrieving all records for {0}:\n{1}", cdEntity.LogicalName, CintQryExp.ConvertToFetchXml(qMatch, crmsvc));
 #endif
-            var matches = Entity.RetrieveMultiple(crmsvc, qMatch, log);
-            SendLine("Pre-retrieved {0} records for matching", matches.Count);
-            log.EndSection();
+            var matches = container.RetrieveMultiple(qMatch);
+            SendLine("Pre-retrieved {0} records for matching", matches.Count());
+            container.EndSection();
             return matches;
         }
 
@@ -167,6 +166,7 @@
             container.StartSection(MethodBase.GetCurrentMethod().Name);
             EntityCollection matches = null;
             var allattributes = new List<string>();
+            
             allattributes.Add(cdEntity.PrimaryIdAttribute);
             if (cdEntity.Contains("ownerid"))
             {
@@ -184,11 +184,11 @@
                 {
                     cAllRecordsToMatch = GetAllRecordsForMatching(allattributes, cdEntity);
                 }
-                matches = GetMatchingRecordsFromPreRetrieved(matchattributes, cdEntity, cAllRecordsToMatch);
+                matches = GetMatchingRecordsFromPreRetrieved(container, matchattributes, cdEntity, cAllRecordsToMatch);
             }
             else
             {
-                var qMatch = new QueryExpression(cdEntity.Name)
+                var qMatch = new QueryExpression(cdEntity.LogicalName)
                 {
                     // We need to be able to see if any attributes have changed, so lets make sure matching records have all the attributes that will be updated
                     ColumnSet = new ColumnSet(allattributes.ToArray())
@@ -197,9 +197,9 @@
                 foreach (var matchattr in matchattributes)
                 {
                     object value = null;
-                    if (cdEntity.Entity.Contains(matchattr))
+                    if (cdEntity.Contains(matchattr))
                     {
-                        value = CintEntity.AttributeToBaseType(cdEntity.Entity[matchattr]);
+                        value = CintEntity.AttributeToBaseType(cdEntity[matchattr]);
                     }
                     else if (matchattr == cdEntity.PrimaryIdAttribute)
                     {
@@ -215,9 +215,9 @@
                     }
                 }
 #if DEBUG
-                log.Log("Finding matches for {0}:\n{1}", cdEntity, CintQryExp.ConvertToFetchXml(qMatch, crmsvc));
+                container.Log("Finding matches for {0}:\n{1}", cdEntity, CintQryExp.ConvertToFetchXml(qMatch, crmsvc));
 #endif
-                matches = Entity.RetrieveMultiple(crmsvc, qMatch, log);
+                matches = container.RetrieveMultiple(qMatch);
             }
             container.EndSection();
             return matches;
@@ -236,15 +236,15 @@
                     container.Log("Found match: {0} {1}", cdRecord.Id, cdRecord);
                 }
             }
-            log.Log("Returned matches: {0}", result.Count);
-            log.EndSection();
+            container.Log("Returned matches: {0}", result.Count());
+            container.EndSection();
             return result;
         }
 
         private List<string> GetUpdateAttributes(EntityCollection entities)
         {
             var result = new List<string>();
-            foreach (var entity in entities.)
+            foreach (var entity in entities.Entities)
             {
                 foreach (var attribute in entity.Attributes.Keys)
                 {
@@ -268,7 +268,7 @@
             var references = new EntityReferenceCollection();
 
             var name = block.Name;
-            log.Log("Block: {0}", name);
+            container.Log("Block: {0}", name);
             SendStatus(name, null);
             SendLine();
 
@@ -298,14 +298,15 @@
                     var entity = block.Entity;
                     var qDelete = new QueryExpression(entity);
                     qDelete.ColumnSet.AddColumn(crmsvc.PrimaryAttribute(entity, log));
-                    var deleterecords = Entity.RetrieveMultiple(crmsvc, qDelete, log);
-                    SendLine("Deleting ALL {0} - {1} records", entity, deleterecords.Count);
-                    foreach (var record in deleterecords)
+                    var deleterecords = container.RetrieveMultiple(qDelete);
+                    //var deleterecords = Entity.RetrieveMultiple(crmsvc, qDelete, log);
+                    SendLine("Deleting ALL {0} - {1} records", entity, deleterecords.Count());
+                    foreach (var record in deleterecords.Entities)
                     {
                         SendLine("{0:000} Deleting existing: {1}", i, record);
                         try
                         {
-                            record.Delete();
+                            container.Delete(record);
                             deleted++;
                         }
                         catch (FaultException<OrganizationServiceFault> ex)
@@ -322,10 +323,10 @@
                         i++;
                     }
                 }
-                var totalRecords = cEntities.Count;
+                var totalRecords = cEntities.Count();
                 i = 1;
                 EntityCollection cAllRecordsToMatch = null;
-                foreach (var cdEntity in cEntities)
+                foreach (var cdEntity in cEntities.Entities)
                 {
                     var unique = cdEntity.Id.ToString();
                     SendStatus(-1, -1, totalRecords, i);
@@ -334,9 +335,9 @@
                         var oldid = cdEntity.Id;
                         var newid = Guid.Empty;
 
-                        ReplaceGuids(cdEntity, includeid);
+                        ReplaceGuids(container, cdEntity, includeid);
                         ReplaceUpdateInfo(cdEntity);
-                        unique = GetEntityDisplayString(block.Import.Match, cdEntity);
+                        unique = GetEntityDisplayString(container, block.Import.Match, cdEntity);
                         SendStatus(null, unique);
 
                         if (!block.TypeSpecified || block.Type == EntityTypes.Entity)
@@ -356,25 +357,25 @@
                                     {
                                         cdEntity.Id = Guid.Empty;
                                     }
-                                    if (SaveEntity(cdEntity, null, updateinactive, updateidentical, i, unique))
+                                    if (SaveEntity(container, cdEntity, null, updateinactive, updateidentical, i, unique))
                                     {
                                         created++;
                                         newid = cdEntity.Id;
-                                        references.Add(cdEntity.Entity.ToEntityReference());
+                                        references.Add(cdEntity.ToEntityReference());
                                     }
                                 }
                             }
                             else
                             {
-                                var matches = GetMatchingRecords(cdEntity, matchattributes, updateattributes, preretrieveall, ref cAllRecordsToMatch);
-                                if (delete == DeleteTypes.All || (matches.Count == 1 && delete == DeleteTypes.Existing))
+                                var matches = GetMatchingRecords(container, cdEntity, matchattributes, updateattributes, preretrieveall, ref cAllRecordsToMatch);
+                                if (delete == DeleteTypes.All || (matches.Count() == 1 && delete == DeleteTypes.Existing))
                                 {
-                                    foreach (var cdMatch in matches)
+                                    foreach (var cdMatch in matches.Entities)
                                     {
                                         SendLine("{0:000} Deleting existing: {1}", i, unique);
                                         try
                                         {
-                                            cdMatch.Delete();
+                                            container.Delete(cdMatch);
                                             deleted++;
                                         }
                                         catch (FaultException<OrganizationServiceFault> ex)
@@ -389,9 +390,9 @@
                                             }
                                         }
                                     }
-                                    matches.Clear();
+                                    matches.Entities.Clear();
                                 }
-                                if (matches.Count == 0)
+                                if (matches.Count() == 0)
                                 {
                                     if (save == SaveTypes.Never || save == SaveTypes.UpdateOnly)
                                     {
@@ -404,24 +405,24 @@
                                         {
                                             cdEntity.Id = Guid.Empty;
                                         }
-                                        if (SaveEntity(cdEntity, null, updateinactive, updateidentical, i, unique))
+                                        if (SaveEntity(container, cdEntity, null, updateinactive, updateidentical, i, unique))
                                         {
                                             created++;
                                             newid = cdEntity.Id;
-                                            references.Add(cdEntity.Entity.ToEntityReference());
+                                            references.Add(cdEntity.ToEntityReference());
                                         }
                                     }
                                 }
-                                else if (matches.Count == 1)
+                                else if (matches.Count() == 1)
                                 {
                                     var match = matches[0];
                                     newid = match.Id;
                                     if (save == SaveTypes.CreateUpdate || save == SaveTypes.UpdateOnly)
                                     {
-                                        if (SaveEntity(cdEntity, match, updateinactive, updateidentical, i, unique))
+                                        if (SaveEntity(container, cdEntity, match, updateinactive, updateidentical, i, unique))
                                         {
                                             updated++;
-                                            references.Add(cdEntity.Entity.ToEntityReference());
+                                            references.Add(cdEntity.ToEntityReference());
                                         }
                                         else
                                         {
@@ -437,13 +438,13 @@
                                 else
                                 {
                                     failed++;
-                                    SendLine("Import object matches {0} records in target database!", matches.Count);
+                                    SendLine("Import object matches {0} records in target database!", matches.Count());
                                     SendLine(unique);
                                 }
                             }
                             if (!oldid.Equals(Guid.Empty) && !newid.Equals(Guid.Empty) && !oldid.Equals(newid) && !guidmap.ContainsKey(oldid))
                             {
-                                log.Log("Mapping IDs: {0} ==> {1}", oldid, newid);
+                                container.Log("Mapping IDs: {0} ==> {1}", oldid, newid);
                                 guidmap.Add(oldid, newid);
                             }
 
@@ -504,11 +505,11 @@
 
                 SendLine("Created: {0} Updated: {1} Skipped: {2} Deleted: {3} Failed: {4}", created, updated, skipped, deleted, failed);
             }
-            log.EndSection();
+            container.EndSection();
             return new Tuple<int, int, int, int, int, EntityReferenceCollection>(created, updated, skipped, deleted, failed, references);
         }
 
-        private void ReplaceGuids(Entity cdEntity, bool includeid)
+        private void ReplaceGuids(IExecutionContainer container, Entity cdEntity, bool includeid)
         {
             foreach (var prop in cdEntity.Attributes)
             {
@@ -520,7 +521,7 @@
                     }
                     else
                     {
-                        log.Log("No action, we don't care about the guid of the object");
+                        container.Log("No action, we don't care about the guid of the object");
                     }
                 }
 
@@ -539,10 +540,10 @@
             {
                 identifier = cdNewEntity.ToString();
             }
-            var newOwner = cdNewEntity.Property<EntityReference>("ownerid", null);
-            var newState = cdNewEntity.Property<OptionSetValue>("statecode", null);
-            var newStatus = cdNewEntity.Property<OptionSetValue>("statuscode", null);
-            var newActive = newState != null ? CintEntity.GetActiveStates(cdNewEntity.Name).Contains(newState.Value) : true;
+            var newOwner = cdNewEntity.GetAttribute<EntityReference>("ownerid", null);
+            var newState = cdNewEntity.GetAttribute<OptionSetValue>("statecode", null);
+            var newStatus = cdNewEntity.GetAttribute<OptionSetValue>("statuscode", null);
+            var newActive = newState != null ? CintEntity.GetActiveStates(cdNewEntity.LogicalName).Contains(newState.Value) : true;
             var nowActive = true;
             if ((newState == null) != (newStatus == null))
             {
@@ -550,25 +551,25 @@
             }
             if (!newActive)
             {
-                log.Log("Removing state+status from entity to update");
+                container.Log("Removing state+status from entity to update");
                 cdNewEntity.RemoveProperty("statecode");
                 cdNewEntity.RemoveProperty("statuscode");
             }
             if (cdMatchEntity == null)
             {
-                cdNewEntity.Create();
+                container.Create(cdNewEntity);
                 recordSaved = true;
                 SendLine("{0:000} Created: {1}", pos, identifier);
             }
             else
             {
-                var oldState = cdMatchEntity.Property<OptionSetValue>("statecode", null);
+                var oldState = cdMatchEntity.GetAttribute<OptionSetValue>("statecode", null);
                 var oldActive = oldState != null ? CintEntity.GetActiveStates(cdNewEntity.Name).Contains(oldState.Value) : true;
                 nowActive = oldActive;
                 cdNewEntity.Id = cdMatchEntity.Id;
                 if (!oldActive && (newActive || updateInactiveRecord))
                 {   // Inaktiv post som ska aktiveras eller uppdateras
-                    cdNewEntity.SetState(0, 1);
+                    container.SetState(cdNewEntity, 0, 1);
                     SendLine("{0:000} Activated: {1} for update", pos, identifier);
                     nowActive = true;
                 }
@@ -580,9 +581,9 @@
                     {
                         updateattributes.Remove(cdNewEntity.PrimaryIdAttribute);
                     }
-                    if (updateIdentical || !EntityAttributesEqual(updateattributes, cdNewEntity, cdMatchEntity))
+                    if (updateIdentical || !EntityAttributesEqual(container, updateattributes, cdNewEntity, cdMatchEntity))
                     {
-                        cdNewEntity.Update();
+                        container.Update(cdNewEntity);
                         recordSaved = true;
                         SendLine("{0:000} Updated: {1}", pos, identifier);
                     }
@@ -595,8 +596,9 @@
                 {
                     SendLine("{0:000} Inactive: {1}", pos, identifier);
                 }
-                if (newOwner != null && !newOwner.Equals(cdMatchEntity.Property("ownerid", new EntityReference())))
+                if (newOwner != null && !newOwner.Equals(cdMatchEntity.GetAttribute("ownerid", new EntityReference())))
                 {
+                    
                     cdNewEntity.Assign(newOwner);
                     SendLine("{0:000} Assigned: {1} to {2} {3}", pos, identifier, newOwner.LogicalName, string.IsNullOrEmpty(newOwner.Name) ? newOwner.Id.ToString() : newOwner.Name);
                 }
@@ -604,11 +606,11 @@
             if (newActive != nowActive)
             {   // Aktiv skall ändras på posten
                 var newStatusValue = newStatus.Value;
-                if (cdNewEntity.Name == "savedquery" && newState.Value == 1 && newStatusValue == 1)
+                if (cdNewEntity.LogicalName == "savedquery" && newState.Value == 1 && newStatusValue == 1)
                 {   // Justering för inaktiverad men ej publicerad vy
                     newStatusValue = 2;
                 }
-                if (cdNewEntity.Name == "duplicaterule")
+                if (cdNewEntity.LogicalName == "duplicaterule")
                 {
                     if (newStatusValue == 2)
                     {
