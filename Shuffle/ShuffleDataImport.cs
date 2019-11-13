@@ -276,7 +276,7 @@ namespace Cinteros.Crm.Utils.Shuffle
                 }
                 var matchattributes = GetMatchAttributes(block.Import.Match);
                 var updateattributes = !updateidentical ? GetUpdateAttributes(cEntities) : new List<string>();
-                var preretrieveall = (bool)block.Import.Match?.PreRetrieveAll;
+                var preretrieveall = block.Import.Match?.PreRetrieveAll == true;
 
                 SendLine();
                 SendLine("Importing block {0} - {1} records ", name, cEntities.Count);
