@@ -3,9 +3,9 @@
 /// </summary>
 namespace Cinteros.Crm.Utils.Shuffle
 {
-    using Cinteros.Crm.Utils.Common;
-    using Cinteros.Crm.Utils.Common.Interfaces;
-    using Cinteros.Crm.Utils.Misc;
+    //using Cinteros.Crm.Utils.Common;
+    //using Cinteros.Crm.Utils.Common.Interfaces;
+    //using Cinteros.Crm.Utils.Misc;
     using Cinteros.Crm.Utils.Shuffle.Types;
     using Innofactor.Xrm.Utils.Common.Extensions;
     using Innofactor.Xrm.Utils.Common.Interfaces;
@@ -51,10 +51,11 @@ namespace Cinteros.Crm.Utils.Shuffle
 
         /// <summary>General constructor for the Shuffler class</summary>
         /// <param name="container"></param>
-        public Shuffler(IContainable container)
+        public Shuffler(IExecutionContainer container)
         {
-            crmsvc = container.Service;
-            log = container.Logger;
+            this.container = container;
+            //crmsvc = container.Service;
+            //log = container.Logger;
         }
 
         #endregion Public Constructors
@@ -82,7 +83,7 @@ namespace Cinteros.Crm.Utils.Shuffle
             get { return definition; }
             set
             {
-                ShuffleHelper.ValidateDefinitionXml(value, log);
+                ShuffleHelper.ValidateDefinitionXml(value);
                 definition = value;
             }
         }
@@ -139,7 +140,7 @@ namespace Cinteros.Crm.Utils.Shuffle
         /// <returns>XmlDocument with exported data</returns>
         public static XmlDocument QuickExport(IExecutionContainer container, XmlDocument Definition, SerializationType Type, char Delimeter, EventHandler<ShuffleEventArgs> ShuffleEventHandler, string defpath, bool clearRemainingShuffleVars)
         {
-            container.Logger.StartSection("QuickExport");
+            container.StartSection("QuickExport");
             var shuffle = new Shuffler(container);
             if (ShuffleEventHandler != null)
             {
@@ -148,9 +149,9 @@ namespace Cinteros.Crm.Utils.Shuffle
             ShuffleHelper.VerifyShuffleVars(Definition, clearRemainingShuffleVars);
             shuffle.Definition = Definition;
             shuffle.definitionpath = defpath;
-            var blocks = shuffle.ExportFromCRM();
-            var result = shuffle.Serialize(blocks, Type, Delimeter);
-            container.Logger.EndSection();
+            var blocks = shuffle.ExportFromCRM(container);
+            var result = shuffle.Serialize(container, blocks, Type, Delimeter);
+            container.EndSection();
             return result;
         }
 
@@ -183,7 +184,7 @@ namespace Cinteros.Crm.Utils.Shuffle
         /// <returns>Tuple with counters for: Created, Updated, Skipped and Failed records and a collection of entityreferences for the created/updated records</returns>
         public static Tuple<int, int, int, int, int, EntityReferenceCollection> QuickImport(IExecutionContainer container, XmlDocument Definition, XmlDocument Data, EventHandler<ShuffleEventArgs> ShuffleEventHandler, string defpath, bool clearRemainingShuffleVars)
         {
-            container.Logger.StartSection("QuickImport");
+            container.StartSection("QuickImport");
             var shuffle = new Shuffler(container);
             if (ShuffleEventHandler != null)
             {
@@ -193,8 +194,8 @@ namespace Cinteros.Crm.Utils.Shuffle
             shuffle.Definition = Definition;
             shuffle.definitionpath = defpath;
             var blocks = shuffle.Deserialize(container, Data);
-            var result = shuffle.ImportToCRM(blocks);
-            container.Logger.EndSection();
+            var result = shuffle.ImportToCRM(container, blocks);
+            container.EndSection();
             return result;
         }
 
@@ -205,7 +206,7 @@ namespace Cinteros.Crm.Utils.Shuffle
         /// <returns>Optional, only required for SerializationType: Text</returns>
         public ShuffleBlocks Deserialize(IExecutionContainer container, XmlDocument serialized)
         {
-            log.StartSection("Deserialize");
+            container.StartSection("Deserialize");
             var result = new ShuffleBlocks();
             if (serialized != null)
             {
@@ -225,7 +226,7 @@ namespace Cinteros.Crm.Utils.Shuffle
                             var name = CintXML.GetAttribute(xBlock, "Name");
                             var xml = new XmlDocument();
                             xml.AppendChild(xml.ImportNode(xBlock.ChildNodes[0], true));
-                            var cEntities = new CintDynEntityCollection(xml, crmsvc, log);
+                            var cEntities = new EntityCollection(xml);
                             SendLine("Block {0}: {1} records", name, cEntities.Count);
                             result.Add(name, cEntities);
                         }
@@ -251,7 +252,7 @@ namespace Cinteros.Crm.Utils.Shuffle
                             {
                                 var cEntities = new EntityCollection(serializedblock.ToString(), delimeter, crmsvc, log);
                                 result.Add(name, cEntities);
-                                SendLine("Block {0}: {1} records", name, cEntities.Count);
+                                SendLine("Block {0}: {1} records", name, cEntities.Entities.Count);
                             }
                             name = current.Substring(3);
                             name = name.Substring(0, name.IndexOf(">>>", StringComparison.Ordinal));
@@ -272,7 +273,7 @@ namespace Cinteros.Crm.Utils.Shuffle
                     }
                 }
             }
-            log.EndSection();
+            container.EndSection();
             return result;
         }
 
@@ -282,7 +283,7 @@ namespace Cinteros.Crm.Utils.Shuffle
         /// <returns>Blocks with exported entities</returns>
         public ShuffleBlocks ExportFromCRM(IExecutionContainer container)
         {
-            log.StartSection("ExportFromCRM");
+            container.StartSection("ExportFromCRM");
             if (definition == null)
             {
                 throw new ArgumentNullException("Definition", "Shuffle definition must be specified to export data");
@@ -293,11 +294,11 @@ namespace Cinteros.Crm.Utils.Shuffle
             {
                 stoponerror = ShuffleDefinition.StopOnError;
                 timeout = ShuffleDefinition.TimeoutSpecified ? ShuffleDefinition.Timeout : -1;
-                double savedtimeout = -1;
-                if (timeout > -1)
-                {
-                    savedtimeout = SetTimeout();
-                }
+                //double savedtimeout = -1;
+                //if (timeout > -1)
+                //{
+                //    savedtimeout = SetTimeout();
+                //}
 
                 var totalBlocks = ShuffleDefinition.Blocks.Items.Length;
                 var currentBlock = 0;
@@ -331,23 +332,24 @@ namespace Cinteros.Crm.Utils.Shuffle
                     }
                 }
                 SendStatus(0, 0, 0, 0);
-                if (savedtimeout > -1)
-                {
-                    ResetTimeout(savedtimeout);
-                }
+                //if (savedtimeout > -1)
+                //{
+                //    ResetTimeout(container, savedtimeout);
+                //}
             }
-            log.EndSection();
+            container.EndSection();
             return blocks;
         }
 
         /// <summary>
         /// Import entities to CRM from dictionary of blocks
         /// </summary>
+        /// <param name="container"></param>
         /// <param name="blocks">Blocks with entities to import</param>
         /// <returns>Tuple with counters for: Created, Updated, Skipped and Failed records</returns>
         public Tuple<int, int, int, int, int, EntityReferenceCollection> ImportToCRM(IExecutionContainer container, ShuffleBlocks blocks)
         {
-            log.StartSection("ImportToCRM");
+            container.StartSection("ImportToCRM");
             if (definition == null)
             {
                 throw new ArgumentNullException("Definition", "Shuffle definition must be specified to import data");
@@ -384,7 +386,7 @@ namespace Cinteros.Crm.Utils.Shuffle
                         {
                             blocks.Add(name, new EntityCollection());
                         }
-                        var dataresult = ImportDataBlock(datablock, blocks[name]);
+                        var dataresult = ImportDataBlock(container, datablock, blocks[name]);
                         created += dataresult.Item1;
                         updated += dataresult.Item2;
                         skipped += dataresult.Item3;
@@ -407,16 +409,17 @@ namespace Cinteros.Crm.Utils.Shuffle
                 SendStatus(0, 0, 0, 0);
                 if (savedtimeout > -1)
                 {
-                    ResetTimeout(savedtimeout);
+                    ResetTimeout(container, savedtimeout);
                 }
             }
-            log.EndSection();
+            container.EndSection();
             return new Tuple<int, int, int, int, int, EntityReferenceCollection>(created, updated, skipped, deleted, failed, references);
         }
 
         /// <summary>
         /// Serialize blocks with entities with given serialization type
         /// </summary>
+        /// <param name="container"></param>
         /// <param name="blocks"></param>
         /// <param name="type"></param>
         /// <param name="delimeter">Optional, only required for SerializationType: Text</param>
@@ -502,33 +505,33 @@ namespace Cinteros.Crm.Utils.Shuffle
             return cSolutions;
         }
 
-        private void ResetTimeout(double savedtimeout)
+        //private void ResetTimeout(IExecutionContainer container, double savedtimeout)
+        //{
+        //    //if (crmsvc.Service is OrganizationServiceProxy orgsvcpxy)
+        //    //{
+        //    //    orgsvcpxy.Timeout = new TimeSpan(0, (int)savedtimeout, 0);
+        //    //}
+        //    //if (container.Service is CrmServiceClient svcclient)
+        //    //{
+        //    //   // svcclient.OrganizationServiceProxy.Timeout = new TimeSpan(0, (int)savedtimeout, 0);
+        //    //}
+        //}
+
+        private void SendLine(IExecutionContainer container)
         {
-            if (crmsvc.Service is OrganizationServiceProxy orgsvcpxy)
-            {
-                orgsvcpxy.Timeout = new TimeSpan(0, (int)savedtimeout, 0);
-            }
-            else if (crmsvc.Service is CrmServiceClient svcclient)
-            {
-                svcclient.OrganizationServiceProxy.Timeout = new TimeSpan(0, (int)savedtimeout, 0);
-            }
+            SendText(container, "\n", false);
         }
 
-        private void SendLine()
+        private void SendLine(IExecutionContainer container, string msg, params object[] args)
         {
-            SendText("\n", false);
+            SendText(container, msg, false, args);
+            SendLine(container);
         }
 
-        private void SendLine(string msg, params object[] args)
+        private void SendLineUpdate(IExecutionContainer container, string msg, params object[] args)
         {
-            SendText(msg, false, args);
-            SendLine();
-        }
-
-        private void SendLineUpdate(string msg, params object[] args)
-        {
-            SendText(msg, true, args);
-            SendLine();
+            SendText(container, msg, true, args);
+            SendLine(container);
         }
 
         private void SendStatus(int totalBlocks, int currentBlock, int blockRecords, int currentRecord)
@@ -541,40 +544,40 @@ namespace Cinteros.Crm.Utils.Shuffle
             OnRaiseShuffleEvent(new ShuffleEventArgs(null, block, record));
         }
 
-        private void SendText(string msg, bool replacelast, params object[] args)
+        private void SendText(IExecutionContainer container, string msg, bool replacelast, params object[] args)
         {
-            SendText(msg, -1, -1, -1, -1, replacelast, args);
+            SendText(container, msg, -1, -1, -1, -1, replacelast, args);
         }
 
-        private void SendText(string msg, int totalBlocks, int currentBlock, int blockRecords, int currentRecord, bool replacelast, params object[] args)
+        private void SendText(IExecutionContainer container, string msg, int totalBlocks, int currentBlock, int blockRecords, int currentRecord, bool replacelast, params object[] args)
         {
             if (msg != null)
             {
                 msg = string.Format(msg, args);
                 if (msg.Length > 1)
                 {
-                    log.Log(msg, args);
+                    container.Log(msg, args);
                 }
             }
             OnRaiseShuffleEvent(new ShuffleEventArgs(msg, totalBlocks, currentBlock, blockRecords, currentRecord, replacelast));
         }
 
-        private double SetTimeout()
-        {
-            SendLine("Setting timeout: {0} minutes", timeout);
-            double savedtimeout = -1;
-            if (crmsvc.Service is OrganizationServiceProxy orgsvcpxy)
-            {
-                savedtimeout = orgsvcpxy.Timeout.TotalMinutes;
-                orgsvcpxy.Timeout = new TimeSpan(0, timeout, 0);
-            }
-            else if (crmsvc.Service is CrmServiceClient svcclient)
-            {
-                savedtimeout = svcclient.OrganizationServiceProxy.Timeout.TotalMinutes;
-                svcclient.OrganizationServiceProxy.Timeout = new TimeSpan(0, timeout, 0);
-            }
-            return savedtimeout;
-        }
+        //private double SetTimeout()
+        //{
+            //SendLine("Setting timeout: {0} minutes", timeout);
+            //double savedtimeout = -1;
+            //if (crmsvc.Service is OrganizationServiceProxy orgsvcpxy)
+            //{
+            //    savedtimeout = orgsvcpxy.Timeout.TotalMinutes;
+            //    orgsvcpxy.Timeout = new TimeSpan(0, timeout, 0);
+            //}
+            //else if (crmsvc.Service is CrmServiceClient svcclient)
+            //{
+            //    savedtimeout = svcclient.OrganizationServiceProxy.Timeout.TotalMinutes;
+            //    svcclient.OrganizationServiceProxy.Timeout = new TimeSpan(0, timeout, 0);
+            //}
+            //return savedtimeout;
+        //}
 
         #endregion Private Methods
     }
