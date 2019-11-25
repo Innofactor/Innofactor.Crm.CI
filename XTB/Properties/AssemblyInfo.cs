@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // Les informations générales relatives à un assembly dépendent de 
 // l'ensemble d'attributs suivant. Changez les valeurs de ces attributs pour modifier les informations
 // associées à un assembly.
-[assembly: AssemblyCompany("Innofactor Sweden")]
-[assembly: AssemblyProduct("Innofactor Shuffle Tools for XrmToolBox")]
-[assembly: AssemblyCopyright("Copyright © Innofactor AB 2017")]
-[assembly: AssemblyTitle("Innofactor Shuffle")]
-[assembly: AssemblyDescription("Innofactor Shuffle Tools for XrmToolBox")]
+[assembly: AssemblyCompany("Dynamics Community")]
+[assembly: AssemblyProduct("Shuffle Tools for XrmToolBox")]
+[assembly: AssemblyCopyright("")]
+[assembly: AssemblyTitle("Shuffle")]
+[assembly: AssemblyDescription("Shuffle Tools for XrmToolBox")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // Vous pouvez spécifier toutes les valeurs ou indiquer les numéros de build et de révision par défaut 
 // en utilisant '*', comme indiqué ci-dessous :
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.2018.05.5")]
-[assembly: AssemblyFileVersion("1.2018.05.5")]
+[assembly: AssemblyVersion("1.2019.11.7")]
+[assembly: AssemblyFileVersion("1.2019.11.7")]

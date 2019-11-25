@@ -381,9 +381,12 @@
                     var xEntity = CintFetchXML.Create(xDoc, block.Entity);
                     CintFetchXML.AddAttribute(xEntity, lAttributes.ToArray());
 
-                    foreach (var relation in block.Relation)
+                    if (block.Relation != null)
                     {
-                        AddRelationFilter(blocks, relation, xEntity, log);
+                        foreach (var relation in block.Relation)
+                        {
+                            AddRelationFilter(blocks, relation, xEntity, log);
+                        }
                     }
 
                     var fetch = xDoc.OuterXml;
