@@ -6,7 +6,7 @@
 https://jonasr.app/2017/04/devops-i/ <br/>
 These describe the outline of the tools in this repository.
 
-### VSTS Build and Release extension
+### Azure DevOps Pipeline extension
 https://marketplace.visualstudio.com/items?itemName=InnofactorSE.cinteros-devutils-ci-build-tasks <br/>
 Tasks to facilitate automation of builds and deployments.
 
