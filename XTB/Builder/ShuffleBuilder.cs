@@ -20,7 +20,7 @@ using Clipboard = Innofactor.Crm.Shuffle.Builder.AppCode.Clipboard;
 
 namespace Innofactor.Crm.Shuffle.Builder
 {
-    public partial class ShuffleBuilder : PluginControlBase, IMessageBusHost, IGitHubPlugin, IStatusBarMessenger
+    public partial class ShuffleBuilder : PluginControlBase, IMessageBusHost, IGitHubPlugin, IStatusBarMessenger, IHelpPlugin
     {
         internal Clipboard clipboard = new Clipboard();
         private string fileName;
@@ -40,6 +40,8 @@ namespace Innofactor.Crm.Shuffle.Builder
         public string RepositoryName => "Innofactor.Crm.CI";
 
         public string UserName => "Innofactor";
+
+        public string HelpUrl => "https://jonasr.app/2017/04/devops-i/";
 
         public ShuffleBuilder()
         {
