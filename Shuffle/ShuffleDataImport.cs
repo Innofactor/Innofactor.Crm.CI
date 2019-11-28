@@ -4,6 +4,7 @@
     using Cinteros.Crm.Utils.Shuffle.Types;
     using Innofactor.Xrm.Utils.Common.Extensions;
     using Innofactor.Xrm.Utils.Common.Interfaces;
+    using Innofactor.Xrm.Utils.Common.Misc;
     using Innofactor.Xrm.Utils.Common.Fluent.Attribute;
     using Innofactor.Xrm.Utils.Common.Fluent.Entity;
     using Microsoft.Crm.Sdk.Messages;
@@ -32,9 +33,9 @@
                 }
                 else
                 {
-                    srcvalue = entity1.PropertyAsBaseType(attr, "<null>", false, false, true).ToString();
+                    srcvalue = entity1.PropertyAsBaseType(attr, "<null>", true).ToString();
                 }
-                var trgvalue = entity2.PropertyAsBaseType(attr, "<null>", false, false, true).ToString();
+                var trgvalue = entity2.PropertyAsBaseType(attr, "<null>", true).ToString();
                 if (srcvalue != trgvalue)
                 {
                     match = false;
@@ -167,7 +168,7 @@
             EntityCollection matches = null;
             var allattributes = new List<string>();
             
-            allattributes.Add(cdEntity.PrimaryIdAttribute);
+            allattributes.Add(container.Entity(cdEntity.LogicalName).PrimaryIdAttribute);
             if (cdEntity.Contains("ownerid"))
             {
                 allattributes.Add("ownerid");
@@ -201,7 +202,7 @@
                     {
                         value = CintEntity.AttributeToBaseType(cdEntity[matchattr]);
                     }
-                    else if (matchattr == cdEntity.PrimaryIdAttribute)
+                    else if (matchattr == container.Entity(cdEntity.LogicalName).PrimaryIdAttribute)
                     {
                         value = cdEntity.Id;
                     }
@@ -577,9 +578,9 @@
                 if (nowActive)
                 {
                     var updateattributes = cdNewEntity.Attributes.Keys.ToList();
-                    if (updateattributes.Contains(cdNewEntity.PrimaryIdAttribute))
+                    if (updateattributes.Contains(container.Entity(cdNewEntity.LogicalName).PrimaryIdAttribute))
                     {
-                        updateattributes.Remove(cdNewEntity.PrimaryIdAttribute);
+                        updateattributes.Remove(container.Entity(cdNewEntity.LogicalName).PrimaryIdAttribute);
                     }
                     if (updateIdentical || !EntityAttributesEqual(container, updateattributes, cdNewEntity, cdMatchEntity))
                     {

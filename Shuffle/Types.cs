@@ -1,6 +1,6 @@
 ﻿namespace Cinteros.Crm.Utils.Shuffle.Types
 {
-    using Cinteros.Crm.Utils.Common;
+    //using Cinteros.Crm.Utils.Common;
     using Microsoft.Xrm.Sdk;
     using System;
     using System.Collections.Generic;

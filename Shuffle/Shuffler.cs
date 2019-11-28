@@ -9,6 +9,7 @@ namespace Cinteros.Crm.Utils.Shuffle
     using Cinteros.Crm.Utils.Shuffle.Types;
     using Innofactor.Xrm.Utils.Common.Extensions;
     using Innofactor.Xrm.Utils.Common.Interfaces;
+    using Innofactor.Xrm.Utils.Common.Misc;
     using Microsoft.Xrm.Sdk;
     using Microsoft.Xrm.Sdk.Client;
     using Microsoft.Xrm.Sdk.Query;
@@ -210,9 +211,9 @@ namespace Cinteros.Crm.Utils.Shuffle
             var result = new ShuffleBlocks();
             if (serialized != null)
             {
-                var root = CintXML.FindChild(serialized, "ShuffleData");
-                var sertype = CintXML.GetAttribute(root, "Type");
-                SendLine("Deserialize from {0}", sertype);
+                var root = XML.FindChild(serialized, "ShuffleData");
+                var sertype = XML.GetAttribute(root, "Type");
+                SendLine(container, "Deserialize from {0}", sertype);
                 if (sertype == SerializationType.Full.ToString() ||
                     sertype == SerializationType.Simple.ToString() ||
                     sertype == SerializationType.SimpleNoId.ToString() ||
@@ -223,20 +224,20 @@ namespace Cinteros.Crm.Utils.Shuffle
                     {
                         if (xBlock.NodeType == XmlNodeType.Element && xBlock.Name == "Block" && xBlock.ChildNodes.Count == 1)
                         {
-                            var name = CintXML.GetAttribute(xBlock, "Name");
+                            var name = XML.GetAttribute(xBlock, "Name");
                             var xml = new XmlDocument();
                             xml.AppendChild(xml.ImportNode(xBlock.ChildNodes[0], true));
-                            var cEntities = new EntityCollection(xml);
-                            SendLine("Block {0}: {1} records", name, cEntities.Count);
+                            var cEntities = container.CreateEntityCollection(xml);
+                            SendLine(container, "Block {0}: {1} records", name, cEntities.Count());
                             result.Add(name, cEntities);
                         }
                     }
                 }
                 else if (sertype == SerializationType.Text.ToString())
                 {
-                    var strdelimeter = CintXML.GetAttribute(root, "Delimeter");
+                    var strdelimeter = XML.GetAttribute(root, "Delimeter");
                     var delimeter = strdelimeter.Length == 1 ? strdelimeter[0] : '\t';
-                    var xText = CintXML.FindChild(root, "Text");
+                    var xText = XML.FindChild(root, "Text");
                     var reader = new StringReader(xText.InnerText);
                     var line = 0;
                     var name = "";
@@ -244,15 +245,15 @@ namespace Cinteros.Crm.Utils.Shuffle
                     var current = reader.ReadLine();
                     while (current != null)
                     {
-                        log.Log("Line {0:000}: {1}", line, current);
+                        container.Log("Line {0:000}: {1}", line, current);
                         if (current.StartsWith("<<<") && current.Contains(">>>"))
                         {
-                            log.Log("Block start");
+                            container.Log("Block start");
                             if (!string.IsNullOrWhiteSpace(name) && serializedblock != null)
                             {
                                 var cEntities = new EntityCollection(serializedblock.ToString(), delimeter, crmsvc, log);
                                 result.Add(name, cEntities);
-                                SendLine("Block {0}: {1} records", name, cEntities.Entities.Count);
+                                SendLine(container, "Block {0}: {1} records", name, cEntities.Count());
                             }
                             name = current.Substring(3);
                             name = name.Substring(0, name.IndexOf(">>>", StringComparison.Ordinal));
@@ -269,7 +270,7 @@ namespace Cinteros.Crm.Utils.Shuffle
                     {
                         var cEntities = new CintDynEntityCollection(serializedblock.ToString(), delimeter, crmsvc, log);
                         result.Add(name, cEntities);
-                        SendLine("Block {0}: {1} records", name, cEntities.Count);
+                        SendLine(container, "Block {0}: {1} records", name, cEntities.Count());
                     }
                 }
             }
@@ -308,13 +309,13 @@ namespace Cinteros.Crm.Utils.Shuffle
                     SendStatus(totalBlocks, currentBlock, -1, -1);
                     if (block is DataBlock datablock)
                     {
-                        var cExported = ExportDataBlock(blocks, datablock);
+                        var cExported = ExportDataBlock(container, blocks, datablock);
                         var name = datablock.Name;
                         if (cExported != null)
                         {
                             if (blocks.ContainsKey(name))
                             {
-                                SendLine($"Block already added: {name}");
+                                SendLine(container, $"Block already added: {name}");
                             }
                             else
                             {
@@ -430,12 +431,12 @@ namespace Cinteros.Crm.Utils.Shuffle
             XmlDocument xml = null;
             if (blocks.Count > 0)
             {
-                SendLine("Serializing {0} blocks with type {1}", blocks.Count, type);
+                SendLine(container, "Serializing {0} blocks with type {1}", blocks.Count, type);
                 xml = new XmlDocument();
                 XmlNode root = xml.CreateElement("ShuffleData");
                 xml.AppendChild(root);
-                CintXML.AppendAttribute(root, "Type", type.ToString());
-                CintXML.AppendAttribute(root, "ExportTime", DateTime.Now.ToString("s"));
+                XML.AppendAttribute(root, "Type", type.ToString());
+                XML.AppendAttribute(root, "ExportTime", DateTime.Now.ToString("s"));
                 switch (type)
                 {
                     case SerializationType.Full:
@@ -445,27 +446,27 @@ namespace Cinteros.Crm.Utils.Shuffle
                     case SerializationType.Explicit:
                         foreach (var block in blocks.Keys)
                         {
-                            SendLine("Serializing {0} records in block {1}", blocks[block].Count(), block);
+                            SendLine(container, "Serializing {0} records in block {1}", blocks[block].Count(), block);
                             XmlNode xBlock = xml.CreateElement("Block");
                             root.AppendChild(xBlock);
-                            CintXML.AppendAttribute(xBlock, "Name", block);
-                            CintXML.AppendAttribute(xBlock, "Count", blocks[block].Count().ToString());
+                            XML.AppendAttribute(xBlock, "Name", block);
+                            XML.AppendAttribute(xBlock, "Count", blocks[block].Count().ToString());
                             var xSerialized = blocks[block].Serialize((SerializationStyle)type);
                             xBlock.AppendChild(xml.ImportNode(xSerialized.ChildNodes[0], true));
                         }
                         break;
 
                     case SerializationType.Text:
-                        CintXML.AppendAttribute(root, "Delimeter", delimeter.ToString());
+                        XML.AppendAttribute(root, "Delimeter", delimeter.ToString());
                         var text = new StringBuilder();
                         foreach (var block in blocks.Keys)
                         {
-                            SendLine("Serializing {0} records in block {1}", blocks[block].Count(), block);
+                            SendLine(container, "Serializing {0} records in block {1}", blocks[block].Count(), block);
                             text.AppendLine("<<<" + block + ">>>");
                             var serializedblock = blocks[block].ToTextFile(delimeter);
                             text.Append(serializedblock);
                         }
-                        CintXML.AddCDATANode(root, "Text", text.ToString());
+                        XML.AddCDATANode(root, "Text", text.ToString());
                         break;
                 }
             }

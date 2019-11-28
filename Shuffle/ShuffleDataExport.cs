@@ -25,7 +25,7 @@
     {
         #region Private Methods
 
-        private static void AddRelationFilter(IExecutionContainer container, ShuffleBlocks blocks, DataBlockRelation relation, XmlNode xEntity, ILoggable log)
+        private static void AddRelationFilter(IExecutionContainer container, ShuffleBlocks blocks, DataBlockRelation relation, XmlNode xEntity)
         {
             if (blocks != null && blocks.Count > 0)
             {
@@ -107,16 +107,16 @@
 
         private static void SelectAttributes(IExecutionContainer container, EntityCollection cExportEntities, List<string> lAttributes, List<string> lNullAttributes)
         {
-            foreach (var cde in cExportEntities.Entities)
+            foreach (var entity in cExportEntities.Entities)
             {
                 var i = 0;
-                var x = new List<string>(cde.Attributes.Keys);
-                while (i < cde.Attributes.Count)
+                var x = new List<string>(entity.Attributes.Keys);
+                while (i < entity.Attributes.Count)
                 {
                     var attr = x[i];
-                    if (attr != cde.PrimaryIdAttribute && !IncludeAttribute(attr, lAttributes))
+                    if (attr != container.Entity(entity.LogicalName).PrimaryIdAttribute && !IncludeAttribute(attr, lAttributes))
                     {
-                        cde.Attributes.Remove(attr);
+                        entity.Attributes.Remove(attr);
                         x.Remove(attr);
                     }
                     else
@@ -126,9 +126,9 @@
                 }
                 foreach (var nullattribute in lNullAttributes)
                 {
-                    if (!cde.Contains(nullattribute))
+                    if (!entity.Contains(nullattribute))
                     {
-                        cde.Entity.Attributes.Add(nullattribute, null);
+                        entity.Attributes.Add(nullattribute, null);
                     }
                 }
             }
@@ -197,7 +197,7 @@
             CintQryExp.AppendCondition(qExport.Criteria, LogicalOperator.And, attribute, oper, value);
         }
 
-        private void AddRelationFilter(IExecutionContainer container, ShuffleBlocks blocks, string entityName, DataBlockRelation relation, FilterExpression filter, ILoggable log)
+        private void AddRelationFilter(IExecutionContainer container, ShuffleBlocks blocks, string entityName, DataBlockRelation relation, FilterExpression filter)
         {
             container.StartSection(MethodBase.GetCurrentMethod().Name);
             if (blocks != null && blocks.Count > 0)
@@ -207,7 +207,7 @@
                 var pkattribute = relation.PKAttribute;
                 var includenull = relation.IncludeNull;
 
-                var type = GetAttributeType(attribute, entityName);
+                var type = GetAttributeType(container, attribute, entityName);
 
                 var cond = new ConditionExpression
                 {
@@ -334,7 +334,7 @@
                     {
                         foreach (var relation in block.Relation)
                         {
-                            AddRelationFilter(blocks, block.Entity, relation, qExport.Criteria, log);
+                            AddRelationFilter(container, blocks, block.Entity, relation, qExport.Criteria);
                         }
                     }
                     foreach (var filter in block.Export.Items.Where(i => i is DataBlockExportFilter).Cast<DataBlockExportFilter>())
@@ -360,7 +360,7 @@
                     container.Log("Converting to FetchXML");
                     try
                     {
-                        var fetch = CintQryExp.ConvertToFetchXml(qExport, crmsvc);
+                        var fetch = CintQryExp.ConvertToFetchXml(qExport);
                         container.Log("Exporting {0}:\n{1}", block.Entity, fetch);
                     }
                     catch (Exception ex)
@@ -369,7 +369,7 @@
                         container.Log(ex);
                     }
 #endif
-                    cExportEntities = CintDynEntity.RetrieveMultiple(crmsvc, qExport, log);
+                    cExportEntities = container.RetrieveMultiple(qExport);
                     if (allcolumns)
                     {
                         SelectAttributes(container, cExportEntities, lAttributes, lNullAttributes);
@@ -390,7 +390,7 @@
 
                     foreach (var relation in block.Relation)
                     {
-                        AddRelationFilter(blocks, relation, xEntity, log);
+                        AddRelationFilter(container, blocks, relation, xEntity);
                     }
 
                     var fetch = xDoc.OuterXml;
@@ -399,11 +399,11 @@
                     container.Log("Exporting intersect entity {0}\n{1}", block.Entity, fetch);
 #endif
                     var qExport = new FetchExpression(fetch);
-                    cExportEntities = CintDynEntity.RetrieveMultiple(crmsvc, qExport, log);
-                    foreach (var cde in cExportEntities)
+                    cExportEntities = container.RetrieveMultiple(qExport);
+                    foreach (var entity in cExportEntities.Entities)
                     {
                         var newattributes = new List<KeyValuePair<string, object>>();
-                        foreach (var attr in cde.Attributes)
+                        foreach (var attr in entity.Attributes)
                         {
                             if (attr.Value is Guid)
                             {
@@ -414,9 +414,9 @@
                         }
                         foreach (var newattr in newattributes)
                         {
-                            if (!newattr.Key.Equals(cde.PrimaryIdAttribute))
+                            if (!newattr.Key.Equals(container.Entity(entity.LogicalName).PrimaryIdAttribute))
                             {
-                                cde.AddProperty(newattr.Key, newattr.Value);
+                                entity.Attributes.Add(newattr.Key, newattr.Value);
                             }
                         }
                     }
@@ -451,7 +451,7 @@
                 Query = eqe,
                 ClientVersionStamp = null
             };
-            var resp = (RetrieveMetadataChangesResponse)crmsvc.Execute(req);
+            var resp = (RetrieveMetadataChangesResponse)container.Execute(req);
             if (resp.EntityMetadata.Count == 1)
             {
                 foreach (var attr in resp.EntityMetadata[0].Attributes)
