@@ -27,7 +27,7 @@ From [CRM Saturday](http://crmsaturday.com) in Madrid 2017-06-03 describing the 
 # Screenshots
 
 ## Available tasks
-![Tasks](tmages/tasks.png)
+![Tasks](images/tasks.png)
 
 ## Minify example
 ![Minify task](images/minify.png)
