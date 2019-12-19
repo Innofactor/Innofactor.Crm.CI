@@ -1,0 +1,4 @@
+[submodule "modules/Xrm.Utils"]
+	path = modules/Xrm.Utils
+	url = https://github.com/Innofactor/Xrm.Utils.git
+	branch = master
