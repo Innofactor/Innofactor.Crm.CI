@@ -4,16 +4,16 @@
     <id>Innofactor.Xrm.DevUtils.Shuffle</id>
     <title>Innofactor DevUtils for Microsoft Dynamics 365 Shuffle features</title>
     <authors>Innofactor AB</authors>
-    <owners>InnofactorSE, rappen</owners>
+    <owners>InnofactorSE, rappen, imranakram</owners>
     <version>$version$</version>
-    <iconUrl>http://rappen.net/Cinteros/innofactor.png</iconUrl>
+    <iconUrl>https://www.innofactor.com/globalassets/other-sizes/innofactor-small-logo.png</iconUrl>
     <projectUrl>https://github.com/Innofactor/Innofactor.Crm.CI</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>Shuffle Utilities for Microsoft Dynamics 365.</description>
+    <description>Shuffle Utilities for Microsoft Dynamics 365</description>
     <copyright>Innofactor Sweden</copyright>
     <language>en-US</language>
     <dependencies>
-      <dependency id="Innofactor.Xrm.DevUtils.Common" version="9.*"/>
+      <dependency id="Innofactor.Xrm.Utils.Common" version="9.*"/>
     </dependencies>
   </metadata>
 </package>
