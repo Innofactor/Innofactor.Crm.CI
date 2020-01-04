@@ -31,15 +31,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Cinteros.Crm.Utils.Common, Version=9.0.1804.11, Culture=neutral, PublicKeyToken=0b6cd78ab2e51f2b, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Innofactor.Xrm.DevUtils.Common.9.0.1804.11\lib\net452\Cinteros.Crm.Utils.Common.dll</HintPath>
-    </Reference>
-    <Reference Include="Cinteros.Crm.Utils.Misc, Version=9.0.1804.11, Culture=neutral, PublicKeyToken=0b6cd78ab2e51f2b, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Innofactor.Xrm.DevUtils.Common.9.0.1804.11\lib\net452\Cinteros.Crm.Utils.Misc.dll</HintPath>
-    </Reference>
-    <Reference Include="Innofactor.Xrm.Utils.Common, Version=1.0.26.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Xrm.Utils.Common.1.0.26\lib\net452\Innofactor.Xrm.Utils.Common.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.Crm.Sdk.Proxy, Version=9.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.CrmSdk.CoreAssemblies.9.0.2.4\lib\net452\Microsoft.Crm.Sdk.Proxy.dll</HintPath>
     </Reference>
@@ -81,6 +72,7 @@
     <Reference Include="System.Management.Automation, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.PowerShell.5.ReferenceAssemblies.1.1.0\lib\net4\System.Management.Automation.dll</HintPath>
     </Reference>
+    <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Security" />
     <Reference Include="System.ServiceModel" />
@@ -117,5 +109,6 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <Import Project="..\..\modules\Xrm.Utils\Innofactor.Xrm.Utils.Common\Innofactor.Xrm.Utils.Common.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

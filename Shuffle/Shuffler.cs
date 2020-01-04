@@ -1,11 +1,8 @@
 ﻿/// <summary>
-/// Common namespace for Cinteros Shuffle functionality
+/// Common namespace for Innofactor Shuffle functionality
 /// </summary>
 namespace Cinteros.Crm.Utils.Shuffle
 {
-    //using Cinteros.Crm.Utils.Common;
-    //using Cinteros.Crm.Utils.Common.Interfaces;
-    //using Cinteros.Crm.Utils.Misc;
     using Cinteros.Crm.Utils.Shuffle.Types;
     using Innofactor.Xrm.Utils.Common.Extensions;
     using Innofactor.Xrm.Utils.Common.Interfaces;
@@ -37,9 +34,11 @@ namespace Cinteros.Crm.Utils.Shuffle
         #region Private Fields
 
         private IExecutionContainer container;
+
         //private readonly IServicable crmsvc;
         //private readonly ILoggable log;
         private XmlDocument definition;
+
         private string definitionpath;
         private Dictionary<Guid, Guid> guidmap = null;
         private ShuffleDefinition shuffledefinition;
@@ -55,8 +54,6 @@ namespace Cinteros.Crm.Utils.Shuffle
         public Shuffler(IExecutionContainer container)
         {
             this.container = container;
-            //crmsvc = container.Service;
-            //log = container.Logger;
         }
 
         #endregion Public Constructors
@@ -203,6 +200,7 @@ namespace Cinteros.Crm.Utils.Shuffle
         /// <summary>
         /// Deserialize xml/string to blocks with entities
         /// </summary>
+        /// <param name="container"></param>
         /// <param name="serialized"></param>
         /// <returns>Optional, only required for SerializationType: Text</returns>
         public ShuffleBlocks Deserialize(IExecutionContainer container, XmlDocument serialized)
@@ -251,7 +249,7 @@ namespace Cinteros.Crm.Utils.Shuffle
                             container.Log("Block start");
                             if (!string.IsNullOrWhiteSpace(name) && serializedblock != null)
                             {
-                                var cEntities = new EntityCollection(serializedblock.ToString(), delimeter, crmsvc, log);
+                                var cEntities = container.CreateEntityCollection(serializedblock.ToString(), delimeter);
                                 result.Add(name, cEntities);
                                 SendLine(container, "Block {0}: {1} records", name, cEntities.Count());
                             }
@@ -268,7 +266,7 @@ namespace Cinteros.Crm.Utils.Shuffle
                     }
                     if (!string.IsNullOrWhiteSpace(serializedblock.ToString()))
                     {
-                        var cEntities = new CintDynEntityCollection(serializedblock.ToString(), delimeter, crmsvc, log);
+                        var cEntities = container.CreateEntityCollection(serializedblock.ToString(), delimeter);
                         result.Add(name, cEntities);
                         SendLine(container, "Block {0}: {1} records", name, cEntities.Count());
                     }
@@ -327,9 +325,9 @@ namespace Cinteros.Crm.Utils.Shuffle
                     {
                         if (ExistingSolutionVersions == null)
                         {
-                            GetCurrentVersions();
+                            GetCurrentVersions(container);
                         }
-                        ExportSolutionBlock(solutionblock);
+                        ExportSolutionBlock(container, solutionblock);
                     }
                 }
                 SendStatus(0, 0, 0, 0);
@@ -368,11 +366,11 @@ namespace Cinteros.Crm.Utils.Shuffle
                 guidmap = new Dictionary<Guid, Guid>();
                 stoponerror = ShuffleDefinition.StopOnError;
                 timeout = ShuffleDefinition.TimeoutSpecified ? ShuffleDefinition.Timeout : -1;
-                double savedtimeout = -1;
-                if (timeout > -1)
-                {
-                    savedtimeout = SetTimeout();
-                }
+                //double savedtimeout = -1;
+                //if (timeout > -1)
+                //{
+                //    savedtimeout = SetTimeout();
+                //}
 
                 var totalBlocks = ShuffleDefinition.Blocks.Items.Length;
                 var currentBlock = 0;
@@ -408,10 +406,10 @@ namespace Cinteros.Crm.Utils.Shuffle
                     }
                 }
                 SendStatus(0, 0, 0, 0);
-                if (savedtimeout > -1)
-                {
-                    ResetTimeout(container, savedtimeout);
-                }
+                //if (savedtimeout > -1)
+                //{
+                //    ResetTimeout(container, savedtimeout);
+                //}
             }
             container.EndSection();
             return new Tuple<int, int, int, int, int, EntityReferenceCollection>(created, updated, skipped, deleted, failed, references);
@@ -446,12 +444,13 @@ namespace Cinteros.Crm.Utils.Shuffle
                     case SerializationType.Explicit:
                         foreach (var block in blocks.Keys)
                         {
-                            SendLine(container, "Serializing {0} records in block {1}", blocks[block].Count(), block);
+                            SendLine(container, $"Serializing {blocks[block].Count()} records in block {block}");
                             XmlNode xBlock = xml.CreateElement("Block");
                             root.AppendChild(xBlock);
                             XML.AppendAttribute(xBlock, "Name", block);
                             XML.AppendAttribute(xBlock, "Count", blocks[block].Count().ToString());
-                            var xSerialized = blocks[block].Serialize((SerializationStyle)type);
+                            
+                            var xSerialized = blocks[block].Serialize(container, (SerializationStyle)type);
                             xBlock.AppendChild(xml.ImportNode(xSerialized.ChildNodes[0], true));
                         }
                         break;
@@ -461,9 +460,9 @@ namespace Cinteros.Crm.Utils.Shuffle
                         var text = new StringBuilder();
                         foreach (var block in blocks.Keys)
                         {
-                            SendLine(container, "Serializing {0} records in block {1}", blocks[block].Count(), block);
+                            SendLine(container, $"Serializing {blocks[block].Count()} records in block {block}");
                             text.AppendLine("<<<" + block + ">>>");
-                            var serializedblock = blocks[block].ToTextFile(delimeter);
+                            var serializedblock = blocks[block].ToTextFile(container, delimeter);
                             text.Append(serializedblock);
                         }
                         XML.AddCDATANode(root, "Text", text.ToString());
@@ -498,7 +497,6 @@ namespace Cinteros.Crm.Utils.Shuffle
 
         private EntityCollection GetExistingSolutions(IExecutionContainer container)
         {
-            
             var cSolutions = container.RetrieveMultiple("solution",
                 new string[] { "isvisible" },
                 new object[] { true },
@@ -506,17 +504,18 @@ namespace Cinteros.Crm.Utils.Shuffle
             return cSolutions;
         }
 
-        //private void ResetTimeout(IExecutionContainer container, double savedtimeout)
-        //{
-        //    //if (crmsvc.Service is OrganizationServiceProxy orgsvcpxy)
-        //    //{
-        //    //    orgsvcpxy.Timeout = new TimeSpan(0, (int)savedtimeout, 0);
-        //    //}
-        //    //if (container.Service is CrmServiceClient svcclient)
-        //    //{
-        //    //   // svcclient.OrganizationServiceProxy.Timeout = new TimeSpan(0, (int)savedtimeout, 0);
-        //    //}
-        //}
+        private void ResetTimeout(IExecutionContainer container, double savedtimeout)
+        {
+            if (container.Service is OrganizationServiceProxy orgsvcpxy)
+            {
+                orgsvcpxy.Timeout = new TimeSpan(0, (int)savedtimeout, 0);
+            }
+            if (container.Service is CrmServiceClient svcclient)
+            {
+                //svcclient.
+                // svcclient.OrganizationServiceProxy.Timeout = new TimeSpan(0, (int)savedtimeout, 0);
+            }
+        }
 
         private void SendLine(IExecutionContainer container)
         {
@@ -565,19 +564,19 @@ namespace Cinteros.Crm.Utils.Shuffle
 
         //private double SetTimeout()
         //{
-            //SendLine("Setting timeout: {0} minutes", timeout);
-            //double savedtimeout = -1;
-            //if (crmsvc.Service is OrganizationServiceProxy orgsvcpxy)
-            //{
-            //    savedtimeout = orgsvcpxy.Timeout.TotalMinutes;
-            //    orgsvcpxy.Timeout = new TimeSpan(0, timeout, 0);
-            //}
-            //else if (crmsvc.Service is CrmServiceClient svcclient)
-            //{
-            //    savedtimeout = svcclient.OrganizationServiceProxy.Timeout.TotalMinutes;
-            //    svcclient.OrganizationServiceProxy.Timeout = new TimeSpan(0, timeout, 0);
-            //}
-            //return savedtimeout;
+        //SendLine("Setting timeout: {0} minutes", timeout);
+        //double savedtimeout = -1;
+        //if (crmsvc.Service is OrganizationServiceProxy orgsvcpxy)
+        //{
+        //    savedtimeout = orgsvcpxy.Timeout.TotalMinutes;
+        //    orgsvcpxy.Timeout = new TimeSpan(0, timeout, 0);
+        //}
+        //else if (crmsvc.Service is CrmServiceClient svcclient)
+        //{
+        //    savedtimeout = svcclient.OrganizationServiceProxy.Timeout.TotalMinutes;
+        //    svcclient.OrganizationServiceProxy.Timeout = new TimeSpan(0, timeout, 0);
+        //}
+        //return savedtimeout;
         //}
 
         #endregion Private Methods

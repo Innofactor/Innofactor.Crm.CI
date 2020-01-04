@@ -1,13 +1,9 @@
 ﻿namespace Cinteros.Crm.Utils.Shuffle
 {
-    //using Cinteros.Crm.Utils.Common;
-    //using Cinteros.Crm.Utils.Common.Interfaces;
-    //using Cinteros.Crm.Utils.Misc;
-    using Innofactor.Xrm.Utils.Common;
-    using Innofactor.Xrm.Utils.Common.Fluent;
-    using Innofactor.Xrm.Utils.Common.Fluent.Entity;
-    using Innofactor.Xrm.Utils.Common.Fluent.Attribute;
     using Cinteros.Crm.Utils.Shuffle.Types;
+    using Innofactor.Xrm.Utils.Common.Extensions;
+    using Innofactor.Xrm.Utils.Common.Interfaces;
+    using Innofactor.Xrm.Utils.Common.Misc;
     using Microsoft.Xrm.Sdk;
     using Microsoft.Xrm.Sdk.Messages;
     using Microsoft.Xrm.Sdk.Metadata;
@@ -18,8 +14,6 @@
     using System.Linq;
     using System.Reflection;
     using System.Xml;
-    using Innofactor.Xrm.Utils.Common.Extensions;
-    using Innofactor.Xrm.Utils.Common.Interfaces;
 
     public partial class Shuffler
     {
@@ -56,15 +50,15 @@
                 }
                 if (!includenull)
                 {
-                    CintFetchXML.AppendFilter(xEntity, "and", attribute, "in", ids.ToArray());
+                    FetchXML.AppendFilter(xEntity, "and", attribute, "in", ids.ToArray());
                 }
                 else
                 {
-                    var xFilter = CintFetchXML.AppendFilter(xEntity, "or");
-                    CintFetchXML.AppendCondition(xFilter, attribute, "null");
-                    CintFetchXML.AppendCondition(xFilter, attribute, "in", ids.ToArray());
+                    var xFilter = FetchXML.AppendFilter(xEntity, "or");
+                    FetchXML.AppendCondition(xFilter, attribute, "null");
+                    FetchXML.AppendCondition(xFilter, attribute, "in", ids.ToArray());
                 }
-                container.Log("Adding relation condition for {0} in {1} values in {2}.{3}", attribute, ids.Count, block, pkattribute);
+                container.Log($"Adding relation condition for {attribute} in {ids.Count} values in {block}.{pkattribute}");
             }
         }
 
@@ -193,8 +187,8 @@
                 }
             }
             var attribute = filter.Attribute;
-            container.Log("Adding filter: {0} {1} {2}", attribute, oper, value);
-            CintQryExp.AppendCondition(qExport.Criteria, LogicalOperator.And, attribute, oper, value);
+            container.Log($"Adding filter: {attribute} {oper} {value}");
+            Query.AppendCondition(qExport.Criteria, LogicalOperator.And, attribute, oper, value);
         }
 
         private void AddRelationFilter(IExecutionContainer container, ShuffleBlocks blocks, string entityName, DataBlockRelation relation, FilterExpression filter)
@@ -316,7 +310,7 @@
                     container.Log("FetchXML:\n{0}", fetchxml);
 #endif
                     cExportEntities = container.RetrieveMultiple(new FetchExpression(fetchxml));
-                    
+
                     container.EndSection();
                 }
                 else if (!block.TypeSpecified || block.Type == EntityTypes.Entity)
@@ -327,7 +321,8 @@
                     var qExport = new QueryExpression(block.Entity);
                     if (block.Export.ActiveOnly)
                     {
-                        CintQryExp.AppendConditionActive(qExport.Criteria);
+                        Query.AppendConditionActive(qExport.Criteria);
+                        //CintQryExp.AppendConditionActive(qExport.Criteria);
                     }
 
                     if (block.Relation != null)
@@ -360,7 +355,7 @@
                     container.Log("Converting to FetchXML");
                     try
                     {
-                        var fetch = CintQryExp.ConvertToFetchXml(qExport);
+                        var fetch = container.ConvertToFetchXml(qExport);
                         container.Log("Exporting {0}:\n{1}", block.Entity, fetch);
                     }
                     catch (Exception ex)
@@ -385,8 +380,8 @@
 
                     container.StartSection("Export intersect " + block.Entity);
                     var xDoc = new XmlDocument();
-                    var xEntity = CintFetchXML.Create(xDoc, block.Entity);
-                    CintFetchXML.AddAttribute(xEntity, lAttributes.ToArray());
+                    var xEntity = FetchXML.Create(xDoc, block.Entity);
+                    FetchXML.AddAttribute(xEntity, lAttributes.ToArray());
 
                     foreach (var relation in block.Relation)
                     {
@@ -463,7 +458,7 @@
                     }
                 }
             }
-            container.Log("Type: {0}", type);
+            container.Log($"Type: {type}");
             container.EndSection();
             return type;
         }
