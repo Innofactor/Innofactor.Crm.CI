@@ -31,12 +31,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Cinteros.Crm.Utils.Common, Version=9.0.1804.11, Culture=neutral, PublicKeyToken=0b6cd78ab2e51f2b, processorArchitecture=MSIL">
-      <HintPath>..\packages\Innofactor.Xrm.DevUtils.Common.9.0.1804.11\lib\net452\Cinteros.Crm.Utils.Common.dll</HintPath>
-    </Reference>
-    <Reference Include="Cinteros.Crm.Utils.Misc, Version=9.0.1804.11, Culture=neutral, PublicKeyToken=0b6cd78ab2e51f2b, processorArchitecture=MSIL">
-      <HintPath>..\packages\Innofactor.Xrm.DevUtils.Common.9.0.1804.11\lib\net452\Cinteros.Crm.Utils.Misc.dll</HintPath>
-    </Reference>
     <Reference Include="ILMerge">
       <HintPath>..\packages\ILMerge.2.14.1208\tools\ILMerge.exe</HintPath>
     </Reference>
@@ -351,6 +345,7 @@
       <Name>Innofactor.Crm.Shuffle</Name>
     </ProjectReference>
   </ItemGroup>
+  <Import Project="..\modules\Xrm.Utils\Innofactor.Xrm.Utils.Common\Innofactor.Xrm.Utils.Common.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>ilmerge.exe /target:library /targetplatform:v4,"C:\Windows\Microsoft.NET\Framework\v4.0.30319" "/out:Innofactor.Crm.XTB.Shuffle.dll" "$(TargetFileName)" "Cinteros.Crm.Utils.Misc.dll" "Cinteros.Crm.Utils.Common.dll" "Innofactor.Crm.Shuffle.dll" "Ionic.Zip.dll"

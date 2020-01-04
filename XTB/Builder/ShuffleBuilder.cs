@@ -291,7 +291,7 @@ namespace Innofactor.Crm.Shuffle.Builder
                 var def = GetDefinitionDocument();
                 try
                 {
-                    ShuffleHelper.ValidateDefinitionXml(def, null);
+                    ShuffleHelper.ValidateDefinitionXml(null, def);
                 }
                 catch (Exception ex)
                 {
