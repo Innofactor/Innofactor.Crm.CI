@@ -3,17 +3,12 @@
     using Innofactor.Xrm.Utils.Common.Interfaces;
     using Microsoft.Xrm.Sdk;
 
-    //using Cinteros.Crm.Utils.Common;
-    //using Cinteros.Crm.Utils.Common.Interfaces;
-
     /// <summary>
     /// Implementation of IExecutionContainer for Shuffle
     /// </summary>
-    internal class ShuffleContainer : IExecutionContainer //IContainable
+    public class ShuffleContainer : IExecutionContainer //IContainable
     {
         #region Private Fields
-
-        //private readonly IOrganizationService service;
 
         private readonly XrmCmdletBase cmdlet;
 
@@ -40,7 +35,7 @@
             get;
         }
 
-        ILoggable Logger => new ShuffleLogger(cmdlet);
+        ILoggable IExecutionContainer.Logger => new ShuffleLogger(cmdlet);
 
         IOrganizationService IExecutionContainer.Service => cmdlet.Service;
 
