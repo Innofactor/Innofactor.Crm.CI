@@ -1,4 +1,4 @@
-﻿using Cinteros.Crm.Utils.Common;
+﻿using Innofactor.Xrm.Utils.Common.Extensions;
 using Cinteros.Crm.Utils.Shuffle;
 using Cinteros.Crm.Utils.Shuffle.Types;
 using System;
