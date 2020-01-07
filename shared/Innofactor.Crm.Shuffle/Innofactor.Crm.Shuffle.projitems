@@ -8,4 +8,34 @@
   <PropertyGroup Label="Configuration">
     <Import_RootNamespace>Innofactor.Crm.Shuffle</Import_RootNamespace>
   </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Const.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Resources\ShuffleDefinition.cs">
+      <DependentUpon>ShuffleDefinition.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)ShuffleCounter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ShuffleDataExport.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ShuffleDataImport.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ShuffleEventArgs.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ShuffleHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Shuffler.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ShuffleSolutionExport.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ShuffleSolutionImport.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Types.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="$(MSBuildThisFileDirectory)Shuffle-LCG-configuration.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)Resources\parameterxml.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)Resources\QueryExpression.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)Resources\ShuffleDefinition.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)Resources\XSD ShuffleDefinition.cs.cmd" />
+  </ItemGroup>
 </Project>
