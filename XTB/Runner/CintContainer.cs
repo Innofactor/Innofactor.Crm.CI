@@ -5,7 +5,7 @@
     using Microsoft.Xrm.Sdk;
     using System;
 
-    internal class CintContainer : IExecutionContainer
+    public class CintContainer : IExecutionContainer
     {
         #region Private Fields
 
