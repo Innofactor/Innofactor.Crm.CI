@@ -365,7 +365,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>ilmerge.exe /target:library /targetplatform:v4,"C:\Windows\Microsoft.NET\Framework\v4.0.30319" "/out:Innofactor.Crm.XTB.Shuffle.dll" "$(TargetFileName)" "Innofactor.Xrm.Utils.Common.dll" "Innofactor.Crm.Shuffle.dll" "Ionic.Zip.dll"
+    <PostBuildEvent>ilmerge.exe /target:library /targetplatform:v4,"C:\Windows\Microsoft.NET\Framework\v4.0.30319" "/out:Innofactor.Crm.XTB.Shuffle.dll" "$(TargetFileName)" "Innofactor.Crm.Shuffle.dll" "Ionic.Zip.dll"
 
 
 IF NOT EXIST Plugins mkdir Plugins
