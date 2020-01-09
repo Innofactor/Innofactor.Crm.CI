@@ -272,7 +272,6 @@
       <DependentUpon>ShuffleBuilder.cs</DependentUpon>
     </Compile>
     <Compile Include="Builder\TreeNodeHelper.cs" />
-    <Compile Include="Runner\CintContainer.cs" />
     <Compile Include="Runner\PluginDescription.cs" />
     <Compile Include="Runner\ShuffleRunner.cs">
       <SubType>UserControl</SubType>

@@ -9,6 +9,7 @@
     <Import_RootNamespace>Innofactor.Crm.Shuffle</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)CintContainer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Const.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Resources\ShuffleDefinition.cs">
       <DependentUpon>ShuffleDefinition.xsd</DependentUpon>

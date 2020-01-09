@@ -1,10 +1,13 @@
-﻿namespace Innofactor.Crm.Shuffle.Runner
+﻿namespace Cinteros.Crm.Utils.Shuffle
 {
     using Innofactor.Xrm.Utils.Common.Interfaces;
     using Innofactor.Xrm.Utils.Common.Loggers;
     using Microsoft.Xrm.Sdk;
     using System;
 
+    /// <summary>
+    /// 
+    /// </summary>
     public class CintContainer : IExecutionContainer
     {
         #region Private Fields
@@ -15,6 +18,11 @@
 
         #endregion Private Fields
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="service"></param>
+        /// <param name="logpath">Folder path for logs</param>
         public CintContainer(IOrganizationService service, string logpath)
         {
             this.service = new Lazy<IOrganizationService>(() => service);

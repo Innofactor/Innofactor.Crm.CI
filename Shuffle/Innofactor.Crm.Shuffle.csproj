@@ -116,6 +116,9 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\shared\Innofactor.Crm.Shuffle\CintContainer.cs">
+      <Link>CintContainer.cs</Link>
+    </Compile>
     <Compile Include="..\shared\Innofactor.Crm.Shuffle\Const.cs">
       <Link>Const.cs</Link>
     </Compile>
