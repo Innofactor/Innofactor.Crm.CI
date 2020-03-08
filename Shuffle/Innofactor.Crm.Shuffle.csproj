@@ -153,6 +153,7 @@
     <Compile Include="ShuffleCounter.cs" />
     <Compile Include="ShuffleDataExport.cs" />
     <Compile Include="ShuffleDataImport.cs" />
+    <Compile Include="ShuffleDataSplitter.cs" />
     <Compile Include="ShuffleEventArgs.cs" />
     <Compile Include="ShuffleHelper.cs" />
     <Compile Include="Shuffler.cs" />
