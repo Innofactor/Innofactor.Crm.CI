@@ -131,7 +131,7 @@
         private void AddFilter(QueryExpression qExport, DataBlockExportFilter filter)
         {
             var valuestring = filter.Value;
-            if (valuestring.Contains("{0}"))
+            if (valuestring != null && valuestring.Contains("{0}"))
             {
                 throw new ArgumentOutOfRangeException("Name", "Filter", "Parameterized Filters not supported in embedded Shuffle Utils");
             }
