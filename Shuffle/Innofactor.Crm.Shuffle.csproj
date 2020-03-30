@@ -159,14 +159,14 @@
       <Link>Resources\parameterxml.xsd</Link>
       <SubType>Designer</SubType>
     </None>
-    <None Include="..\shared\Innofactor.Crm.Shuffle\Resources\QueryExpression.xsd">
+    <EmbeddedResource Include="..\shared\Innofactor.Crm.Shuffle\Resources\QueryExpression.xsd">
       <Link>Resources\QueryExpression.xsd</Link>
       <SubType>Designer</SubType>
-    </None>
-    <None Include="..\shared\Innofactor.Crm.Shuffle\Resources\ShuffleDefinition.xsd">
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\shared\Innofactor.Crm.Shuffle\Resources\ShuffleDefinition.xsd">
       <Link>Resources\ShuffleDefinition.xsd</Link>
       <SubType>Designer</SubType>
-    </None>
+    </EmbeddedResource>
     <None Include="Innofactor.Crm.Shuffle.nuspec" />
     <None Include="Cinteros.CRM.snk" />
     <None Include="packages.config">
