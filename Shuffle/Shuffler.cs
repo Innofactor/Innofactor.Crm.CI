@@ -133,6 +133,7 @@ namespace Cinteros.Crm.Utils.Shuffle
         /// <param name="ShuffleEventHandler">Event handler processing messages from the export. May be null.</param>
         /// <param name="defpath">Folder path for the shuffle definition file.</param>
         /// <param name="clearRemainingShuffleVars"></param>
+        /// <param name="splitFiles">if true, it will split into seperate XmlDocuments for each record exported. </param>
         /// <returns>XmlDocument with exported data</returns>
         public static Dictionary<string, XmlDocument> QuickExport(IContainable container, XmlDocument definition, SerializationType type, char delimeter, EventHandler<ShuffleEventArgs> ShuffleEventHandler, string defpath, bool clearRemainingShuffleVars, bool splitFiles = false)
         {
@@ -146,7 +147,7 @@ namespace Cinteros.Crm.Utils.Shuffle
             shuffle.Definition = definition;
             shuffle.definitionpath = defpath;
             var blocks = shuffle.ExportFromCRM();
-            Dictionary<string, XmlDocument> results = null;
+            Dictionary<string, XmlDocument> results;
             if (splitFiles)
             {
                 results = shuffle.SplitFiles(blocks, type, delimeter);
@@ -491,60 +492,26 @@ namespace Cinteros.Crm.Utils.Shuffle
 
             if (blocks.Count > 0)
             {
-                switch (type)
+                foreach (var blockName in blocks.Keys)
                 {
-                    case SerializationType.Full:
-                    case SerializationType.Simple:
-                    case SerializationType.SimpleWithValue:
-                    case SerializationType.SimpleNoId:
-                    case SerializationType.Explicit:
-                        foreach (var blockName in blocks.Keys)
-                        {
-                            var block = blocks[blockName];
+                    var block = blocks[blockName];
 
-                            foreach (var item in block)
-                            {
-                                //Build path to use later when writing to disk
-                                string path = blockName;
-                                path += "\\" + item.Id;
+                    foreach (var item in block)
+                    {
+                        //Build path to use later when writing to disk
+                        string path = blockName;
+                        path += "\\" + item.Id;
 
-                                // Somehow create a single entity record shuffleBlock
-                                var singleShuffleBlock = new ShuffleBlocks();
-                                var entityCollection = new Common.CintDynEntityCollection();
-                                singleShuffleBlock.Add(blockName, entityCollection);
+                        // Somehow create a single entity record shuffleBlock
+                        var singleShuffleBlock = new ShuffleBlocks();
+                        var entityCollection = new Common.CintDynEntityCollection();
+                        singleShuffleBlock.Add(blockName, entityCollection);
 
-                                entityCollection.Add(item);
+                        entityCollection.Add(item);
 
-                                dictionarySplitFiles.Add(path, Serialize(singleShuffleBlock, type, delimeter));
-                            }
-
-
-                            //SendLine("Serializing {0} records in block {1}", blocks[block].Count, block);
-                            //XmlNode xBlock = xml.CreateElement("Block");
-                            //root.AppendChild(xBlock);
-                            //CintXML.AppendAttribute(xBlock, "Name", block);
-                            //CintXML.AppendAttribute(xBlock, "Count", blocks[block].Count.ToString());
-                            //var xSerialized = blocks[block].Serialize((SerializationStyle)type);
-                            //xBlock.AppendChild(xml.ImportNode(xSerialized.ChildNodes[0], true));
-                        }
-                        break;
-
-                        //case SerializationType.Text:
-                        //    CintXML.AppendAttribute(root, "Delimeter", delimeter.ToString());
-                        //    var text = new StringBuilder();
-                        //    foreach (var block in blocks.Keys)
-                        //    {
-                        //        SendLine("Serializing {0} records in block {1}", blocks[block].Count, block);
-                        //        text.AppendLine("<<<" + block + ">>>");
-                        //        var serializedblock = blocks[block].ToTextFile(delimeter);
-                        //        text.Append(serializedblock);
-                        //    }
-                        //    CintXML.AddCDATANode(root, "Text", text.ToString());
-                        //    break;
+                        dictionarySplitFiles.Add(path, Serialize(singleShuffleBlock, type, delimeter));
+                    }
                 }
-
-
-
             }
             log.EndSection();
             return dictionarySplitFiles;

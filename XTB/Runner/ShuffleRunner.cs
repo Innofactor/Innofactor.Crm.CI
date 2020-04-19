@@ -82,6 +82,7 @@ namespace Innofactor.Crm.Shuffle.Runner
                     var log = container.Logger;
                     var location = System.Reflection.Assembly.GetExecutingAssembly().Location;
                     var verinfo = FileVersionInfo.GetVersionInfo(location);
+                    var splitFiles = cbSplitFiles.Checked;
                     log.Log("  ***  {0} ***", verinfo.Comments.PadRight(50));
                     log.Log("  ***  {0} ***", verinfo.LegalCopyright.PadRight(50));
                     log.Log("  ***  {0} ***", (verinfo.InternalName + ", " + verinfo.FileVersion).PadRight(50));
@@ -93,18 +94,18 @@ namespace Innofactor.Crm.Shuffle.Runner
                     {
                         if (rbExport.Checked)
                         {
-                            var export = Shuffler.QuickExport(container, definition, type, ';', ShuffleEventHandler, definitionpath);
+                            var export = Shuffler.QuickExport(container, definition, type, ';', ShuffleEventHandler, definitionpath, false, splitFiles);
                             if (export != null)
                             {
-                                if (true)
-                                {
-                                    export[string.Empty].Save(txtData.Text);
-                                    AddLogText("Export saved to: " + txtData.Text);
-                                }
-                                else // new split option
+                                if (splitFiles)
                                 {
                                     var pathtoBaseFilder = SaveFilesToDisk(txtData.Text, export);
                                     AddLogText("Exports saved to: " + pathtoBaseFilder);
+                                }
+                                else
+                                {
+                                    export[string.Empty].Save(txtData.Text);
+                                    AddLogText("Export saved to: " + txtData.Text);
                                 }
                             }
                         }
@@ -118,11 +119,11 @@ namespace Innofactor.Crm.Shuffle.Runner
                             }
                             var importresult = Shuffler.QuickImport(container, definition, data, ShuffleEventHandler, definitionpath);
                             AddLogText("---");
-                            AddLogText(string.Format("Created: {0}", importresult.Item1));
-                            AddLogText(string.Format("Updated: {0}", importresult.Item2));
-                            AddLogText(string.Format("Skipped: {0}", importresult.Item3));
-                            AddLogText(string.Format("Deleted: {0}", importresult.Item4));
-                            AddLogText(string.Format("Failed : {0}", importresult.Item5));
+                            AddLogText(string.Format("Created: {0}", importresult.created));
+                            AddLogText(string.Format("Updated: {0}", importresult.updated));
+                            AddLogText(string.Format("Skipped: {0}", importresult.skipped));
+                            AddLogText(string.Format("Deleted: {0}", importresult.deleted));
+                            AddLogText(string.Format("Failed : {0}", importresult.failed));
                             AddLogText("---");
                         }
                     }
