@@ -96,8 +96,16 @@ namespace Innofactor.Crm.Shuffle.Runner
                             var export = Shuffler.QuickExport(container, definition, type, ';', ShuffleEventHandler, definitionpath);
                             if (export != null)
                             {
-                                export.Save(txtData.Text);
-                                AddLogText("Export saved to: " + txtData.Text);
+                                if (true)
+                                {
+                                    export[string.Empty].Save(txtData.Text);
+                                    AddLogText("Export saved to: " + txtData.Text);
+                                }
+                                else // new split option
+                                {
+                                    var pathtoBaseFilder = SaveFilesToDisk(txtData.Text, export);
+                                    AddLogText("Exports saved to: " + pathtoBaseFilder);
+                                }
                             }
                         }
                         else if (rbImport.Checked)
@@ -140,6 +148,19 @@ namespace Innofactor.Crm.Shuffle.Runner
                     }
                 }
             });
+        }
+
+        private static string SaveFilesToDisk(string fileWithPath, Dictionary<string, XmlDocument> results)
+        {
+            var pathtoBaseFilder = Path.GetDirectoryName(fileWithPath);
+            foreach (var item in results)
+            {
+                var pathToCurrentFile = Path.Combine(pathtoBaseFilder, item.Key + ".xml");
+                Directory.CreateDirectory(Path.GetDirectoryName(pathToCurrentFile));
+
+                item.Value.Save(pathToCurrentFile);
+            }
+            return pathtoBaseFilder;
         }
 
         private void txtFile_TextChanged(object sender, EventArgs e)

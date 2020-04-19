@@ -68,11 +68,11 @@
                 var result = Shuffler.QuickImport(new ShuffleContainer(this), Definition, Data, ShuffleListener, Folder, true);
                 var output = new ShuffleImportResult
                 {
-                    Created = result.Item1,
-                    Updated = result.Item2,
-                    Skipped = result.Item3,
-                    Deleted = result.Item4,
-                    Failed = result.Item5
+                    Created = result.created,
+                    Updated = result.updated,
+                    Skipped = result.skipped,
+                    Deleted = result.deleted,
+                    Failed = result.failed
                 };
                 WriteObject(output);
             }
