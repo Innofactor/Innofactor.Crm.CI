@@ -66,8 +66,10 @@
             try
             {
                 WriteDebug("Importing");
-                var dataList = new Dictionary<string, XmlDocument>();
-                dataList.Add(string.Empty, Data);
+                var dataList = new Dictionary<string, XmlDocument>
+                {
+                    { string.Empty, Data }
+                };
 
                 var result = Shuffler.QuickImport(new ShuffleContainer(this), Definition, dataList, ShuffleListener, Folder, true);
                 var output = new ShuffleImportResult

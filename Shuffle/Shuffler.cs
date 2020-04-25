@@ -403,11 +403,11 @@ namespace Cinteros.Crm.Utils.Shuffle
                             blocks.Add(name, new CintDynEntityCollection());
                         }
                         var dataresult = ImportDataBlock(datablock, blocks[name]);
-                        created += dataresult.Item1;
-                        updated += dataresult.Item2;
-                        skipped += dataresult.Item3;
-                        deleted += dataresult.Item4;
-                        failed += dataresult.Item5;
+                        created += dataresult.created;
+                        updated += dataresult.updated;
+                        skipped += dataresult.skipped;
+                        deleted += dataresult.deleted;
+                        failed += dataresult.failed;
                         references.AddRange(dataresult.Item6);
                     }
                     else if (block is SolutionBlock solutionblock)
@@ -515,7 +515,7 @@ namespace Cinteros.Crm.Utils.Shuffle
 
                         // Somehow create a single entity record shuffleBlock
                         var singleShuffleBlock = new ShuffleBlocks();
-                        var entityCollection = new Common.CintDynEntityCollection();
+                        var entityCollection = new CintDynEntityCollection();
                         singleShuffleBlock.Add(blockName, entityCollection);
 
                         entityCollection.Add(item);

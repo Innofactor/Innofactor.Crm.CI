@@ -252,7 +252,7 @@
             return result;
         }
 
-        private Tuple<int, int, int, int, int, EntityReferenceCollection> ImportDataBlock(DataBlock block, CintDynEntityCollection cEntities)
+        private (int created, int updated, int skipped, int deleted, int failed, EntityReferenceCollection references) ImportDataBlock(DataBlock block, CintDynEntityCollection cEntities)
         {
             log.StartSection("ImportDataBlock");
             var created = 0;
@@ -500,7 +500,7 @@
                 SendLine("Created: {0} Updated: {1} Skipped: {2} Deleted: {3} Failed: {4}", created, updated, skipped, deleted, failed);
             }
             log.EndSection();
-            return new Tuple<int, int, int, int, int, EntityReferenceCollection>(created, updated, skipped, deleted, failed, references);
+            return (created, updated, skipped, deleted, failed, references);
         }
 
         private void ReplaceGuids(CintDynEntity cdEntity, bool includeid)
