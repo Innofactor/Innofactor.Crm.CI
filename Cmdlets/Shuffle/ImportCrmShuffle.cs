@@ -3,6 +3,7 @@
     using Cinteros.Crm.Utils.Shuffle;
     using Innofactor.Crm.CI.Cmdlets.Structure;
     using System;
+    using System.Collections.Generic;
     using System.Management.Automation;
     using System.Xml;
 
@@ -65,7 +66,10 @@
             try
             {
                 WriteDebug("Importing");
-                var result = Shuffler.QuickImport(new ShuffleContainer(this), Definition, Data, ShuffleListener, Folder, true);
+                var dataList = new Dictionary<string, XmlDocument>();
+                dataList.Add(string.Empty, Data);
+
+                var result = Shuffler.QuickImport(new ShuffleContainer(this), Definition, dataList, ShuffleListener, Folder, true);
                 var output = new ShuffleImportResult
                 {
                     Created = result.created,

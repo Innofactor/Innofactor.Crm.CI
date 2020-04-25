@@ -154,8 +154,10 @@ namespace Cinteros.Crm.Utils.Shuffle
             }
             else
             {
-                results = new Dictionary<string, XmlDocument>();
-                results.Add(string.Empty, shuffle.Serialize(blocks, type, delimeter));
+                results = new Dictionary<string, XmlDocument>
+                {
+                    { string.Empty, shuffle.Serialize(blocks, type, delimeter) }
+                };
             }
             container.Logger.EndSection();
             return results;
@@ -167,7 +169,7 @@ namespace Cinteros.Crm.Utils.Shuffle
         /// <param name="Data">Exported data</param>
         /// <param name="ShuffleEventHandler">Event handler processing messages from the import. May be null.</param>
         /// <returns>Tuple with counters for: Created, Updated, Skipped and Failed records and a collection of entityreferences for the created/updated records</returns>
-        public static (int created, int updated, int skipped, int deleted, int failed, EntityReferenceCollection references) QuickImport(IContainable container, XmlDocument Definition, XmlDocument Data, EventHandler<ShuffleEventArgs> ShuffleEventHandler) =>
+        public static (int created, int updated, int skipped, int deleted, int failed, EntityReferenceCollection references) QuickImport(IContainable container, XmlDocument Definition, Dictionary<string, XmlDocument> Data, EventHandler<ShuffleEventArgs> ShuffleEventHandler) =>
             QuickImport(container, Definition, Data, ShuffleEventHandler, null);
 
         /// <summary>Import data in Data according to shuffle definition in Definition</summary>
@@ -177,7 +179,7 @@ namespace Cinteros.Crm.Utils.Shuffle
         /// <param name="ShuffleEventHandler">Event handler processing messages from the import. May be null.</param>
         /// <param name="defpath">Path to definition file, if not standard</param>
         /// <returns>Tuple with counters for: Created, Updated, Skipped and Failed records and a collection of entityreferences for the created/updated records</returns>
-        public static (int created, int updated, int skipped, int deleted, int failed, EntityReferenceCollection references) QuickImport(IContainable container, XmlDocument Definition, XmlDocument Data, EventHandler<ShuffleEventArgs> ShuffleEventHandler, string defpath) =>
+        public static (int created, int updated, int skipped, int deleted, int failed, EntityReferenceCollection references) QuickImport(IContainable container, XmlDocument Definition, Dictionary<string, XmlDocument> Data, EventHandler<ShuffleEventArgs> ShuffleEventHandler, string defpath) =>
             QuickImport(container, Definition, Data, ShuffleEventHandler, defpath, false);
 
         /// <summary>Import data in Data according to shuffle definition in Definition</summary>
@@ -188,7 +190,7 @@ namespace Cinteros.Crm.Utils.Shuffle
         /// <param name="defpath">Path to definition file, if not standard</param>
         /// <param name="clearRemainingShuffleVars"></param>
         /// <returns>Tuple with counters for: Created, Updated, Skipped and Failed records and a collection of entityreferences for the created/updated records</returns>
-        public static (int created, int updated, int skipped, int deleted, int failed, EntityReferenceCollection references) QuickImport(IContainable container, XmlDocument Definition, XmlDocument Data, EventHandler<ShuffleEventArgs> ShuffleEventHandler, string defpath, bool clearRemainingShuffleVars)
+        public static (int created, int updated, int skipped, int deleted, int failed, EntityReferenceCollection references) QuickImport(IContainable container, XmlDocument Definition, Dictionary<string, XmlDocument> Data, EventHandler<ShuffleEventArgs> ShuffleEventHandler, string defpath, bool clearRemainingShuffleVars, bool splitFiles = false)
         {
             container.Logger.StartSection("QuickImport");
             var shuffle = new Shuffler(container);
@@ -199,7 +201,16 @@ namespace Cinteros.Crm.Utils.Shuffle
             ShuffleHelper.VerifyShuffleVars(Definition, clearRemainingShuffleVars);
             shuffle.Definition = Definition;
             shuffle.definitionpath = defpath;
-            var blocks = shuffle.Deserialize(Data);
+
+            ShuffleBlocks blocks;
+            if (splitFiles)
+            {
+                blocks = shuffle.MergeFiles(Data);
+            }
+            else
+            {
+                blocks = shuffle.Deserialize(Data.First().Value);
+            }
             var result = shuffle.ImportToCRM(blocks);
             container.Logger.EndSection();
             return result;
@@ -517,9 +528,33 @@ namespace Cinteros.Crm.Utils.Shuffle
             return dictionarySplitFiles;
         }
 
-        public void MergeFiles()
+        public ShuffleBlocks MergeFiles(Dictionary<string, XmlDocument> datas)
         {
+            log.StartSection("Start MergeFiles");
+            ShuffleBlocks blocks = new ShuffleBlocks();
 
+            foreach (var dataKeyValuePair in datas)
+            {
+                var blockNameItemIdCombinationString = dataKeyValuePair.Key;
+                var blockNameItemIdCombination = blockNameItemIdCombinationString.Split('\\');
+                var blockName = blockNameItemIdCombination[0];
+
+                var block = Deserialize(dataKeyValuePair.Value);
+                var blockEntityCollection = block.First().Value;
+
+                if (!blocks.ContainsKey(blockName))
+                {
+                    blocks.Add(blockName, blockEntityCollection);
+                }
+                else
+                {
+                    blocks[blockName].Add(blockEntityCollection.First());
+                }
+
+            }
+
+            log.EndSection();
+            return blocks;
         }
 
         #endregion Public Methods

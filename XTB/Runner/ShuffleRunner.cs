@@ -111,13 +111,21 @@ namespace Innofactor.Crm.Shuffle.Runner
                         }
                         else if (rbImport.Checked)
                         {
-                            XmlDocument data = null;
+                            Dictionary<string, XmlDocument> data = new Dictionary<string, XmlDocument>();
                             if (datafilerequired)
                             {
-                                AddLogText("Loading data from: " + txtData.Text);
-                                data = ShuffleHelper.LoadDataFile(txtData.Text);
+                                if (splitFiles)
+                                {
+                                    AddLogText("Loading data from: " + txtData.Text);
+                                    data = ReadFilesFromDisk(txtData.Text);
+                                }
+                                else
+                                {
+                                    AddLogText("Loading data from: " + txtData.Text);
+                                    data.Add(string.Empty, ShuffleHelper.LoadDataFile(txtData.Text));
+                                }
                             }
-                            var importresult = Shuffler.QuickImport(container, definition, data, ShuffleEventHandler, definitionpath);
+                            var importresult = Shuffler.QuickImport(container, definition, data, ShuffleEventHandler, definitionpath, false, splitFiles);
                             AddLogText("---");
                             AddLogText(string.Format("Created: {0}", importresult.created));
                             AddLogText(string.Format("Updated: {0}", importresult.updated));
@@ -151,6 +159,39 @@ namespace Innofactor.Crm.Shuffle.Runner
             });
         }
 
+        /// <summary>
+        /// Read all directory as Entity Name and then all files as records
+        /// </summary>
+        /// <param name="fileWithPath"></param>
+        /// <returns></returns>
+        private static Dictionary<string, XmlDocument> ReadFilesFromDisk(string fileWithPath)
+        {
+            var pathToBaseFilder = Path.GetDirectoryName(fileWithPath);
+            var directories = Directory.GetDirectories(pathToBaseFilder);
+
+            var deserializedData = new Dictionary<string, XmlDocument>();
+            foreach (var directory in directories)
+            {
+                var directoryName = Path.GetFileName(directory);
+                var files = Directory.GetFiles(directory);
+                foreach (var file in files)
+                {
+                    var fileName = Path.GetFileName(file);
+                    var fullPathToFile = file;
+                        
+                    deserializedData.Add(Path.Combine(directoryName, fileName), ShuffleHelper.LoadDataFile(fullPathToFile));
+                }
+            }
+
+            return deserializedData;
+        }
+
+        /// <summary>
+        /// Save 
+        /// </summary>
+        /// <param name="fileWithPath"></param>
+        /// <param name="results"></param>
+        /// <returns></returns>
         private static string SaveFilesToDisk(string fileWithPath, Dictionary<string, XmlDocument> results)
         {
             var pathtoBaseFilder = Path.GetDirectoryName(fileWithPath);
@@ -312,7 +353,13 @@ namespace Innofactor.Crm.Shuffle.Runner
                     Service != null &&
                     File.Exists(txtFile.Text) &&
                     ((rbExport.Checked && cmbType.SelectedIndex >= 0) ||
-                     (rbImport.Checked && (!datafilerequired || File.Exists(txtData.Text))));
+                     (rbImport.Checked && 
+                      (!datafilerequired || 
+                      File.Exists(txtData.Text) ||
+                      (cbSplitFiles.Checked && Directory.Exists(Path.GetDirectoryName(txtData.Text))) 
+                      )
+                     ) 
+                    );
                 btnShuffle.Enabled = enabled;
             };
             if (InvokeRequired)
