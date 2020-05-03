@@ -173,7 +173,7 @@ namespace Innofactor.Crm.Shuffle.Runner
             foreach (var directory in directories)
             {
                 var directoryName = Path.GetFileName(directory);
-                var files = Directory.GetFiles(directory);
+                var files = Directory.GetFiles(directory, "*.xml");
                 foreach (var file in files)
                 {
                     var fileName = Path.GetFileName(file);
