@@ -53,6 +53,7 @@
             this.pbRecords = new System.Windows.Forms.ProgressBar();
             this.label7 = new System.Windows.Forms.Label();
             this.label8 = new System.Windows.Forms.Label();
+            this.cbSplitFiles = new System.Windows.Forms.CheckBox();
             this.toolStripMain.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -69,7 +70,7 @@
             // 
             // txtFile
             // 
-            this.txtFile.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.txtFile.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtFile.Location = new System.Drawing.Point(75, 36);
             this.txtFile.Name = "txtFile";
@@ -121,7 +122,7 @@
             // 
             // txtParams
             // 
-            this.txtParams.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.txtParams.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtParams.Location = new System.Drawing.Point(75, 115);
             this.txtParams.Multiline = true;
@@ -169,7 +170,7 @@
             // 
             // txtData
             // 
-            this.txtData.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.txtData.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtData.Location = new System.Drawing.Point(75, 62);
             this.txtData.Name = "txtData";
@@ -217,8 +218,8 @@
             // 
             // lbLog
             // 
-            this.lbLog.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.lbLog.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.lbLog.FormattingEnabled = true;
             this.lbLog.Location = new System.Drawing.Point(75, 293);
@@ -247,7 +248,7 @@
             // 
             // pbBlocks
             // 
-            this.pbBlocks.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.pbBlocks.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.pbBlocks.Location = new System.Drawing.Point(75, 228);
             this.pbBlocks.Name = "pbBlocks";
@@ -257,7 +258,7 @@
             // 
             // pbRecords
             // 
-            this.pbRecords.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.pbRecords.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
             this.pbRecords.Location = new System.Drawing.Point(75, 258);
             this.pbRecords.Name = "pbRecords";
@@ -283,10 +284,21 @@
             this.label8.TabIndex = 28;
             this.label8.Text = "Records";
             // 
+            // cbSplitFiles
+            // 
+            this.cbSplitFiles.AutoSize = true;
+            this.cbSplitFiles.Location = new System.Drawing.Point(400, 88);
+            this.cbSplitFiles.Name = "cbSplitFiles";
+            this.cbSplitFiles.Size = new System.Drawing.Size(288, 24);
+            this.cbSplitFiles.TabIndex = 29;
+            this.cbSplitFiles.Text = "(Alfa) Split data file into sperate files";
+            this.cbSplitFiles.UseVisualStyleBackColor = true;
+            // 
             // ShuffleRunner
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.cbSplitFiles);
             this.Controls.Add(this.label8);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.pbRecords);
@@ -343,5 +355,6 @@
         private System.Windows.Forms.ProgressBar pbRecords;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.CheckBox cbSplitFiles;
     }
 }
