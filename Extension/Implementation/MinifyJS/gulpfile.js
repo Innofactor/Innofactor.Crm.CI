@@ -1,6 +1,6 @@
 ﻿const gulp = require('gulp');
+const terser = require('gulp-terser');
 const strip = require('gulp-strip-debug');
-const uglify = require('gulp-uglify');
 const rename = require("gulp-rename");
 
 function minify() {
@@ -8,10 +8,10 @@ function minify() {
         file.basename = file.basename.replace('.maxi', '');
     };
     
-    return gulp.src('*.maxi.js')
+    return gulp.src('treeview.maxi.js')
         .pipe(strip())
-        .pipe(uglify().on('error', function (uglify) {
-            console.log("An error occurred in minification (uglify) " + uglify.toString());
+        .pipe(terser().on('error', function (uglify) {
+            console.log("An error occurred in minification (gulp-terser) " + uglify.toString());
             console.error(uglify.message);
             this.emit('end');
         }))
