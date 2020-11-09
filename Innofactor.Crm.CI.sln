@@ -121,6 +121,8 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Innofactor.Crm.Shuffle", "s
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		modules\Xrm.Utils\Innofactor.Xrm.Utils.Common\Innofactor.Xrm.Utils.Common.projitems*{13ae5564-5c72-4a70-8ac5-00d227e8200a}*SharedItemsImports = 4
+		shared\Innofactor.Crm.Shuffle\Innofactor.Crm.Shuffle.projitems*{13ae5564-5c72-4a70-8ac5-00d227e8200a}*SharedItemsImports = 4
 		shared\Innofactor.Crm.Shuffle\Innofactor.Crm.Shuffle.projitems*{5c10bfe2-afaa-4b01-a570-b30ef41de1f0}*SharedItemsImports = 13
 		modules\Xrm.Utils\Innofactor.Xrm.Utils.Common\Innofactor.Xrm.Utils.Common.projitems*{6b4f59ae-7903-47b0-b888-b7b2ead40b2c}*SharedItemsImports = 13
 		modules\Xrm.Utils\Innofactor.Xrm.Utils.Common\Innofactor.Xrm.Utils.Common.projitems*{c381e1b6-63d1-4f5f-9d9b-b275f3cc6687}*SharedItemsImports = 4
