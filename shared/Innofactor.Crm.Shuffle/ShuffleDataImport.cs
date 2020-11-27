@@ -587,9 +587,18 @@
                     }
                     if (updateIdentical || !EntityAttributesEqual(container, updateattributes, cdNewEntity, cdMatchEntity))
                     {
-                        container.Update(cdNewEntity);
-                        recordSaved = true;
-                        SendLine(container, "{0:000} Updated: {1}", pos, identifier);
+                        try
+                        {
+                            container.Update(cdNewEntity);
+                            recordSaved = true;
+                            SendLine(container, "{0:000} Updated: {1}", pos, identifier);
+                        }
+                        catch (Exception)
+                        {
+                            recordSaved = false;
+                            SendLine(container, "{0:000} Update Failed: {1} {2} {3}", pos, identifier, cdNewEntity.LogicalName);
+                            
+                        }
                     }
                     else
                     {
