@@ -586,13 +586,13 @@ namespace Innofactor.Crm.ShuffleDeployer
                 progress.ModuleNo = 0;
                 ClearLog();
                 ClearProgressBars(false);
-                AddLogText("Deploying package: " + packagefile, false, log);
+                AddLogText($"Deploying package: {packagefile}", false, log);
                 foreach (var module in selectedModules)
                 {
                     progress.ModuleNo++;
                     progress.Module = module.ToString();
                     UpdateProgressBars(progress);
-                    DeployShuffleDefinition(module, packagefolder, container, ref created, ref updated, ref skipped, ref deleted, ref failed);
+                    DeployShuffleDefinition(container, module, packagefolder, ref created, ref updated, ref skipped, ref deleted, ref failed);
                     
                     UpdateCounters(progress.ModuleNo, created, updated, deleted, skipped, failed);
                 }
@@ -619,13 +619,14 @@ namespace Innofactor.Crm.ShuffleDeployer
             {
                 AddLogText("");
                 AddLogText("Deployment completed");
-                SaveLog();
+                //SaveLog();
+                
                 log.CloseLog();
             }
             return returnmessage;
         }
 
-        private void DeployShuffleDefinition(Module module, string packagefolder, IExecutionContainer container, ref int created, ref int updated, ref int skipped, ref int deleted, ref int failed)
+        private void DeployShuffleDefinition(IExecutionContainer container, Module module, string packagefolder, ref int created, ref int updated, ref int skipped, ref int deleted, ref int failed)
         {
             var log = container.Logger;
             AddLogText("---");
@@ -756,23 +757,23 @@ namespace Innofactor.Crm.ShuffleDeployer
             if (InvokeRequired) Invoke(mi); else mi();
         }
 
-        private void SaveLog()
-        {
-            MethodInvoker mi = delegate
-            {
-                var packagefolder = Path.GetDirectoryName(packagefile);
-                var file = "Deploy_" + DateTime.Now.ToString("yyyyMMdd_HHmmss_") + Path.GetFileName(packagefile).Replace(".cdpkg", "") + "_" + ConnectionDetail + ".log";
-                file = packagefolder + "\\" + file;
-                System.IO.StreamWriter SaveFile = new System.IO.StreamWriter(file);
-                foreach (var item in lbLog.Items)
-                {
-                    SaveFile.WriteLine(item);
-                }
+        //private void SaveLog()
+        //{
+        //    MethodInvoker mi = delegate
+        //    {
+        //        var packagefolder = Path.GetDirectoryName(packagefile);
+        //        var file = "Deploy_" + DateTime.Now.ToString("yyyyMMdd_HHmmss_") + Path.GetFileName(packagefile).Replace(".cdpkg", "") + "_" + ConnectionDetail + ".log";
+        //        file = packagefolder + "\\" + file;
+        //        System.IO.StreamWriter SaveFile = new System.IO.StreamWriter(file);
+        //        foreach (var item in lbLog.Items)
+        //        {
+        //            SaveFile.WriteLine(item);
+        //        }
 
-                SaveFile.Close();
-            };
-            if (InvokeRequired) Invoke(mi); else mi();
-        }
+        //        SaveFile.Close();
+        //    };
+        //    if (InvokeRequired) Invoke(mi); else mi();
+        //}
 
         private void UpdateProgressBars(ShuffleCounter counters)
         {
@@ -912,116 +913,116 @@ namespace Innofactor.Crm.ShuffleDeployer
             return defpath;
         }
 
-        private void ZipIt(IExecutionContainer container, bool defaultFile = false, bool silent = false)
-        {
-            var zipfile = string.Empty;
-            if (defaultFile)
-            {
-                zipfile = Path.ChangeExtension(packagefile, ".cdzip");
-            }
-            else
-            {
-                var sfd = new SaveFileDialog()
-                {
-                    DefaultExt = "*.cdzip",
-                    Filter = "Innofactor CRM Deployer Zip (*.cdzip)|*.cdzip",
-                    Title = "Zip It!",
-                    FileName = Path.GetFileName(packagefile).Replace(".cdpkg", ".cdzip")
-                };
-                if (sfd.ShowDialog() != DialogResult.OK)
-                {
-                    return;
-                }
-                zipfile = sfd.FileName;
-            }
-            var zipfolder = Path.GetDirectoryName(zipfile);
-            var ziplogfile = DateTime.Now.ToString("HHmmss") + "_ZipIt_" + Path.GetFileName(zipfile).Replace(".cdzip", "");
-            //var log = new PluginLogger(ziplogfile, true, zipfolder);
-            var log = new FileLogger(ziplogfile, zipfolder);
-            try
-            {
-                var tmpPackageFile = Path.ChangeExtension(zipfile, ".cdpkg");
-                var tmpPackageFileExisted = File.Exists(tmpPackageFile);
-                log.Log("PackageFile: {0} (existed: {1})", tmpPackageFile, tmpPackageFileExisted);
-                package = new Package(lbBuild.Items)
-                {
-                    FileOrigin = $"{zipfile} ({Path.GetFileName(tmpPackageFile)})",
-                    FileCreated = DateTime.Now
-                };
-                log.Log("Serializing package file");
-                XmlSerializerHelper.SerializeToFile(package, tmpPackageFile);
-                var packagefolder = Path.GetDirectoryName(packagefile);
-                log.Log("Looking for content files in: {0}", packagefolder);
-                var files = new List<string>();
-                files.Add(tmpPackageFile);
+        //private void ZipIt(IExecutionContainer container, bool defaultFile = false, bool silent = false)
+        //{
+        //    var zipfile = string.Empty;
+        //    if (defaultFile)
+        //    {
+        //        zipfile = Path.ChangeExtension(packagefile, ".cdzip");
+        //    }
+        //    else
+        //    {
+        //        var sfd = new SaveFileDialog()
+        //        {
+        //            DefaultExt = "*.cdzip",
+        //            Filter = "Innofactor CRM Deployer Zip (*.cdzip)|*.cdzip",
+        //            Title = "Zip It!",
+        //            FileName = Path.GetFileName(packagefile).Replace(".cdpkg", ".cdzip")
+        //        };
+        //        if (sfd.ShowDialog() != DialogResult.OK)
+        //        {
+        //            return;
+        //        }
+        //        zipfile = sfd.FileName;
+        //    }
+        //    var zipfolder = Path.GetDirectoryName(zipfile);
+        //    var ziplogfile = DateTime.Now.ToString("HHmmss") + "_ZipIt_" + Path.GetFileName(zipfile).Replace(".cdzip", "");
+        //    //var log = new PluginLogger(ziplogfile, true, zipfolder);
+        //    var log = new FileLogger(ziplogfile, zipfolder);
+        //    try
+        //    {
+        //        var tmpPackageFile = Path.ChangeExtension(zipfile, ".cdpkg");
+        //        var tmpPackageFileExisted = File.Exists(tmpPackageFile);
+        //        log.Log("PackageFile: {0} (existed: {1})", tmpPackageFile, tmpPackageFileExisted);
+        //        package = new Package(lbBuild.Items)
+        //        {
+        //            FileOrigin = $"{zipfile} ({Path.GetFileName(tmpPackageFile)})",
+        //            FileCreated = DateTime.Now
+        //        };
+        //        log.Log("Serializing package file");
+        //        XmlSerializerHelper.SerializeToFile(package, tmpPackageFile);
+        //        var packagefolder = Path.GetDirectoryName(packagefile);
+        //        log.Log("Looking for content files in: {0}", packagefolder);
+        //        var files = new List<string>();
+        //        files.Add(tmpPackageFile);
 
-                foreach (var module in package.Modules)
-                {
-                    log.StartSection(module.ToString());
-                    log.Log("Investigating definition: {0}", module.File);
-                    var deffile = GetDefinitionFilePath(module.File);
-                    if (!File.Exists(deffile))
-                    {
-                        log.Log("Missing definition file: {0}", deffile);
-                        MessageBox.Show("Definition file missing:\n" + deffile + "\n\nCorrect the path and try again.", "Zip It!",
-                            MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        return;
-                    }
-                    log.Log("Found definition file: {0}", deffile);
-                    var modulefiles = new List<string>();
-                    if (!string.IsNullOrEmpty(module.DataFile))
-                    {
-                        var datafile = GetDefinitionFilePath(module.DataFile);
-                        log.Log("Adding data file: {0}", datafile);
-                        modulefiles.Add(datafile);
-                    }
-                    else if (module.Type == ModuleType.ShuffleDefinition)
-                    {
-                        modulefiles = ShuffleHelper.GetReferencedFiles(container, deffile, packagefolder);
-                    }
-                    foreach (var modfile in modulefiles)
-                    {
-                        if (!File.Exists(modfile))
-                        {
-                            log.Log("Missing module file: {0}", modfile);
-                            MessageBox.Show("File missing:\n" + modfile + "\n\nRequired by:\n" + deffile + "\n\nCorrect this and try again.", "Zip It!",
-                                MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            return;
-                        }
-                    }
-                    modulefiles.Add(deffile);
-                    log.Log("Adding {0} module files to package", modulefiles.Count);
-                    files.AddRange(modulefiles.Where(f => !files.Contains(f)));
-                    module.File = Path.GetFileName(module.File);    // In the zip all files will be in the same folder, so no relative paths necessary
-                    log.EndSection();
-                }
-                if (File.Exists(zipfile))
-                {
-                    log.Log("Deleting existing cdzip file: {0}", zipfile);
-                    File.Delete(zipfile);
-                }
-                log.Log("Zipping package to: {0}", zipfile);
-                using (ZipFile zip = new ZipFile(zipfile))
-                {
-                    zip.AddFiles(files, false, "");
-                    zip.Save();
-                }
-                if (!tmpPackageFileExisted)
-                {   // Remove temporary package file if it did not exist
-                    log.Log("Deleting temp package file: {0}", tmpPackageFile);
-                    File.Delete(tmpPackageFile);
-                }
-                if (!silent)
-                {
-                    MessageBox.Show($"Packed {files.Count} files into {Path.GetFileName(zipfile)} !", "ZipIt!", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
-                log.Log("Package successully zipped with {0} files in: {1}", files.Count, zipfile);
-            }
-            finally
-            {
-                log.CloseLog();
-            }
-        }
+        //        foreach (var module in package.Modules)
+        //        {
+        //            log.StartSection(module.ToString());
+        //            log.Log("Investigating definition: {0}", module.File);
+        //            var deffile = GetDefinitionFilePath(module.File);
+        //            if (!File.Exists(deffile))
+        //            {
+        //                log.Log("Missing definition file: {0}", deffile);
+        //                MessageBox.Show("Definition file missing:\n" + deffile + "\n\nCorrect the path and try again.", "Zip It!",
+        //                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+        //                return;
+        //            }
+        //            log.Log("Found definition file: {0}", deffile);
+        //            var modulefiles = new List<string>();
+        //            if (!string.IsNullOrEmpty(module.DataFile))
+        //            {
+        //                var datafile = GetDefinitionFilePath(module.DataFile);
+        //                log.Log("Adding data file: {0}", datafile);
+        //                modulefiles.Add(datafile);
+        //            }
+        //            else if (module.Type == ModuleType.ShuffleDefinition)
+        //            {
+        //                modulefiles = ShuffleHelper.GetReferencedFiles(container, deffile, packagefolder);
+        //            }
+        //            foreach (var modfile in modulefiles)
+        //            {
+        //                if (!File.Exists(modfile))
+        //                {
+        //                    log.Log("Missing module file: {0}", modfile);
+        //                    MessageBox.Show("File missing:\n" + modfile + "\n\nRequired by:\n" + deffile + "\n\nCorrect this and try again.", "Zip It!",
+        //                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+        //                    return;
+        //                }
+        //            }
+        //            modulefiles.Add(deffile);
+        //            log.Log("Adding {0} module files to package", modulefiles.Count);
+        //            files.AddRange(modulefiles.Where(f => !files.Contains(f)));
+        //            module.File = Path.GetFileName(module.File);    // In the zip all files will be in the same folder, so no relative paths necessary
+        //            log.EndSection();
+        //        }
+        //        if (File.Exists(zipfile))
+        //        {
+        //            log.Log("Deleting existing cdzip file: {0}", zipfile);
+        //            File.Delete(zipfile);
+        //        }
+        //        log.Log("Zipping package to: {0}", zipfile);
+        //        using (ZipFile zip = new ZipFile(zipfile))
+        //        {
+        //            zip.AddFiles(files, false, "");
+        //            zip.Save();
+        //        }
+        //        if (!tmpPackageFileExisted)
+        //        {   // Remove temporary package file if it did not exist
+        //            log.Log("Deleting temp package file: {0}", tmpPackageFile);
+        //            File.Delete(tmpPackageFile);
+        //        }
+        //        if (!silent)
+        //        {
+        //            MessageBox.Show($"Packed {files.Count} files into {Path.GetFileName(zipfile)} !", "ZipIt!", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        //        }
+        //        log.Log("Package successully zipped with {0} files in: {1}", files.Count, zipfile);
+        //    }
+        //    finally
+        //    {
+        //        log.CloseLog();
+        //    }
+        //}
 
         private void OpenWorkingFolder()
         {

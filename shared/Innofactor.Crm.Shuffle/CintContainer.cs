@@ -26,16 +26,25 @@
         public CintContainer(IOrganizationService service, string logpath)
         {
             this.service = new Lazy<IOrganizationService>(() => service);
-            logger = new Lazy<ILoggable>(() => new FileLogger(string.Empty, logpath));
+            logger = new Lazy<ILoggable>(() => new FileLogger(logpath));
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public dynamic Values
         {
             get;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public ILoggable Logger => logger.Value;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public IOrganizationService Service => service.Value;
     }
 }
