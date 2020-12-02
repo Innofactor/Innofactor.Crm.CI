@@ -25,6 +25,9 @@
 
         #region Public Properties
 
+        /// <summary>
+        /// 
+        /// </summary>
         public static XmlSchemaSet Schemas
         {
             get

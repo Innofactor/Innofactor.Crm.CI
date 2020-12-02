@@ -234,7 +234,7 @@
                 if (EntityAttributesEqual(container, matchattributes, cdEntity, cdRecord))
                 {
                     result.Add(cdRecord);
-                    container.Log("Found match: {cdRecord.Id} {cdRecord}");
+                    container.Log($"Found match: {cdRecord.Id} {cdRecord}");
                 }
             }
             container.Log($"Returned matches: {result.Count()}");

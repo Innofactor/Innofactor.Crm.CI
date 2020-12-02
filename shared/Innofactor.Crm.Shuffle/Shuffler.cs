@@ -1,7 +1,4 @@
-﻿/// <summary>
-/// Common namespace for Innofactor Shuffle functionality
-/// </summary>
-namespace Cinteros.Crm.Utils.Shuffle
+﻿namespace Cinteros.Crm.Utils.Shuffle
 {
     using Cinteros.Crm.Utils.Shuffle.Types;
     using Innofactor.Xrm.Utils.Common.Extensions;
@@ -33,10 +30,7 @@ namespace Cinteros.Crm.Utils.Shuffle
 
         #region Private Fields
 
-        private IExecutionContainer container;
-
-        //private readonly IServicable crmsvc;
-        //private readonly ILoggable log;
+        private readonly IExecutionContainer container;
         private XmlDocument definition;
 
         private string definitionpath;
@@ -68,7 +62,9 @@ namespace Cinteros.Crm.Utils.Shuffle
         #endregion Public Delegates
 
         #region Public Events
-
+        /// <summary>
+        /// 
+        /// </summary>
         public event EventHandler<ShuffleEventArgs> RaiseShuffleEvent;
 
         #endregion Public Events
@@ -86,6 +82,9 @@ namespace Cinteros.Crm.Utils.Shuffle
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public ShuffleDefinition ShuffleDefinition
         {
             get

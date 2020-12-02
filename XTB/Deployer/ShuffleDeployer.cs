@@ -1,13 +1,12 @@
-﻿using Innofactor.Xrm.Utils.Common.Extensions;
+﻿using Cinteros.Crm.Utils.Shuffle;
+using Innofactor.Xrm.Utils.Common.Extensions;
 using Innofactor.Xrm.Utils.Common.Interfaces;
 using Innofactor.Xrm.Utils.Common.Loggers;
 using Innofactor.Xrm.Utils.Common.Misc;
-using Cinteros.Crm.Utils.Shuffle;
 using Ionic.Zip;
 using McTools.Xrm.Connection;
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
@@ -26,7 +25,7 @@ namespace Innofactor.Crm.ShuffleDeployer
         #region Private parts
 
         private const string AppName = "Innofactor CRM Deployer";
-        private string TempFolder = Path.GetTempPath() + AppName;
+        private readonly string TempFolder = Path.GetTempPath() + AppName;
         private string packagefile;
         private Package package;
         private string logfile;
@@ -77,7 +76,7 @@ namespace Innofactor.Crm.ShuffleDeployer
                 Directory.CreateDirectory(configpath);
             }
             List<string> args = Environment.GetCommandLineArgs().ToList();
-            
+
             if (args.Count >= 2 && (args[1].ToLowerInvariant().EndsWith(".cdpkg") || args[1].ToLowerInvariant().EndsWith(".cdzip")))
             {   // Probably started by double clicking a cdpkg file
                 initialPackage = args[1];
@@ -102,11 +101,12 @@ namespace Innofactor.Crm.ShuffleDeployer
 
         #region Event handlers
 
+#pragma warning disable IDE0060 // Remove unused parameter
 
-
-        private void ShuffleHandler(object sender, ShuffleEventArgs e)
+        private void ShuffleHandler(IExecutionContainer container, object sender, ShuffleEventArgs e)
+#pragma warning restore IDE0060 // Remove unused parameter
         {
-            AddLogText(e.Message, e.ReplaceLastMessage);
+            AddLogText(container, e.Message, e.ReplaceLastMessage);
             UpdateProgressBars(e.Counters);
         }
 
@@ -133,8 +133,6 @@ namespace Innofactor.Crm.ShuffleDeployer
                 MessageBox.Show("Zipit action called!! - Skipped because of refactoring");
             }
         }
-
-     
 
         private void btnPackage_Click(object sender, EventArgs e)
         {
@@ -171,11 +169,9 @@ namespace Innofactor.Crm.ShuffleDeployer
                 return;
             }
             txtModuleName.Tag = "Loading";
-            if (lbBuild.SelectedItem is Module)
+            if (lbBuild.SelectedItem is Module module)
             {
-                var module = (Module)lbBuild.SelectedItem;
                 txtModuleName.Text = module.Name;
-                //cmbModuleType.SelectedIndex = module.Type == ModuleType.SQLscript ? 1 : 0;
                 cmbModuleType.SelectedIndex = 0;
                 txtModuleFile.Text = module.File;
                 txtModuleDataFile.Text = "";
@@ -232,11 +228,9 @@ namespace Innofactor.Crm.ShuffleDeployer
                 cmbModuleType.Enabled = string.IsNullOrEmpty(txtModuleFile.Text);
                 SetDataFile();
             }
-            if (lbBuild.SelectedItem is Module)
+            if (lbBuild.SelectedItem is Module module)
             {
-                var module = (Module)lbBuild.SelectedItem;
                 module.Name = txtModuleName.Text;
-                //module.Type = cmbModuleType.SelectedIndex == 1 ? ModuleType.SQLscript : ModuleType.ShuffleDefinition;
                 module.Type = ModuleType.ShuffleDefinition;
                 module.File = txtModuleFile.Text;
                 module.DataFile = txtModuleDataFile.Text;
@@ -292,7 +286,7 @@ namespace Innofactor.Crm.ShuffleDeployer
         private void btnZipIt_Click(object sender, EventArgs e)
         {
             MessageBox.Show("Deactivated during refactoring.");
-           // ZipIt();
+            // ZipIt();
         }
 
         private void timer_Tick(object sender, EventArgs e)
@@ -326,76 +320,9 @@ namespace Innofactor.Crm.ShuffleDeployer
             OpenLogFile();
         }
 
-        //private void btnSQLLookup_Click(object sender, EventArgs e)
-        //{
-        //   // LookupSQLInfo();
-        //}
-
-        //private void btnSQLSave_Click(object sender, EventArgs e)
-        //{
-        //    //SaveSQLInfo();
-        //}
-
-        //private void btnCRMOpen_Click(object sender, EventArgs e)
-        //{
-        //    if (!string.IsNullOrEmpty(txtCRMurl.Text))
-        //    {
-        //        System.Diagnostics.Process.Start(txtCRMurl.Text);
-        //    }
-        //}
-
-        //private void txtSQL_TextChanged(object sender, EventArgs e)
-        //{
-        //   // txtSQLconnstr.Text = GetSQLConnectionString(txtSQLserver.Text, txtSQLinstance.Text, txtSQLdatabase.Text);
-        //}
-
         #endregion Form event handlers
 
         #region Private methods
-
-        //private void ConnectCRM(bool manage)
-        //{
-        //    var cs = new ConnectionSelector(!manage);
-        //    if (cs.ShowDialog(this) == DialogResult.OK)
-        //    {
-        //        var connectionDetail = cs.SelectedConnections.First();
-        //        DoConnect(connectionDetail);
-        //    }
-        //}
-
-        //private void DoConnect(ConnectionDetail connectionDetail)
-        //{
-        //    gbCRM.Enabled = false;
-        //    gbSQL.Enabled = false;
-        //    txtCRMserver.Text = "";
-        //    txtCRMorganization.Text = "";
-        //    txtCRMurl.Text = "";
-        //    txtCRMversion.Text = "";
-        //    txtSQLserver.Text = "";
-        //    txtSQLinstance.Text = "";
-        //    txtSQLdatabase.Text = "";
-        //    if (connectionDetail.IsCustomAuth)
-        //    {
-        //        if (connectionDetail.PasswordIsEmpty)
-        //        {
-        //            var pForm = new PasswordForm(connectionDetail);
-        //            if (pForm.ShowDialog(this) == DialogResult.OK)
-        //            {
-        //                connectionDetail.SetPassword(pForm.UserPassword);
-        //                connectionDetail.SavePassword = pForm.SavePassword;
-        //            }
-        //            else
-        //            {
-        //                btnConnect.Enabled = true;
-        //                return;
-        //            }
-        //        }
-        //    }
-        //    lblConnected.Text = "Connecting...";
-        //    UseWaitCursor = true;
-
-        //    ConnectionManager.Instance.ConnectToServer(new List<ConnectionDetail> { connectionDetail });
-        //}
 
         private void OpenPackage()
         {
@@ -512,7 +439,7 @@ namespace Innofactor.Crm.ShuffleDeployer
             var mod2 = lbBuild.Items[lbBuild.SelectedIndex + target];
             lbBuild.Items[lbBuild.SelectedIndex] = mod2;
             lbBuild.Items[lbBuild.SelectedIndex + target] = mod1;
-            lbBuild.SelectedIndex = lbBuild.SelectedIndex + target;
+            lbBuild.SelectedIndex += target;
         }
 
         private void AutoSelectModules(string initialModules)
@@ -566,13 +493,10 @@ namespace Innofactor.Crm.ShuffleDeployer
         private string Deploy(List<Module> selectedModules)
         {
             var packagefolder = Path.GetDirectoryName(packagefile);
-            //logfile = DateTime.Now.ToString("HHmmss") + "_" + Path.GetFileName(packagefile).Replace(".cdpkg", "") + "_" + ConnectionDetail;
-            //logfile = Path.Combine(packagefolder, DateTime.Now.ToString("yyyyMMdd") + "_" + Path.GetFileName(logfile) + ".log");
-            //logfile = Path.Combine(packagefolder, logfile);
+
             logfile = Path.Combine(packagefolder, DateTime.Now.ToString("yyyyMMdd") + "_" + DateTime.Now.ToString("HHmmss") + "_" + Path.GetFileName(packagefile).Replace(".cdpkg", "") + "_" + ConnectionDetail + ".log");
             var container = new CintContainer(Service, logfile);
-            
-            var log = container.Logger;
+
             var progress = new ShuffleCounter() { Modules = selectedModules.Count };
             var created = 0;
             var updated = 0;
@@ -586,53 +510,51 @@ namespace Innofactor.Crm.ShuffleDeployer
                 progress.ModuleNo = 0;
                 ClearLog();
                 ClearProgressBars(false);
-                AddLogText($"Deploying package: {packagefile}", false, log);
+                AddLogText(container, $"Deploying package: {packagefile}", false);
                 foreach (var module in selectedModules)
                 {
                     progress.ModuleNo++;
                     progress.Module = module.ToString();
                     UpdateProgressBars(progress);
                     DeployShuffleDefinition(container, module, packagefolder, ref created, ref updated, ref skipped, ref deleted, ref failed);
-                    
                     UpdateCounters(progress.ModuleNo, created, updated, deleted, skipped, failed);
                 }
                 ClearProgressBars(true);
             }
             catch (Exception ex)
             {
-                log.Log(ex);
-                AddLogText("_______________________________________________");
-                AddLogText("ERROR: " + ex.Message);
+                container.Logger.Log(ex);
+                AddLogText(container, "_______________________________________________");
+                AddLogText(container, "ERROR: " + ex.Message);
                 returnmessage = ex.Message;
-                if (log is CRMLogger)//&& (log as CRMLogger).UseLog
+                if (container.Logger is FileLogger)
                 {
-                    AddLogText("See detailed errors in file:");
-                    //AddLogText("  " + (log as CRMLogger).FileName);
-                    AddLogText("  " + "FileName not available");
+                    AddLogText(container, "See detailed errors in file:");
+                    var fileName = (container.Logger as FileLogger).FileName ?? "FileName not available";
+                    AddLogText(container, $"  {fileName}");
                 }
                 else
                 {
-                    AddLogText("Activate logging to get details about this problem");
+                    AddLogText(container, "Activate logging to get details about this problem");
                 }
             }
             finally
             {
-                AddLogText("");
-                AddLogText("Deployment completed");
+                AddLogText(container, "");
+                AddLogText(container, "Deployment completed");
                 //SaveLog();
-                
-                log.CloseLog();
+
+                container.Logger.CloseLog();
             }
             return returnmessage;
         }
 
         private void DeployShuffleDefinition(IExecutionContainer container, Module module, string packagefolder, ref int created, ref int updated, ref int skipped, ref int deleted, ref int failed)
         {
-            var log = container.Logger;
-            AddLogText("---");
-            AddLogText("Deploying module: " + module, false, log);
+            AddLogText(container, "---");
+            AddLogText(container, $"Deploying module: {module}", false);
             var definitionfile = packagefolder + "\\" + module.File;
-            AddLogText("Loading definition: " + Path.GetFileName(definitionfile), false, log);
+            AddLogText(container, $"Loading definition: {Path.GetFileName(definitionfile)}", false);
             var definition = new XmlDocument();
             definition.Load(definitionfile);
             var datafile = Path.ChangeExtension(definitionfile, ".data.xml");
@@ -640,21 +562,23 @@ namespace Innofactor.Crm.ShuffleDeployer
             {
                 datafile = GetDefinitionFilePath(module.DataFile);
             }
-            log.Log("Data File: {0}", datafile);
+            container.Logger.Log($"Data File: {datafile}");
             XmlDocument data = null;
             if (File.Exists(datafile))
             {
-                AddLogText("Loading data file: " + Path.GetFileName(datafile), false, log);
+                AddLogText(container, $"Loading data file: {Path.GetFileName(datafile)}", false);
                 data = ShuffleHelper.LoadDataFile(datafile);
             }
             var definitionfolder = Path.GetDirectoryName(definitionfile);
-            var result = Shuffler.QuickImport(container, definition, data, ShuffleHandler, definitionfolder, true);
-            AddLogText("Module " + module + " totals:");
-            AddLogText("  Created: " + result.Item1);
-            AddLogText("  Updated: " + result.Item2);
-            AddLogText("  Skipped: " + result.Item3);
-            AddLogText("  Deleted: " + result.Item4);
-            AddLogText("  Failed:  " + result.Item5);
+
+            var result = Shuffler.QuickImport(container, definition, data, (object sender, ShuffleEventArgs e) => { ShuffleHandler(container, sender, e); }, definitionfolder, true);
+
+            AddLogText(container, $"Module {module} totals:");
+            AddLogText(container, $"  Created: {result.Item1}");
+            AddLogText(container, $"  Updated: {result.Item2}");
+            AddLogText(container, $"  Skipped: {result.Item3}");
+            AddLogText(container, $"  Deleted: {result.Item4}");
+            AddLogText(container, $"  Failed:  {result.Item5}");
             created += result.Item1;
             updated += result.Item2;
             skipped += result.Item3;
@@ -673,25 +597,6 @@ namespace Innofactor.Crm.ShuffleDeployer
                 }
             }
         }
-
-        //private int ExecuteSQLScript(Module module, string packagefolder, ILoggable log)
-        //{
-        //    AddLogText("---");
-        //    AddLogText("Deploying module: " + module, false, log);
-        //    var sqlfile = packagefolder + "\\" + module.File;
-        //    AddLogText("Loading SQL script: " + Path.GetFileName(sqlfile), false, log);
-        //    var sql = File.ReadAllText(sqlfile);
-        //    var connstr = GetSQLConnectionString(conn.CustomInformation["SQLServer"], conn.CustomInformation["SQLInstance"] ?? "", conn.CustomInformation["Database"]);
-        //    var sqlconn = new SqlConnection(connstr);
-        //    AddLogText("Opening connection", false, log);
-        //    sqlconn.Open();
-        //    var command = new SqlCommand(sql, sqlconn);
-        //    AddLogText("Executing script", false, log);
-        //    var result = command.ExecuteNonQuery();
-        //    AddLogText($"Result: {result}", false, log);
-        //    sqlconn.Close();
-        //    return result;
-        //}
 
         private void ClearProgressBars(bool fill)
         {
@@ -723,7 +628,7 @@ namespace Innofactor.Crm.ShuffleDeployer
             if (InvokeRequired) Invoke(mi); else mi();
         }
 
-        private void AddLogText(string text, bool replace = false, ILoggable log = null)
+        private void AddLogText(IExecutionContainer container, string text, bool replace = false)
         {
             if (text == null)
             {
@@ -731,9 +636,9 @@ namespace Innofactor.Crm.ShuffleDeployer
             }
             if (text == "" || !string.IsNullOrWhiteSpace(text.Trim()))
             {
-                if (log != null)
+                if (container.Logger != null)
                 {
-                    log.Log(text);
+                    container.Logger.Log(text);
                 }
                 MethodInvoker mi = delegate
                 {
@@ -825,11 +730,6 @@ namespace Innofactor.Crm.ShuffleDeployer
 
         private void SelectDefinitionFile(bool isDataFile)
         {
-            //var type = ModuleType.ShuffleDefinition;
-            //if (cmbModuleType.SelectedItem != null && cmbModuleType.SelectedIndex == 1)
-            //{
-            //    type = ModuleType.SQLscript;
-            //}
             var packdir = Path.GetDirectoryName(packagefile);
             var file = GetDefinitionFilePath(!isDataFile || string.IsNullOrWhiteSpace(txtModuleDataFile.Text) ? txtModuleFile.Text : txtModuleDataFile.Text);
             var dir = !string.IsNullOrWhiteSpace(file) ? file : packdir;
@@ -838,9 +738,6 @@ namespace Innofactor.Crm.ShuffleDeployer
                 DefaultExt = "*.xml",
                 Filter = "XML file|*.xml",
                 Title = "Select Data File",
-                //DefaultExt = type == ModuleType.SQLscript ? "*.sql" : "*.xml",
-                //Filter = type == ModuleType.SQLscript ? "SQL file|*.sql" : "XML file|*.xml",
-                //Title = isDataFile ? "Select Data File" : type == ModuleType.SQLscript ? "Select SQL Script file" : "Select Shuffle Definition or SQL Script",
                 InitialDirectory = dir,
                 FileName = file
             };
@@ -1045,84 +942,6 @@ namespace Innofactor.Crm.ShuffleDeployer
             }
         }
 
-        //private void LookupSQLInfo()
-        //{
-        //    if (conn == null)
-        //    {
-        //        return;
-        //    }
-        //    UseWaitCursor = true;
-        //    gbCRM.Enabled = false;
-        //    gbSQL.Enabled = false;
-        //    var proto = conn.UseSsl ? "https" : "http";
-        //    var deploymenturl = new Uri($"{proto}://{conn.ServerName}:{conn.ServerPort}/XRMDeployment/2011/Deployment.svc");
-        //    var service = Microsoft.Xrm.Sdk.Deployment.Proxy.ProxyClientHelper.CreateClient(deploymenturl);
-        //    var instanceid = new Microsoft.Xrm.Sdk.Deployment.EntityInstanceId() { Name = conn.Organization };
-        //    var organization = (Microsoft.Xrm.Sdk.Deployment.Organization)service.Retrieve(DeploymentEntityType.Organization, instanceid);
-
-        //    var sqlserver = organization.SqlServerName;
-        //    var instance = string.Empty;
-        //    if (sqlserver.Contains("\\"))
-        //    {
-        //        instance = sqlserver.Split('\\')[1];
-        //        sqlserver = sqlserver.Split('\\')[0];
-        //    }
-        //    if (!sqlserver.Contains(".") && conn.ServerName.Contains("."))
-        //    {
-        //        sqlserver += conn.ServerName.Substring(conn.ServerName.IndexOf('.'));
-        //    }
-        //    txtSQLserver.Text = sqlserver;
-        //    txtSQLinstance.Text = instance;
-        //    txtSQLdatabase.Text = organization.DatabaseName;
-        //    gbCRM.Enabled = true;
-        //    gbSQL.Enabled = true;
-        //    UseWaitCursor = false;
-        //}
-
-        //private void SaveSQLInfo()
-        //{
-        //    if (conn.CustomInformation == null)
-        //    {
-        //        conn.CustomInformation = new Dictionary<string, string>();
-        //    }
-        //    else
-        //    {
-        //        conn.CustomInformation.Remove("SQLServer");
-        //        conn.CustomInformation.Remove("SQLInstance");
-        //        conn.CustomInformation.Remove("Database");
-        //    }
-        //    if (!string.IsNullOrEmpty(txtSQLserver.Text))
-        //    {
-        //        conn.CustomInformation.Add("SQLServer", txtSQLserver.Text);
-        //    }
-        //    if (!string.IsNullOrEmpty(txtSQLinstance.Text))
-        //    {
-        //        conn.CustomInformation.Add("SQLInstance", txtSQLinstance.Text);
-        //    }
-        //    if (!string.IsNullOrEmpty(txtSQLdatabase.Text))
-        //    {
-        //        conn.CustomInformation.Add("Database", txtSQLdatabase.Text);
-        //    }
-        //    var listedConnection = ConnectionManager.Instance.ConnectionsList.Connections.Where(c => c.ConnectionName == conn.ConnectionName).FirstOrDefault();
-        //    if (listedConnection != null)
-        //    {
-        //        if (listedConnection.CustomInformation == null)
-        //        {
-        //            listedConnection.CustomInformation = conn.CustomInformation;
-        //        }
-        //        else
-        //        {
-        //            foreach (var info in conn.CustomInformation)
-        //            {
-        //                listedConnection.CustomInformation.Remove(info.Key);
-        //                listedConnection.CustomInformation.Add(info.Key, info.Value);
-        //            }
-        //        }
-        //        ConnectionManager.Instance.SaveConnectionsFile();
-        //        MessageBox.Show("SQL Server information saved to connection file.", AppName, MessageBoxButtons.OK, MessageBoxIcon.Information);
-        //    }
-        //}
-
         #endregion Private methods
 
         #region Static helpers
@@ -1136,7 +955,7 @@ namespace Innofactor.Crm.ShuffleDeployer
         /// <exception cref="UriFormatException"></exception>
         /// <exception cref="InvalidOperationException"></exception>
         ///
-        public static String MakeRelativePath(String fromPath, String toPath)
+        public static string MakeRelativePath(string fromPath, string toPath)
         {
             if (String.IsNullOrEmpty(fromPath)) throw new ArgumentNullException("fromPath");
             if (String.IsNullOrEmpty(toPath)) throw new ArgumentNullException("toPath");
@@ -1147,7 +966,7 @@ namespace Innofactor.Crm.ShuffleDeployer
             if (fromUri.Scheme != toUri.Scheme) { return toPath; } // path can't be made relative.
 
             Uri relativeUri = fromUri.MakeRelativeUri(toUri);
-            String relativePath = Uri.UnescapeDataString(relativeUri.ToString());
+            string relativePath = Uri.UnescapeDataString(relativeUri.ToString());
 
             if (toUri.Scheme.ToUpperInvariant() == "FILE")
             {
@@ -1170,24 +989,6 @@ namespace Innofactor.Crm.ShuffleDeployer
             }
 
             return name;
-        }
-
-        private static string GetSQLConnectionString(string server, string instance, string database)
-        {
-            if (string.IsNullOrEmpty(server))
-            {
-                return "";
-            }
-            var serverinstance = server;
-            if (!string.IsNullOrEmpty(instance))
-            {
-                serverinstance += "\\" + instance;
-            }
-            var sqlconnbldr = new SqlConnectionStringBuilder();
-            sqlconnbldr.Add("Data Source", serverinstance);
-            sqlconnbldr.Add("Initial Catalog", database);
-            sqlconnbldr.Add("Integrated Security", true);
-            return sqlconnbldr.ConnectionString;
         }
 
         #endregion Static helpers
