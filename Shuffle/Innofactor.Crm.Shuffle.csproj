@@ -122,57 +122,9 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\shared\Innofactor.Crm.Shuffle\CintContainer.cs">
-      <Link>CintContainer.cs</Link>
-    </Compile>
-    <Compile Include="..\shared\Innofactor.Crm.Shuffle\Const.cs">
-      <Link>Const.cs</Link>
-    </Compile>
-    <Compile Include="..\shared\Innofactor.Crm.Shuffle\Resources\ShuffleDefinition.cs">
-      <Link>Resources\ShuffleDefinition.cs</Link>
-    </Compile>
-    <Compile Include="..\shared\Innofactor.Crm.Shuffle\ShuffleCounter.cs">
-      <Link>ShuffleCounter.cs</Link>
-    </Compile>
-    <Compile Include="..\shared\Innofactor.Crm.Shuffle\ShuffleDataExport.cs">
-      <Link>ShuffleDataExport.cs</Link>
-    </Compile>
-    <Compile Include="..\shared\Innofactor.Crm.Shuffle\ShuffleDataImport.cs">
-      <Link>ShuffleDataImport.cs</Link>
-    </Compile>
-    <Compile Include="..\shared\Innofactor.Crm.Shuffle\ShuffleEventArgs.cs">
-      <Link>ShuffleEventArgs.cs</Link>
-    </Compile>
-    <Compile Include="..\shared\Innofactor.Crm.Shuffle\ShuffleHelper.cs">
-      <Link>ShuffleHelper.cs</Link>
-    </Compile>
-    <Compile Include="..\shared\Innofactor.Crm.Shuffle\Shuffler.cs">
-      <Link>Shuffler.cs</Link>
-    </Compile>
-    <Compile Include="..\shared\Innofactor.Crm.Shuffle\ShuffleSolutionExport.cs">
-      <Link>ShuffleSolutionExport.cs</Link>
-    </Compile>
-    <Compile Include="..\shared\Innofactor.Crm.Shuffle\ShuffleSolutionImport.cs">
-      <Link>ShuffleSolutionImport.cs</Link>
-    </Compile>
-    <Compile Include="..\shared\Innofactor.Crm.Shuffle\Types.cs">
-      <Link>Types.cs</Link>
-    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\shared\Innofactor.Crm.Shuffle\Resources\parameterxml.xsd">
-      <Link>Resources\parameterxml.xsd</Link>
-      <SubType>Designer</SubType>
-    </None>
-    <EmbeddedResource Include="..\shared\Innofactor.Crm.Shuffle\Resources\QueryExpression.xsd">
-      <Link>Resources\QueryExpression.xsd</Link>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\shared\Innofactor.Crm.Shuffle\Resources\ShuffleDefinition.xsd">
-      <Link>Resources\ShuffleDefinition.xsd</Link>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
     <None Include="app.config" />
     <None Include="Innofactor.Crm.Shuffle.nuspec" />
     <None Include="Cinteros.CRM.snk" />
@@ -182,6 +134,7 @@
   </ItemGroup>
   <ItemGroup />
   <Import Project="..\modules\Xrm.Utils\Innofactor.Xrm.Utils.Common\Innofactor.Xrm.Utils.Common.projitems" Label="Shared" />
+  <Import Project="..\shared\Innofactor.Crm.Shuffle\Innofactor.Crm.Shuffle.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>
