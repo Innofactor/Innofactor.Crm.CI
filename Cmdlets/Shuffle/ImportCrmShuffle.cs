@@ -2,6 +2,7 @@
 {
     using Cinteros.Crm.Utils.Shuffle;
     using Innofactor.Crm.CI.Cmdlets.Structure;
+    using Innofactor.Xrm.Utils.Common.Interfaces;
     using System;
     using System.Management.Automation;
     using System.Xml;
@@ -65,7 +66,8 @@
             try
             {
                 WriteDebug("Importing");
-                var result = Shuffler.QuickImport(new ShuffleContainer(this), Definition, Data, ShuffleListener, Folder, true);
+                var container = (IExecutionContainer)new ShuffleContainer(this);
+                var result = Shuffler.QuickImport(container, Definition, Data, ShuffleListener, Folder, true);
                 var output = new ShuffleImportResult
                 {
                     Created = result.Item1,

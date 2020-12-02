@@ -1,4 +1,4 @@
-﻿using Cinteros.Crm.Utils.Slim;
+﻿using Innofactor.Xrm.Utils.Common.Extensions;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
@@ -28,7 +28,7 @@ namespace Innofactor.Crm.Shuffle.Builder.Controls
             }
             cmbName.Items.Clear();
             cmbName.Items.AddRange(shuffleBuilder.Solutions.Entities
-                .Select(s => s.Property("uniquename", string.Empty))
+                .Select(s => s.GetAttribute("uniquename", string.Empty))
                 .Where(s => !string.IsNullOrEmpty(s))
                 .OrderBy(s => s)
                 .ToArray());

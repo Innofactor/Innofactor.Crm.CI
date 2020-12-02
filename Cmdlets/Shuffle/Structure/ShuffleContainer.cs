@@ -1,17 +1,14 @@
 ﻿namespace Innofactor.Crm.CI.Cmdlets.Structure
 {
-    using Cinteros.Crm.Utils.Common;
-    using Cinteros.Crm.Utils.Common.Interfaces;
-    using Microsoft.Xrm.Sdk.Client;
+    using Innofactor.Xrm.Utils.Common.Interfaces;
+    using Microsoft.Xrm.Sdk;
 
     /// <summary>
-    /// Implementation of IContainable for Shuffle
+    /// Implementation of IExecutionContainer for Shuffle
     /// </summary>
-    internal class ShuffleContainer : IContainable
+    public class ShuffleContainer : IExecutionContainer //IContainable
     {
         #region Private Fields
-
-        private readonly OrganizationServiceProxy service;
 
         private readonly XrmCmdletBase cmdlet;
 
@@ -22,16 +19,25 @@
         internal ShuffleContainer(XrmCmdletBase cmdlet)
         {
             this.cmdlet = cmdlet;
-            service = cmdlet.Service.OrganizationServiceProxy;
+            //service = cmdlet.Service;
         }
 
         #endregion Internal Constructors
 
         #region Public Properties
 
-        public ILoggable Logger => new ShuffleLogger(cmdlet);
+        //public ILoggable Logger => new ShuffleLogger(cmdlet);
 
-        public IServicable Service => new CrmServiceProxy(service);
+        //public IServicable Service => new CrmServiceProxy(service);
+
+        public dynamic Values
+        {
+            get;
+        }
+
+        ILoggable IExecutionContainer.Logger => new ShuffleLogger(cmdlet);
+
+        IOrganizationService IExecutionContainer.Service => cmdlet.Service;
 
         #endregion Public Properties
     }

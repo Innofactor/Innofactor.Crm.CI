@@ -1,9 +1,9 @@
 ﻿namespace Cinteros.Crm.Utils.Shuffle
 {
-    using Cinteros.Crm.Utils.Common;
-    using Cinteros.Crm.Utils.Common.Interfaces;
-    using Cinteros.Crm.Utils.Misc;
     using Cinteros.Crm.Utils.Shuffle.Types;
+    using Innofactor.Xrm.Utils.Common.Extensions;
+    using Innofactor.Xrm.Utils.Common.Interfaces;
+    using Innofactor.Xrm.Utils.Common.Misc;
     using System;
     using System.Collections;
     using System.Collections.Generic;
@@ -25,6 +25,9 @@
 
         #region Public Properties
 
+        /// <summary>
+        /// 
+        /// </summary>
         public static XmlSchemaSet Schemas
         {
             get
@@ -54,6 +57,11 @@
             return DataFileRequired(definition);
         }
 
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="elementname"></param>
+        /// <returns></returns>
         public static string GetNodeDocumentation(string elementname)
         {
             var result = string.Empty;
@@ -95,12 +103,13 @@
         }
 
         /// <summary>Returns a list of file names that are required for the given ShuffleDefinition</summary>
+        /// <param name="container"></param>
         /// <param name="shuffleDefinition">ShuffleDefinition file</param>
         /// <param name="definitionpath"></param>
         /// <returns>List of files</returns>
-        public static List<string> GetReferencedFiles(string shuffleDefinition, string definitionpath, CRMLogger log)
+        public static List<string> GetReferencedFiles(IExecutionContainer container, string shuffleDefinition, string definitionpath)
         {
-            log.StartSection(MethodBase.GetCurrentMethod().Name);
+            container.StartSection(MethodBase.GetCurrentMethod().Name);
             var result = new List<string>();
             if (File.Exists(shuffleDefinition))
             {
@@ -108,7 +117,7 @@
                 if (DataFileRequired(definition))
                 {
                     var datafile = Path.ChangeExtension(shuffleDefinition, ".data.xml");
-                    log.Log("Adding data file: {0}", datafile);
+                    container.Log($"Adding data file: {datafile}");
                     result.Add(datafile);
                 }
                 foreach (var solBlock in definition.Blocks.Items.Where(b => b is SolutionBlock))
@@ -116,17 +125,17 @@
                     var solFile = GetSolutionFilename((SolutionBlock)solBlock, definitionpath);
                     if (!result.Contains(solFile))
                     {
-                        log.Log("Adding solution file: {0}", solFile);
+                        container.Log($"Adding solution file: {solFile}");
                         result.Add(solFile);
                     }
                 }
             }
             else
             {
-                log.Log("Definition file not found");
+                container.Log("Definition file not found");
             }
-            log.Log("Returning {0} files", result.Count);
-            log.EndSection();
+            container.Log($"Returning {result.Count} files");
+            container.EndSection();
             return result;
         }
 
@@ -209,14 +218,14 @@
         /// <returns></returns>
         public static void ValidateDefinitionXml(XmlDocument def)
         {
-            ValidateDefinitionXml(def, null);
+            ValidateDefinitionXml(null, def);
         }
 
         /// <summary>Validates given ShuffleDefinition with XSD.</summary>
+        /// <param name="container"></param>
         /// <param name="def"></param>
-        /// <param name="log"></param>
         /// <returns></returns>
-        public static void ValidateDefinitionXml(XmlDocument def, ILoggable log)
+        public static void ValidateDefinitionXml(IExecutionContainer container, XmlDocument def)
         {
             try
             {
@@ -224,12 +233,13 @@
                 if (def.Schemas.Count >= 2)
                 {
                     def.Validate(null);
-                    log?.Log("ShuffleDefinition validated");
+
+                    container?.Log("ShuffleDefinition validated");
                 }
             }
             catch (XmlSchemaValidationException ex)
             {
-                log?.Log(ex);
+                container?.Log(ex);
                 throw;
             }
         }
@@ -275,11 +285,11 @@
         /// <returns>Block with text-serialized CRM data</returns>
         public static string XmlSerializedToTextFile(XmlDocument xml)
         {
-            var root = CintXML.FindChild(xml, "ShuffleData");
-            var sertype = CintXML.GetAttribute(root, "Type");
+            var root = XML.FindChild(xml, "ShuffleData");
+            var sertype = XML.GetAttribute(root, "Type");
             if (sertype == SerializationType.Text.ToString())
             {
-                var xText = CintXML.FindChild(root, "Text");
+                var xText = XML.FindChild(root, "Text");
                 var text = xText.InnerText;
                 return text;
             }
@@ -400,9 +410,9 @@
             var xml = new XmlDocument();
             XmlNode root = xml.CreateElement("ShuffleData");
             xml.AppendChild(root);
-            CintXML.AppendAttribute(root, "Type", SerializationType.Text.ToString());
-            CintXML.AppendAttribute(root, "Delimeter", delimeter.ToString());
-            CintXML.AddCDATANode(root, "Text", text);
+            XML.AppendAttribute(root, "Type", SerializationType.Text.ToString());
+            XML.AppendAttribute(root, "Delimeter", delimeter.ToString());
+            XML.AddCDATANode(root, "Text", text);
             return xml;
         }
 

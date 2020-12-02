@@ -1,6 +1,7 @@
 ﻿namespace Cinteros.Crm.Utils.Shuffle.Types
 {
-    using Cinteros.Crm.Utils.Common;
+    //using Cinteros.Crm.Utils.Common;
+    using Microsoft.Xrm.Sdk;
     using System;
     using System.Collections.Generic;
     using System.Runtime.Serialization;
@@ -54,7 +55,7 @@
 
     /// <summary>Dictionary containing Block name and corresponding CintDynEntityCollection</summary>
     [Serializable]
-    public class ShuffleBlocks : Dictionary<string, CintDynEntityCollection>
+    public class ShuffleBlocks : Dictionary<string, EntityCollection>
     {   // Constructor added by suggestion from Code Analysis...
         #region Public Constructors
 

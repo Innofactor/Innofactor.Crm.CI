@@ -1,6 +1,7 @@
 ﻿namespace Innofactor.Crm.CI.Cmdlets.Structure
 {
-    using Cinteros.Crm.Utils.Common.Interfaces;
+    //using Cinteros.Crm.Utils.Common.Interfaces;
+    using Innofactor.Xrm.Utils.Common.Interfaces;
     using Microsoft.Xrm.Sdk;
     using Microsoft.Xrm.Sdk.Query;
     using System;
@@ -60,36 +61,41 @@
         public void Log(string message, params object[] arg) =>
           cmdlet.WriteVerbose(" [INFO] " + string.Format(message, arg));
 
-        public void LogIf(bool condition, string message)
-        {
-            if (condition)
-            {
-                Log(message);
-            }
-        }
+        //public void LogIf(bool condition, string message)
+        //{
+        //    if (condition)
+        //    {
+        //        Log(message);
+        //    }
+        //}
 
-        public void LogIf(bool condition, string message, params object[] arg) =>
-            LogIf(condition, string.Format(message, arg));
+        //public void LogIf(bool condition, string message, params object[] arg) =>
+        //    LogIf(condition, string.Format(message, arg));
 
-        public string SaveEntity(IExecutionContext context, string filename, string info)
-        {
-            return default(string);
-        }
+        //public string SaveEntity(IExecutionContext context, string filename, string info)
+        //{
+        //    return default(string);
+        //}
 
-        public string SaveEntity(Entity entity, string filename, string info)
-        {
-            return default(string);
-        }
+        //public string SaveEntity(Entity entity, string filename, string info)
+        //{
+        //    return default(string);
+        //}
 
-        public void SaveQX(IServicable service, QueryBase qry, string filename)
-        {
-        }
+        //public void SaveQX(IServicable service, QueryBase qry, string filename)
+        //{
+        //}
 
         public void StartSection(string name)
         {
             cmdlet.WriteVerbose($" [START of {name}]");
             this.name = name;
         }
+
+        //public void Trace(string format, params object[] args)
+        //{
+        //    throw new NotImplementedException();
+        //}
 
         #endregion Public Methods
     }
