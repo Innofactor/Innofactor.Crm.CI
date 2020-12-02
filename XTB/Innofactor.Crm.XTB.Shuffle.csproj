@@ -391,6 +391,14 @@
     <Content Include="Deployer\CSD.ico" />
     <Content Include="Deployer\icon.png" />
     <Content Include="Deployer\Ionic.Zip.xml" />
+     <EmbeddedResource Include="..\shared\Innofactor.Crm.Shuffle\Resources\QueryExpression.xsd">
+      <Link>Resources\QueryExpression.xsd</Link>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\shared\Innofactor.Crm.Shuffle\Resources\ShuffleDefinition.xsd">
+      <Link>Resources\ShuffleDefinition.xsd</Link>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="..\shared\Innofactor.Crm.Shuffle\Innofactor.Crm.Shuffle.projitems" Label="Shared" />
   <Import Project="..\modules\Xrm.Utils\Innofactor.Xrm.Utils.Common\Innofactor.Xrm.Utils.Common.projitems" Label="Shared" />
