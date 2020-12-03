@@ -253,7 +253,7 @@
                     orfilter.AddCondition(cond);
                     filter.AddFilter(orfilter);
                 }
-                container.Log("Adding relation condition for {0} in {1} values in {2}.{3}", attribute, ids.Count, block, pkattribute);
+                container.Log($"Adding relation condition for {attribute} in {ids.Count} values in {block}.{pkattribute}");
             }
             container.EndSection();
         }
@@ -261,7 +261,7 @@
         private EntityCollection ExportDataBlock(IExecutionContainer container, ShuffleBlocks blocks, DataBlock block)
         {
             container.StartSection("ExportDataBlock");
-            container.Log("Block: {0}", block.Name);
+            container.Log($"Block: {block.Name}");
             EntityCollection cExportEntities = null;
 
             if (block.Export != null)
@@ -307,7 +307,7 @@
                 {
                     container.StartSection("Export entity using FetchXML");
 #if DEBUG
-                    container.Log("FetchXML:\n{0}", fetchxml);
+                    container.Log($"FetchXML:\n{fetchxml}");
 #endif
                     cExportEntities = container.RetrieveMultiple(new FetchExpression(fetchxml));
 
@@ -378,14 +378,17 @@
                 {
                     #region FetchXML Intersect
 
-                    container.StartSection("Export intersect " + block.Entity);
+                    container.StartSection($"Export intersect {block.Entity}");
                     var xDoc = new XmlDocument();
                     var xEntity = FetchXML.Create(xDoc, block.Entity);
                     FetchXML.AddAttribute(xEntity, lAttributes.ToArray());
 
                     if (block.Relation != null)
                     {
-                        AddRelationFilter(container, blocks, relation, xEntity);
+                        foreach (var relation in block.Relation)
+                        {
+                            AddRelationFilter(container, blocks, relation, xEntity);
+                        }
                     }
 
                     var fetch = xDoc.OuterXml;
@@ -420,7 +423,7 @@
                     #endregion FetchXML Intersect
                 }
 
-                container.Log("Returning {0} records", cExportEntities.Count());
+                container.Log($"Returning {cExportEntities.Count()} records");
             }
             container.EndSection();
             return cExportEntities;

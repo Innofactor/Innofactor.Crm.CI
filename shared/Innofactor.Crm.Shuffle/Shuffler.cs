@@ -210,7 +210,7 @@
             {
                 var root = XML.FindChild(serialized, "ShuffleData");
                 var sertype = XML.GetAttribute(root, "Type");
-                SendLine(container, "Deserialize from {0}", sertype);
+                SendLine(container, $"Deserialize from {sertype}");
                 if (sertype == SerializationType.Full.ToString() ||
                     sertype == SerializationType.Simple.ToString() ||
                     sertype == SerializationType.SimpleNoId.ToString() ||
@@ -225,7 +225,7 @@
                             var xml = new XmlDocument();
                             xml.AppendChild(xml.ImportNode(xBlock.ChildNodes[0], true));
                             var cEntities = container.CreateEntityCollection(xml);
-                            SendLine(container, "Block {0}: {1} records", name, cEntities.Count());
+                            SendLine(container, $"Block {name}: {cEntities.Count()} records");
                             result.Add(name, cEntities);
                         }
                     }
@@ -250,7 +250,7 @@
                             {
                                 var cEntities = container.CreateEntityCollection(serializedblock.ToString(), delimeter);
                                 result.Add(name, cEntities);
-                                SendLine(container, "Block {0}: {1} records", name, cEntities.Count());
+                                SendLine(container, $"Block {name}: {cEntities.Count()} records");
                             }
                             name = current.Substring(3);
                             name = name.Substring(0, name.IndexOf(">>>", StringComparison.Ordinal));
@@ -267,7 +267,7 @@
                     {
                         var cEntities = container.CreateEntityCollection(serializedblock.ToString(), delimeter);
                         result.Add(name, cEntities);
-                        SendLine(container, "Block {0}: {1} records", name, cEntities.Count());
+                        SendLine(container, $"Block {name}: {cEntities.Count()} records");
                     }
                 }
             }

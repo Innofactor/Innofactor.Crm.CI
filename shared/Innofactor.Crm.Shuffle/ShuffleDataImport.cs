@@ -198,8 +198,6 @@
                     object value = null;
                     if (cdEntity.Contains(matchattr))
                     {
-                        //container.Entity(cdEntity).
-                        //value = container.AttributeAsBaseType(cdEntity[matchattr]);
                         value = container.AttributeAsBaseType(cdEntity, matchattr, null, false);
                     }
                     else if (matchattr == container.Entity(cdEntity.LogicalName).PrimaryIdAttribute)
@@ -216,7 +214,7 @@
                     }
                 }
 #if DEBUG
-                container.Log($"Finding matches for {cdEntity}:\n{container.ConvertToFetchXml(qMatch)}");
+                container.Log($"Finding matches for {cdEntity.LogicalName}:\n{container.ConvertToFetchXml(qMatch)}");
 #endif
                 matches = container.RetrieveMultiple(qMatch);
             }
@@ -227,14 +225,14 @@
         private EntityCollection GetMatchingRecordsFromPreRetrieved(IExecutionContainer container, List<string> matchattributes, Entity cdEntity, EntityCollection cAllRecordsToMatch)
         {
             container.StartSection(MethodBase.GetCurrentMethod().Name);
-            container.Log($"Searching matches for: {cdEntity.Id} {cdEntity}");
+            container.Log($"Searching matches for: {cdEntity.Id} {cdEntity.LogicalName}");
             var result = new EntityCollection();
             foreach (var cdRecord in cAllRecordsToMatch.Entities)
             {
                 if (EntityAttributesEqual(container, matchattributes, cdEntity, cdRecord))
                 {
                     result.Add(cdRecord);
-                    container.Log($"Found match: {cdRecord.Id} {cdRecord}");
+                    container.Log($"Found match: {cdRecord.Id} {cdRecord.LogicalName}");
                 }
             }
             container.Log($"Returned matches: {result.Count()}");
@@ -290,7 +288,7 @@
                 var preretrieveall = block.Import.Match?.PreRetrieveAll == true;
 
                 SendLine(container);
-                SendLine(container, "Importing block {0} - {1} records ", name, cEntities.Count());
+                SendLine(container, $"Importing block {name} - {cEntities.Count()} records ");
 
                 var i = 1;
 
@@ -497,7 +495,7 @@
                     catch (Exception ex)
                     {
                         failed++;
-                        SendLine(container, "\n*** Error record: {unique} ***\n{ex.Message}");
+                        SendLine(container, $"\n*** Error record: {unique} ***\n{ex.Message}");
                         container.Log(ex);
                         if (stoponerror)
                         {
