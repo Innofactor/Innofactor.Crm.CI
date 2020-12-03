@@ -1,5 +1,6 @@
 ﻿using Cinteros.Crm.Utils.Shuffle;
 using Cinteros.Crm.Utils.Shuffle.Types;
+using Innofactor.Xrm.Utils.Common.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -78,12 +79,12 @@ namespace Innofactor.Crm.Shuffle.Runner
                     EnableShuffle();
                     var logpath = Path.Combine(Paths.LogsPath, "ShuffleRunner");
                     var container = new CintContainer(Service, logpath);
-                    var log = container.Logger;
+                    
                     var location = System.Reflection.Assembly.GetExecutingAssembly().Location;
                     var verinfo = FileVersionInfo.GetVersionInfo(location);
-                    log.Log("  ***  {0} ***", verinfo.Comments.PadRight(50));
-                    log.Log("  ***  {0} ***", verinfo.LegalCopyright.PadRight(50));
-                    log.Log("  ***  {0} ***", (verinfo.InternalName + ", " + verinfo.FileVersion).PadRight(50));
+                    container.Log("  ***  {0} ***", verinfo.Comments.PadRight(50));
+                    container.Log("  ***  {0} ***", verinfo.LegalCopyright.PadRight(50));
+                    container.Log("  ***  {0} ***", (verinfo.InternalName + ", " + verinfo.FileVersion).PadRight(50));
                     var definition = new XmlDocument();
                     definition.Load(txtFile.Text);
                     ReplaceShufflePlaceholders(definition);
@@ -96,7 +97,7 @@ namespace Innofactor.Crm.Shuffle.Runner
                             if (export != null)
                             {
                                 export.Save(txtData.Text);
-                                AddLogText("Export saved to: " + txtData.Text);
+                                AddLogText($"Export saved to: {txtData.Text}");
                             }
                         }
                         else if (rbImport.Checked)
@@ -104,27 +105,27 @@ namespace Innofactor.Crm.Shuffle.Runner
                             XmlDocument data = null;
                             if (datafilerequired)
                             {
-                                AddLogText("Loading data from: " + txtData.Text);
+                                AddLogText($"Loading data from: {txtData.Text}");
                                 data = ShuffleHelper.LoadDataFile(txtData.Text);
                             }
                             var importresult = Shuffler.QuickImport(container, definition, data, ShuffleEventHandler, definitionpath);
                             AddLogText("---");
-                            AddLogText(string.Format("Created: {0}", importresult.Item1));
-                            AddLogText(string.Format("Updated: {0}", importresult.Item2));
-                            AddLogText(string.Format("Skipped: {0}", importresult.Item3));
-                            AddLogText(string.Format("Deleted: {0}", importresult.Item4));
-                            AddLogText(string.Format("Failed : {0}", importresult.Item5));
+                            AddLogText($"Created: {importresult.Item1}");
+                            AddLogText($"Updated: {importresult.Item2}");
+                            AddLogText($"Skipped: {importresult.Item3}");
+                            AddLogText($"Deleted: {importresult.Item4}");
+                            AddLogText($"Failed : {importresult.Item5}");
                             AddLogText("---");
                         }
                     }
                     catch (Exception ex)
                     {
-                        log.Log(ex);
+                        container.Log(ex);
                         throw;
                     }
                     finally
                     {
-                        log.CloseLog();
+                        container.Logger.CloseLog();
                         shuffeling = false;
                         EnableShuffle();
                     }
@@ -197,7 +198,7 @@ namespace Innofactor.Crm.Shuffle.Runner
                     if (xml.Contains(name))
                     {
                         xml = xml.Replace(name, value);
-                        AddLogText(string.Format("Replacing \"{0}\" with \"{1}\"", name, value));
+                        AddLogText($"Replacing \"{name}\" with \"{value}\"");
                     }
                 }
                 else
