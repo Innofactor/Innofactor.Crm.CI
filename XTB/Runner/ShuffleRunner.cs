@@ -35,7 +35,7 @@ namespace Innofactor.Crm.Shuffle.Runner
             ConnectionUpdated += ShuffleRunner_ConnectionUpdated;
         }
 
-        void ShuffleRunner_ConnectionUpdated(object sender, ConnectionUpdatedEventArgs e)
+        private void ShuffleRunner_ConnectionUpdated(object sender, ConnectionUpdatedEventArgs e)
         {
             EnableShuffle();
         }
@@ -77,9 +77,11 @@ namespace Innofactor.Crm.Shuffle.Runner
                 {
                     shuffeling = true;
                     EnableShuffle();
-                    var logpath = Path.Combine(Paths.LogsPath, "ShuffleRunner");
-                    var container = new CintContainer(Service, logpath);
                     
+                    var definitionpath = Path.GetDirectoryName(txtFile.Text);
+                    var logPath = Path.Combine(definitionpath, DateTime.Now.ToString("yyyyMMdd") + "_" + DateTime.Now.ToString("HHmmss") + "_" + "ShuffleRunner" + "_" + ConnectionDetail + ".log");
+                    var container = new CintContainer(Service, logPath);
+
                     var location = System.Reflection.Assembly.GetExecutingAssembly().Location;
                     var verinfo = FileVersionInfo.GetVersionInfo(location);
                     container.Log("  ***  {0} ***", verinfo.Comments.PadRight(50));
@@ -88,7 +90,7 @@ namespace Innofactor.Crm.Shuffle.Runner
                     var definition = new XmlDocument();
                     definition.Load(txtFile.Text);
                     ReplaceShufflePlaceholders(definition);
-                    var definitionpath = Path.GetDirectoryName(txtFile.Text);
+                    
                     try
                     {
                         if (rbExport.Checked)
