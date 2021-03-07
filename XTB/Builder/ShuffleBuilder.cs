@@ -173,7 +173,7 @@ namespace Innofactor.Crm.Shuffle.Builder
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Calliung Shuffle Runner failed:\n" + ex.Message);
+                MessageBox.Show("Calling Shuffle Runner failed:\n" + ex.Message);
             }
         }
 
