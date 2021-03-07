@@ -277,7 +277,7 @@
                     foreach (var attribute in attributes.Attribute)
                     {
                         var attr = attribute.Name;
-                        container.Log("Adding column: {0}", attr);
+                        container.Log($"Adding column: {attr}");
                         lAttributes.Add(attr.Replace("*", "%"));
                         if (attr.Contains("*"))
                         {
@@ -317,7 +317,7 @@
                 {
                     #region QueryExpression Entity
 
-                    container.StartSection("Export entity " + block.Entity);
+                    container.StartSection($"Export entity {block.Entity}");
                     var qExport = new QueryExpression(block.Entity);
                     if (block.Export.ActiveOnly)
                     {
@@ -356,7 +356,7 @@
                     try
                     {
                         var fetch = container.ConvertToFetchXml(qExport);
-                        container.Log("Exporting {0}:\n{1}", block.Entity, fetch);
+                        container.Log($"Exporting {block.Entity}:\n{fetch}");
                     }
                     catch (Exception ex)
                     {
@@ -369,7 +369,7 @@
                     {
                         SelectAttributes(container, cExportEntities, lAttributes, lNullAttributes);
                     }
-                    SendLine(container, "Block {0} - {1} records", block.Name, cExportEntities.Count());
+                    SendLine(container, $"Block {block.Name} - {cExportEntities.Count()} records");
                     container.EndSection();
 
                     #endregion QueryExpression Entity
@@ -392,9 +392,10 @@
                     }
 
                     var fetch = xDoc.OuterXml;
-                    fetch = fetch.Replace("<fetch ", "<fetch {0} {1} ");    // Detta för att se till att CrmServiceProxy.RetrieveMultiple kan hantera paging
+                    //Imran: Removed because this is causing invalid Xml errors. Could not see the point of having these placeholders.
+                    //fetch = fetch.Replace("<fetch ", "<fetch {0} {1} ");    // Detta för att se till att CrmServiceProxy.RetrieveMultiple kan hantera paging
 #if DEBUG
-                    container.Log("Exporting intersect entity {0}\n{1}", block.Entity, fetch);
+                    container.Log($"Exporting intersect entity {block.Entity}\n{fetch}");
 #endif
                     var qExport = new FetchExpression(fetch);
                     cExportEntities = container.RetrieveMultiple(qExport);
@@ -403,16 +404,35 @@
                         var newattributes = new List<KeyValuePair<string, object>>();
                         foreach (var attr in entity.Attributes)
                         {
-                            if (attr.Value is Guid)
+                            if (attr.Value is Guid guid)
                             {
                                 var attrname = attr.Key;
                                 var relatedentity = attrname.Substring(0, attrname.Length - (attrname.EndsWith("idone") || attrname.EndsWith("idtwo") ? 5 : 2));
-                                newattributes.Add(new KeyValuePair<string, object>(attrname, new EntityReference(relatedentity, (Guid)attr.Value)));
+                                if (!newattributes.Contains(new KeyValuePair<string, object>(attrname, new EntityReference(relatedentity, guid))))
+                                {
+                                    container.Log($"Adding Attribute {attrname} - Related entity {relatedentity}");
+                                    newattributes.Add(new KeyValuePair<string, object>(attrname, new EntityReference(relatedentity, guid)));
+#if DEBUG
+                                    container.Log($"{attrname} added");
+#endif
+
+                                }
+                                else
+                                {
+#if DEBUG
+                                    container.Log($"{attrname} already exists.");
+#endif
+
+                                }
                             }
                         }
                         foreach (var newattr in newattributes)
                         {
-                            if (!newattr.Key.Equals(container.Entity(entity.LogicalName).PrimaryIdAttribute))
+                            
+#if DEBUG
+                            container.Log($"Entity {entity.LogicalName} contains attribute {newattr.Key}: {entity.Attributes.Contains(newattr.Key)}");
+#endif
+                            if(!entity.Attributes.Contains(newattr.Key))
                             {
                                 entity.Attributes.Add(newattr.Key, newattr.Value);
                             }
@@ -420,7 +440,7 @@
                     }
                     container.EndSection();
 
-                    #endregion FetchXML Intersect
+#endregion FetchXML Intersect
                 }
 
                 container.Log($"Returning {cExportEntities.Count()} records");
@@ -466,6 +486,6 @@
             return type;
         }
 
-        #endregion Private Methods
+#endregion Private Methods
     }
 }
