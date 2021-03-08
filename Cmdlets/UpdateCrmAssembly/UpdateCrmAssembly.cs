@@ -66,8 +66,8 @@
             fileculture = chunks[2];
             filetoken = chunks[3];
             WriteObject($"Loaded assembly {filename} {fileversion}");
-            WriteVerbose("Culture: " + fileculture);
-            WriteVerbose("Token  : " + filetoken);
+            WriteVerbose($"Culture: {fileculture}");
+            WriteVerbose($"Token  : {filetoken}");
 
             var query = new QueryExpression("pluginassembly");
             query.ColumnSet.AddColumns("name", "version", "ismanaged");
@@ -80,7 +80,7 @@
 
             if (plugin != null)
             {
-                WriteObject($"Found plugin: {plugin} {plugin.Attributes["version"]}");
+                WriteObject($"Found plugin: {plugin.Attributes["name"]} {plugin.Attributes["version"]}");
                 if (plugin.Attributes["ismanaged"] as bool? ?? false)
                 {
                     if (!UpdateManaged)
@@ -115,12 +115,26 @@
         {
             try
             {
-                WriteVerbose("Reading assembly file " + AssemblyFile);
+                WriteVerbose($"Reading assembly file {AssemblyFile}");
                 var file = ReadFile(AssemblyFile);
                 WriteVerbose("Adding Base64String to entity");
                 var updateplugin = plugin;
-                updateplugin.Attributes.Add("version", fileversion.ToString());
-                updateplugin.Attributes.Add("content", Convert.ToBase64String(file));
+                if (updateplugin.Attributes.Contains("version"))
+                {
+                    updateplugin.Attributes["version"] = fileversion.ToString();
+                }
+                else
+                {
+                    updateplugin.Attributes.Add("version", fileversion.ToString());
+                }
+                if (updateplugin.Attributes.Contains("content"))
+                {
+                    updateplugin.Attributes["content"] = Convert.ToBase64String(file);
+                }
+                else
+                {
+                    updateplugin.Attributes.Add("content", Convert.ToBase64String(file));
+                }
                 WriteObject("Saving updated assembly record");
                 Service.Update(updateplugin);
             }
