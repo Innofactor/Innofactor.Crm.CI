@@ -2,7 +2,7 @@
   "manifestVersion": 1,
   "id": "cinteros-devutils-ci-build-tasks",
   "name": "DevOps for Microsoft Dynamics 365",
-  "version": "9.0.69",
+  "version": "9.0.70",
   "publisher": "InnofactorSE",
   "targets": [
     {
@@ -19,6 +19,7 @@
   "tags": [
     "Dynamics 365",
     "Dynamics CRM",
+    "Microsoft Dataverse",
     "CRM",
     "Shuffle",
     "CRM 365",
