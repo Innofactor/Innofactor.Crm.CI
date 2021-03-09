@@ -1,10 +1,10 @@
 ﻿namespace Innofactor.Crm.CI.Cmdlets.Structure
 {
-    //using Cinteros.Crm.Utils.Common.Interfaces;
     using Innofactor.Xrm.Utils.Common.Interfaces;
-    using Microsoft.Xrm.Sdk;
-    using Microsoft.Xrm.Sdk.Query;
     using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Reflection;
 
     /// <summary>
     /// Implementation of ILoggable for Shuffle
@@ -14,8 +14,14 @@
         #region Private Fields
 
         private readonly DateTime begin;
-        private string name;
+
+        //private string name;
         private readonly XrmCmdletBase cmdlet;
+
+        /// <summary>
+        ///
+        /// </summary>
+        protected List<Tuple<string, DateTime>> stack = new List<Tuple<string, DateTime>>();
 
         #endregion Private Fields
 
@@ -50,53 +56,81 @@
             cmdlet.WriteVerbose($"Finished {timeString}");
         }
 
-        public void EndSection() =>
-           cmdlet.WriteVerbose($" [END of {name}]");
+        public void EndSection()
+        {
+            int i = stack.Count - 1;
+            try
+            {
+                var section = stack[i];
+                stack.RemoveAt(i);
+                cmdlet.WriteVerbose($" [END of {section.Item1}] ({(DateTime.Now - section.Item2).TotalMilliseconds})");
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                cmdlet.WriteDebug($"  *** Logger: Invalid section stack index: {i}");
+                cmdlet.WriteDebug("[END of  -unknown section-]");
+            }
+        }
 
         public void Log(string message) =>
            cmdlet.WriteDebug($" [INFO] {message}");
 
-        public void Log(Exception ex) => cmdlet.WriteDebug(ex.Message);
+        public void Log(Exception ex) => LogException(ex);
 
         public void Log(string message, params object[] arg) =>
           cmdlet.WriteVerbose(" [INFO] " + string.Format(message, arg));
 
-        //public void LogIf(bool condition, string message)
-        //{
-        //    if (condition)
-        //    {
-        //        Log(message);
-        //    }
-        //}
-
-        //public void LogIf(bool condition, string message, params object[] arg) =>
-        //    LogIf(condition, string.Format(message, arg));
-
-        //public string SaveEntity(IExecutionContext context, string filename, string info)
-        //{
-        //    return default(string);
-        //}
-
-        //public string SaveEntity(Entity entity, string filename, string info)
-        //{
-        //    return default(string);
-        //}
-
-        //public void SaveQX(IServicable service, QueryBase qry, string filename)
-        //{
-        //}
-
-        public void StartSection(string name)
+        public void StartSection(string section = null)
         {
-            cmdlet.WriteVerbose($" [START of {name}]");
-            this.name = name;
+            if (string.IsNullOrEmpty(section))
+            {
+                var mb = GetOrigin();
+                section = mb.ReflectedType.Name + "." + mb.Name;
+            }
+            cmdlet.WriteVerbose($" [START of {section}]");
+            stack.Add(new Tuple<string, DateTime>(section, DateTime.Now));
         }
 
-        //public void Trace(string format, params object[] args)
-        //{
-        //    throw new NotImplementedException();
-        //}
-
         #endregion Public Methods
+
+        #region Private Methods
+
+        private MethodBase GetOrigin()
+        {
+            StackFrame[] stackFrames = new StackTrace(true).GetFrames();
+            MethodBase mb = null;
+            try
+            {
+                foreach (StackFrame stackFrame in stackFrames)
+                {
+                    mb = stackFrame.GetMethod();
+                    if (!mb.ReflectedType.FullName.ToLowerInvariant().StartsWith("innofactor.xrm.utils"))
+                    {
+                        break;
+                    }
+                }
+            }
+            catch (Exception ex) { }
+            return mb;
+        }
+        private void LogException(Exception ex)
+        {
+            var padding = Indentchars();
+            cmdlet.WriteDebug("---------------------------------------------------------");
+            cmdlet.WriteDebug($"{padding}{ex.ToString()}");
+            cmdlet.WriteDebug($"{padding}{ex.Message}");
+            cmdlet.WriteDebug($"{padding}{ex.Source}");
+            cmdlet.WriteDebug($"{padding}{ex.StackTrace}");
+            cmdlet.WriteDebug("---------------------------------------------------------");
+        }
+        #endregion Private Methods
+        /// <summary>
+        /// Returns current indentation based on section stack count
+        /// </summary>
+        /// <returns></returns>
+        protected string Indentchars()
+        {
+            return new string(' ', (stack.Count > 0) ? stack.Count * 2 : 0); ;
+        }
     }
 }
