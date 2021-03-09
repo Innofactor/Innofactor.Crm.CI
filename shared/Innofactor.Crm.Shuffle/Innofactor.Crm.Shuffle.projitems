@@ -28,15 +28,15 @@
     <Content Include="$(MSBuildThisFileDirectory)Shuffle-LCG-configuration.xml" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="$(MSBuildThisFileDirectory)Resources\parameterxml.xsd">
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)Resources\parameterxml.xsd">
       <SubType>Designer</SubType>
-    </None>
-    <None Include="$(MSBuildThisFileDirectory)Resources\QueryExpression.xsd">
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)Resources\QueryExpression.xsd">
       <SubType>Designer</SubType>
-    </None>
-    <None Include="$(MSBuildThisFileDirectory)Resources\ShuffleDefinition.xsd">
+    </EmbeddedResource>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)Resources\ShuffleDefinition.xsd">
       <SubType>Designer</SubType>
-    </None>
+    </EmbeddedResource>
     <None Include="$(MSBuildThisFileDirectory)Resources\XSD ShuffleDefinition.cs.cmd" />
   </ItemGroup>
 </Project>
