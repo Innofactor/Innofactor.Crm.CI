@@ -14,7 +14,7 @@ Copy-Item $gulpFile $JsPath
 Set-Location $JsPath
 
 Write-Host "Installing Gulp"
-npm install gulp gulp-rename gulp-strip-debug gulp-uglify gulp-terser
+npm install gulp gulp-rename gulp-strip-debug gulp-terser
 
 Write-Verbose "Calling gulp minify" 
 node .\node_modules\gulp\bin\gulp.js minify

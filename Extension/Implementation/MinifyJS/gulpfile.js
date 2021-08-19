@@ -8,7 +8,7 @@ function minify() {
         file.basename = file.basename.replace('.maxi', '');
     };
     
-    return gulp.src('treeview.maxi.js')
+    return gulp.src('*.maxi.js')
         .pipe(strip())
         .pipe(terser().on('error', function (uglify) {
             console.log("An error occurred in minification (gulp-terser) " + uglify.toString());
