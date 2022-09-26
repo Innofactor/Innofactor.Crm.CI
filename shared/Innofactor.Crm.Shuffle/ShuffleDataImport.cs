@@ -463,10 +463,10 @@
                             {
                                 intersect = cdEntity.LogicalName;
                             }
-
-                            var ref1 = (EntityReference)cdEntity.Attributes.ElementAt(0).Value;
-                            var ref2 = (EntityReference)cdEntity.Attributes.ElementAt(1).Value;
-
+                     
+                            var ref1 = GetAttributeEntityReference(cdEntity.Attributes.ElementAt(0));
+                            var ref2 = GetAttributeEntityReference(cdEntity.Attributes.ElementAt(1));
+                           
                             var party1 = new Entity(ref1.LogicalName, ref1.Id); //Entity.InitFromNameAndId(ref1.LogicalName, ref1.Id, crmsvc, log);
                             var party2 = new Entity(ref2.LogicalName, ref2.Id); //Entity.InitFromNameAndId(ref2.LogicalName, ref2.Id, crmsvc, log);
                             try
@@ -511,11 +511,29 @@
             return new Tuple<int, int, int, int, int, EntityReferenceCollection>(created, updated, skipped, deleted, failed, references);
         }
 
+        private EntityReference GetAttributeEntityReference(KeyValuePair<string, object> x)
+        {
+            if (x.Value is EntityReference entref)
+            {
+                return entref;
+            }
+            else if (x.Value is Guid id)
+            {
+                if (guidmap.ContainsKey(id))
+                {
+                    id = guidmap[id];
+                }
+                var logicname = x.Key.EndsWith("id") ? x.Key.Substring(0, x.Key.Length - 2) : x.Key;
+                return new EntityReference(logicname, id);
+            }
+            return null;
+        }
+
         private void ReplaceGuids(IExecutionContainer container, Entity cdEntity, bool includeid)
         {
             foreach (var prop in cdEntity.Attributes)
             {
-                if (prop.Value is Guid && guidmap.ContainsKey((Guid)prop.Value))
+                if (prop.Value is Guid id && guidmap.ContainsKey(id))
                 {
                     if (includeid)
                     {
@@ -527,9 +545,9 @@
                     }
                 }
 
-                if (prop.Value is EntityReference && guidmap.ContainsKey(((EntityReference)prop.Value).Id))
+                if (prop.Value is EntityReference er && guidmap.ContainsKey(er.Id))
                 {
-                    ((EntityReference)prop.Value).Id = guidmap[((EntityReference)prop.Value).Id];
+                    ((EntityReference)prop.Value).Id = guidmap[er.Id];
                 }
             }
         }
@@ -595,7 +613,7 @@
                         {
                             recordSaved = false;
                             SendLine(container, "{0:000} Update Failed: {1} {2} {3}", pos, identifier, cdNewEntity.LogicalName);
-                            
+
                         }
                     }
                     else
