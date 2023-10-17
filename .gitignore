@@ -257,3 +257,6 @@ VSIX/
 pat.txt
 test.txt
 /codealike.json
+
+!**/*.cjs
+
