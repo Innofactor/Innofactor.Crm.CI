@@ -168,7 +168,6 @@
     <Compile Include="Structure\ShuffleLogger.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="..\..\modules\Xrm.Shuffle\shared\Xrm.Shuffle.Core\Xrm.Shuffle.Core.projitems" Label="Shared" />

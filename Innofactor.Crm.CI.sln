@@ -3,15 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.6.33927.249
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Innofactor.Crm.Shuffle", "Shuffle\Innofactor.Crm.Shuffle.csproj", "{C381E1B6-63D1-4F5F-9D9B-B275F3CC6687}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F8BB4722-8B8D-43B3-AB98-50E18E031574}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 		.gitignore = .gitignore
 	EndProjectSection
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Innofactor.Crm.XTB.Shuffle", "XTB\Innofactor.Crm.XTB.Shuffle.csproj", "{13AE5564-5C72-4A70-8AC5-00D227E8200A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Extension", "Extension", "{6FCD8972-7DD1-4AA7-83DA-4C2B453AB24F}"
 	ProjectSection(SolutionItems) = preProject
@@ -113,12 +109,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Innofactor.Crm.CI.PublishTh
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "modules", "modules", "{CAA30CCF-FF3D-420C-86CC-EAFCBC878654}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Innofactor.Xrm.Utils.Common", "modules\Xrm.Utils\Innofactor.Xrm.Utils.Common\Innofactor.Xrm.Utils.Common.shproj", "{6B4F59AE-7903-47B0-B888-B7B2EAD40B2C}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "shared", "shared", "{44DE50B5-DA2B-4BD6-9D10-8BB345F68226}"
-EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Innofactor.Crm.Shuffle", "shared\Innofactor.Crm.Shuffle\Innofactor.Crm.Shuffle.shproj", "{5C10BFE2-AFAA-4B01-A570-B30EF41DE1F0}"
-EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Xrm.Shuffle.Core", "modules\Xrm.Shuffle\shared\Xrm.Shuffle.Core\Xrm.Shuffle.Core.shproj", "{3DB1CBFE-3A00-42A1-8C04-EB3BB1498F00}"
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Xrm.Utils.Core.Common", "modules\Xrm.Shuffle\Xrm.Utils.Core\Xrm.Utils.Core.Common\Xrm.Utils.Core.Common.shproj", "{A939CF3B-672A-4F68-8E6A-89EFE8C8CFBB}"
@@ -129,14 +119,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{C381E1B6-63D1-4F5F-9D9B-B275F3CC6687}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C381E1B6-63D1-4F5F-9D9B-B275F3CC6687}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C381E1B6-63D1-4F5F-9D9B-B275F3CC6687}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C381E1B6-63D1-4F5F-9D9B-B275F3CC6687}.Release|Any CPU.Build.0 = Release|Any CPU
-		{13AE5564-5C72-4A70-8AC5-00D227E8200A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{13AE5564-5C72-4A70-8AC5-00D227E8200A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{13AE5564-5C72-4A70-8AC5-00D227E8200A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{13AE5564-5C72-4A70-8AC5-00D227E8200A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{37B302D4-5C3B-4B80-BBE7-42D044BDAED8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{37B302D4-5C3B-4B80-BBE7-42D044BDAED8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{37B302D4-5C3B-4B80-BBE7-42D044BDAED8}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -183,8 +165,6 @@ Global
 		{DA437681-4734-40BF-A1EB-82F8C5E50C76} = {07B43341-393E-4B76-8410-C2068E8D5519}
 		{5A43B8FF-DE9F-4A30-857A-1619F51D8D6C} = {07B43341-393E-4B76-8410-C2068E8D5519}
 		{79307A18-283F-47B9-A7C6-41268AC7C2A4} = {07B43341-393E-4B76-8410-C2068E8D5519}
-		{6B4F59AE-7903-47B0-B888-B7B2EAD40B2C} = {CAA30CCF-FF3D-420C-86CC-EAFCBC878654}
-		{5C10BFE2-AFAA-4B01-A570-B30EF41DE1F0} = {44DE50B5-DA2B-4BD6-9D10-8BB345F68226}
 		{3DB1CBFE-3A00-42A1-8C04-EB3BB1498F00} = {CAA30CCF-FF3D-420C-86CC-EAFCBC878654}
 		{A939CF3B-672A-4F68-8E6A-89EFE8C8CFBB} = {CAA30CCF-FF3D-420C-86CC-EAFCBC878654}
 	EndGlobalSection
@@ -193,11 +173,7 @@ Global
 	EndGlobalSection
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		modules\Xrm.Shuffle\shared\Xrm.Shuffle.Core\Xrm.Shuffle.Core.projitems*{3db1cbfe-3a00-42a1-8c04-eb3bb1498f00}*SharedItemsImports = 13
-		shared\Innofactor.Crm.Shuffle\Innofactor.Crm.Shuffle.projitems*{5c10bfe2-afaa-4b01-a570-b30ef41de1f0}*SharedItemsImports = 13
-		modules\Xrm.Utils\Innofactor.Xrm.Utils.Common\Innofactor.Xrm.Utils.Common.projitems*{6b4f59ae-7903-47b0-b888-b7b2ead40b2c}*SharedItemsImports = 13
 		modules\Xrm.Shuffle\Xrm.Utils.Core\Xrm.Utils.Core.Common\Xrm.Utils.Core.Common.projitems*{a939cf3b-672a-4f68-8e6a-89efe8c8cfbb}*SharedItemsImports = 13
-		modules\Xrm.Utils\Innofactor.Xrm.Utils.Common\Innofactor.Xrm.Utils.Common.projitems*{c381e1b6-63d1-4f5f-9d9b-b275f3cc6687}*SharedItemsImports = 4
-		shared\Innofactor.Crm.Shuffle\Innofactor.Crm.Shuffle.projitems*{c381e1b6-63d1-4f5f-9d9b-b275f3cc6687}*SharedItemsImports = 4
 		modules\Xrm.Shuffle\shared\Xrm.Shuffle.Core\Xrm.Shuffle.Core.projitems*{eab7a869-e290-4262-b61e-b41ac221d45e}*SharedItemsImports = 4
 		modules\Xrm.Shuffle\Xrm.Utils.Core\Xrm.Utils.Core.Common\Xrm.Utils.Core.Common.projitems*{eab7a869-e290-4262-b61e-b41ac221d45e}*SharedItemsImports = 4
 	EndGlobalSection
