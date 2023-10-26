@@ -2,3 +2,6 @@
 	path = modules/Xrm.Utils
 	url = https://github.com/Innofactor/Xrm.Utils.git
 	branch = master
+[submodule "modules/Xrm.Shuffle"]
+	path = modules/Xrm.Shuffle
+	url = https://github.com/rappen/Xrm.Shuffle
