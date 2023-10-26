@@ -2,7 +2,7 @@
 {
     using Cinteros.Crm.Utils.Shuffle;
     using Innofactor.Crm.CI.Cmdlets.Structure;
-    using Innofactor.Xrm.Utils.Common.Interfaces;
+    using Xrm.Utils.Core.Common.Interfaces;
     using System;
     using System.Management.Automation;
     using System.Xml;

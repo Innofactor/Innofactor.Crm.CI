@@ -1,7 +1,7 @@
 ﻿namespace Innofactor.Crm.CI.Cmdlets.Structure
 {
-    using Innofactor.Xrm.Utils.Common.Interfaces;
     using Microsoft.Xrm.Sdk;
+    using Xrm.Utils.Core.Common.Interfaces;
 
     /// <summary>
     /// Implementation of IExecutionContainer for Shuffle

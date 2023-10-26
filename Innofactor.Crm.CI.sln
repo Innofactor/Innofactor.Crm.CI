@@ -119,6 +119,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "shared", "shared", "{44DE50
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Innofactor.Crm.Shuffle", "shared\Innofactor.Crm.Shuffle\Innofactor.Crm.Shuffle.shproj", "{5C10BFE2-AFAA-4B01-A570-B30EF41DE1F0}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Xrm.Shuffle.Core", "modules\Xrm.Shuffle\shared\Xrm.Shuffle.Core\Xrm.Shuffle.Core.shproj", "{3DB1CBFE-3A00-42A1-8C04-EB3BB1498F00}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Xrm.Utils.Core.Common", "modules\Xrm.Shuffle\Xrm.Utils.Core\Xrm.Utils.Core.Common\Xrm.Utils.Core.Common.shproj", "{A939CF3B-672A-4F68-8E6A-89EFE8C8CFBB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -181,16 +185,20 @@ Global
 		{79307A18-283F-47B9-A7C6-41268AC7C2A4} = {07B43341-393E-4B76-8410-C2068E8D5519}
 		{6B4F59AE-7903-47B0-B888-B7B2EAD40B2C} = {CAA30CCF-FF3D-420C-86CC-EAFCBC878654}
 		{5C10BFE2-AFAA-4B01-A570-B30EF41DE1F0} = {44DE50B5-DA2B-4BD6-9D10-8BB345F68226}
+		{3DB1CBFE-3A00-42A1-8C04-EB3BB1498F00} = {CAA30CCF-FF3D-420C-86CC-EAFCBC878654}
+		{A939CF3B-672A-4F68-8E6A-89EFE8C8CFBB} = {CAA30CCF-FF3D-420C-86CC-EAFCBC878654}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {ED295346-E5B5-4006-855E-1100CEB0F456}
 	EndGlobalSection
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		modules\Xrm.Utils\Innofactor.Xrm.Utils.Common\Innofactor.Xrm.Utils.Common.projitems*{13ae5564-5c72-4a70-8ac5-00d227e8200a}*SharedItemsImports = 4
-		shared\Innofactor.Crm.Shuffle\Innofactor.Crm.Shuffle.projitems*{13ae5564-5c72-4a70-8ac5-00d227e8200a}*SharedItemsImports = 4
+		modules\Xrm.Shuffle\shared\Xrm.Shuffle.Core\Xrm.Shuffle.Core.projitems*{3db1cbfe-3a00-42a1-8c04-eb3bb1498f00}*SharedItemsImports = 13
 		shared\Innofactor.Crm.Shuffle\Innofactor.Crm.Shuffle.projitems*{5c10bfe2-afaa-4b01-a570-b30ef41de1f0}*SharedItemsImports = 13
 		modules\Xrm.Utils\Innofactor.Xrm.Utils.Common\Innofactor.Xrm.Utils.Common.projitems*{6b4f59ae-7903-47b0-b888-b7b2ead40b2c}*SharedItemsImports = 13
+		modules\Xrm.Shuffle\Xrm.Utils.Core\Xrm.Utils.Core.Common\Xrm.Utils.Core.Common.projitems*{a939cf3b-672a-4f68-8e6a-89efe8c8cfbb}*SharedItemsImports = 13
 		modules\Xrm.Utils\Innofactor.Xrm.Utils.Common\Innofactor.Xrm.Utils.Common.projitems*{c381e1b6-63d1-4f5f-9d9b-b275f3cc6687}*SharedItemsImports = 4
 		shared\Innofactor.Crm.Shuffle\Innofactor.Crm.Shuffle.projitems*{c381e1b6-63d1-4f5f-9d9b-b275f3cc6687}*SharedItemsImports = 4
+		modules\Xrm.Shuffle\shared\Xrm.Shuffle.Core\Xrm.Shuffle.Core.projitems*{eab7a869-e290-4262-b61e-b41ac221d45e}*SharedItemsImports = 4
+		modules\Xrm.Shuffle\Xrm.Utils.Core\Xrm.Utils.Core.Common\Xrm.Utils.Core.Common.projitems*{eab7a869-e290-4262-b61e-b41ac221d45e}*SharedItemsImports = 4
 	EndGlobalSection
 EndGlobal
