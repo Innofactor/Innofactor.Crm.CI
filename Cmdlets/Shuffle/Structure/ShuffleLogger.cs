@@ -1,6 +1,6 @@
 ﻿namespace Innofactor.Crm.CI.Cmdlets.Structure
 {
-    using Innofactor.Xrm.Utils.Common.Interfaces;
+    using Xrm.Utils.Core.Common.Interfaces;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
