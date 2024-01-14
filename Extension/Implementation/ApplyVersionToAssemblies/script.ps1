@@ -141,22 +141,43 @@ if ($PrefixVersions -and ($Env:BUILD_SOURCEBRANCHNAME -eq $PrefixBranch))
     Write-Host "##vso[task.setvariable variable=SemanticVersion;]$SemVersion"
 }
 
+# Function to update version in .csproj file
+function Update-CsprojVersion($csprojPath, $newVersion) {
+    $xml = [xml](Get-Content $csprojPath)
+
+    $propertyGroup = $xml.Project.PropertyGroup | Where-Object { $_.AssemblyVersion -and $_.FileVersion }
+
+    if ($propertyGroup) {
+        $propertyGroup.AssemblyVersion = $newVersion.ToString()
+        $propertyGroup.FileVersion = $newVersion.ToString()
+        $xml.Save($csprojPath)
+        Write-Host "Updated version in $csprojPath"
+    } else {
+        Write-Warning "No version information found in $csprojPath"
+    }
+}
+
 # Apply the version to the assembly property files
-$files = gci $Env:BUILD_SOURCESDIRECTORY -recurse -include "*Properties*","My Project","*Version*" | 
-    ?{ $_.PSIsContainer } | 
-    foreach { gci -Path $_.FullName -Recurse -include *Info.cs }
-if($files)
-{
+$files = Get-ChildItem $Env:BUILD_SOURCESDIRECTORY -Recurse -Include "*Properties*","My Project","*Version*" | 
+    Where-Object { $_.PSIsContainer } | 
+    ForEach-Object { Get-ChildItem -Path $_.FullName -Recurse -Include *Info.cs }
+
+if ($files) {
     Write-Host "Will apply $NewVersion to $($files.count) files."
 
     foreach ($file in $files) {
-        $filecontent = Get-Content($file)
+        $fileContent = Get-Content $file
         attrib $file -r
-        $filecontent -replace $VersionRegex, $NewVersion | Out-File $file
+        $fileContent -replace $VersionRegex, $NewVersion | Out-File $file
         Write-Host "$file - version applied"
     }
+} else {
+    Write-Warning "Found no files with version information such as info.cs, going to search for .csproj files."
 }
-else
-{
-    Write-Warning "Warning: Found no files."
+
+# Get the .csproj file paths from the environment variable
+$csprojFiles = Get-ChildItem $Env:BUILD_SOURCESDIRECTORY -Filter *.csproj
+
+foreach ($csprojFile in $csprojFiles) {
+    Update-CsprojVersion $csprojFile.FullName $NewVersion
 }
