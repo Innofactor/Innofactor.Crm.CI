@@ -114,6 +114,8 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Xrm.Shuffle.Core", "modules
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Xrm.Utils.Core.Common", "modules\Xrm.Shuffle\Xrm.Utils.Core\Xrm.Utils.Core.Common\Xrm.Utils.Core.Common.shproj", "{A939CF3B-672A-4F68-8E6A-89EFE8C8CFBB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UpdatePluginPackage", "Cmdlets\UpdatePluginPackage\UpdatePluginPackage.csproj", "{D05FCED2-45D8-467C-94DB-E3C06E9A42AD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -144,6 +146,10 @@ Global
 		{79307A18-283F-47B9-A7C6-41268AC7C2A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{79307A18-283F-47B9-A7C6-41268AC7C2A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{79307A18-283F-47B9-A7C6-41268AC7C2A4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D05FCED2-45D8-467C-94DB-E3C06E9A42AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D05FCED2-45D8-467C-94DB-E3C06E9A42AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D05FCED2-45D8-467C-94DB-E3C06E9A42AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D05FCED2-45D8-467C-94DB-E3C06E9A42AD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -168,6 +174,7 @@ Global
 		{79307A18-283F-47B9-A7C6-41268AC7C2A4} = {07B43341-393E-4B76-8410-C2068E8D5519}
 		{5C10BFE2-AFAA-4B01-A570-B30EF41DE1F0} = {CAA30CCF-FF3D-420C-86CC-EAFCBC878654}
 		{A939CF3B-672A-4F68-8E6A-89EFE8C8CFBB} = {CAA30CCF-FF3D-420C-86CC-EAFCBC878654}
+		{D05FCED2-45D8-467C-94DB-E3C06E9A42AD} = {07B43341-393E-4B76-8410-C2068E8D5519}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {ED295346-E5B5-4006-855E-1100CEB0F456}
