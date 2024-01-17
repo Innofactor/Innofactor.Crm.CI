@@ -29,12 +29,12 @@ namespace UpdatePluginPackage
         [Parameter(
             Mandatory = true,
             Position = 0,
-            HelpMessage = "Path to assembly file"
-        ), Alias("DLL", "D")]
-        public string AssemblyFile { get; set; }
+            HelpMessage = "Path to the nuget package file containing the plugin"
+        ), Alias("Nupkg", "N")]
+        public string PluginPackageFile { get; set; }
 
         [Parameter(
-            HelpMessage = "Set this to allow updating managed assembly"
+            HelpMessage = "Set this to allow updating managed plugin package"
         ), Alias("UM")]
         public bool UpdateManaged { get; set; } = false;
 
@@ -44,10 +44,10 @@ namespace UpdatePluginPackage
 
         protected override void ProcessRecord()
         {
-            var assembly = GetAssembly();
-            if (assembly != null)
+            var package = GetPluginPackage();
+            if (package != null)
             {
-                UpdateAssembly(assembly);
+                UpdatePackage(package);
             }
         }
 
@@ -55,51 +55,48 @@ namespace UpdatePluginPackage
 
         #region Private Methods
 
-        private Entity GetAssembly()
+        private Entity GetPluginPackage()
         {
-            WriteObject($"Reading assembly file {AssemblyFile}");
-            var file = ReadFile(AssemblyFile);
-            WriteVerbose("Loading assembly file");
+            WriteObject($"Reading plugin package file {PluginPackageFile}");
+            var file = ReadFile(PluginPackageFile);
+            WriteVerbose("Loading plugin package file");
             var assembly = Assembly.Load(file);
             var chunks = assembly.FullName.Split(new string[] { ", ", "Version=", "Culture=", "PublicKeyToken=" }, StringSplitOptions.RemoveEmptyEntries);
-            filename = chunks[0];
-            fileversion = new Version(chunks[1]);
-            fileculture = chunks[2];
-            filetoken = chunks[3];
-            WriteObject($"Loaded assembly {filename} {fileversion}");
-            WriteVerbose($"Culture: {fileculture}");
-            WriteVerbose($"Token  : {filetoken}");
-
-            var query = new QueryExpression("pluginassembly");
+            var packageName = chunks[0];
+            var packageVersion = new Version(chunks[1]);
+            var packageCulture = chunks[2];
+            var packageToken = chunks[3];
+            WriteObject($"Loaded plugin package {packageName} {packageVersion}");
+            
+            var query = new QueryExpression("pluginpackage");
             query.ColumnSet.AddColumns("name", "version", "ismanaged");
-            query.Criteria.AddCondition("name", ConditionOperator.Equal, filename);
-            query.Criteria.AddCondition("version", ConditionOperator.Like, fileversion.ToString(2) + "%");
-            query.Criteria.AddCondition("culture", ConditionOperator.Equal, fileculture);
-            query.Criteria.AddCondition("publickeytoken", ConditionOperator.Equal, filetoken);
+            query.Criteria.AddCondition("name", ConditionOperator.Equal, packageName);
+            query.Criteria.AddCondition("version", ConditionOperator.Like, packageVersion.ToString(2) + "%");
+            
+            var pluginPackage = Service.RetrieveMultiple(query).Entities.FirstOrDefault();
 
-            var plugin = Service.RetrieveMultiple(query).Entities.FirstOrDefault();
-
-            if (plugin != null)
+            if (pluginPackage != null)
             {
-                WriteObject($"Found plugin: {plugin.Attributes["name"]} {plugin.Attributes["version"]}");
-                if (plugin.Attributes["ismanaged"] as bool? ?? false)
+                WriteObject($"Found plugin package: {pluginPackage.Attributes["name"]} {pluginPackage.Attributes["version"]}");
+                if (pluginPackage.Attributes["ismanaged"] as bool? ?? false)
                 {
                     if (!UpdateManaged)
                     {
-                        throw new ArgumentOutOfRangeException("AssemblyFile", AssemblyFile, "Assembly is managed in target CRM. Use parameter UpdateManaged to allow this.");
+                        throw new ArgumentOutOfRangeException("PluginPackageFile", PluginPackageFile, "Plugin package is managed in target CRM. Use parameter UpdateManaged to allow this.");
                     }
                     else
                     {
-                        WriteWarning("Updating managed assembly");
+                        WriteWarning("Updating managed plugin package");
                     }
                 }
-                return plugin;
+                return pluginPackage;
             }
             else
             {
-                throw new ArgumentOutOfRangeException("AssemblyFile", AssemblyFile, "Assembly does not appear to be registered in CRM");
+                throw new ArgumentOutOfRangeException("PluginPackageFile", PluginPackageFile, "Plugin package does not appear to be registered in CRM");
             }
         }
+
 
         private byte[] ReadFile(string fileName)
         {
@@ -112,38 +109,44 @@ namespace UpdatePluginPackage
             return buffer;
         }
 
-        private void UpdateAssembly(Entity plugin)
+        private void UpdatePackage(Entity pluginPackage)
         {
             try
             {
-                WriteVerbose($"Reading assembly file {AssemblyFile}");
-                var file = ReadFile(AssemblyFile);
+                WriteVerbose($"Reading plugin package file {PluginPackageFile}");
+                var file = ReadFile(PluginPackageFile);
                 WriteVerbose("Adding Base64String to entity");
-                var updateplugin = plugin;
-                if (updateplugin.Attributes.Contains("version"))
+                var updatePluginPackage = pluginPackage;
+
+                // Update version attribute
+                if (updatePluginPackage.Attributes.Contains("version"))
                 {
-                    updateplugin.Attributes["version"] = fileversion.ToString();
+                    updatePluginPackage.Attributes["version"] = fileversion.ToString();
                 }
                 else
                 {
-                    updateplugin.Attributes.Add("version", fileversion.ToString());
+                    updatePluginPackage.Attributes.Add("version", fileversion.ToString());
                 }
-                if (updateplugin.Attributes.Contains("content"))
+
+                // Update content attribute
+                if (updatePluginPackage.Attributes.Contains("content"))
                 {
-                    updateplugin.Attributes["content"] = Convert.ToBase64String(file);
+                    updatePluginPackage.Attributes["content"] = Convert.ToBase64String(file);
                 }
                 else
                 {
-                    updateplugin.Attributes.Add("content", Convert.ToBase64String(file));
+                    updatePluginPackage.Attributes.Add("content", Convert.ToBase64String(file));
                 }
-                WriteObject("Saving updated assembly record");
-                Service.Update(updateplugin);
+
+                WriteObject("Saving updated plugin package record");
+                Service.Update(updatePluginPackage);
             }
             catch (Exception ex)
             {
-                WriteError(new ErrorRecord(ex, "UpdateCrmAssembly", ErrorCategory.WriteError, plugin));
+                WriteError(new ErrorRecord(ex, "UpdatePluginPackage", ErrorCategory.WriteError, pluginPackage));
             }
         }
+
 
         #endregion Private Methods
     }
