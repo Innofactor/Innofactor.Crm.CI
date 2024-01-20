@@ -114,7 +114,7 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Xrm.Shuffle.Core", "modules
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Xrm.Utils.Core.Common", "modules\Xrm.Shuffle\Xrm.Utils.Core\Xrm.Utils.Core.Common\Xrm.Utils.Core.Common.shproj", "{A939CF3B-672A-4F68-8E6A-89EFE8C8CFBB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UpdatePluginPackage", "Cmdlets\UpdatePluginPackage\UpdatePluginPackage.csproj", "{D05FCED2-45D8-467C-94DB-E3C06E9A42AD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Innofactor.Crm.CI.UpdatePluginPackage", "Cmdlets\UpdatePluginPackage\Innofactor.Crm.CI.UpdatePluginPackage.csproj", "{D05FCED2-45D8-467C-94DB-E3C06E9A42AD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

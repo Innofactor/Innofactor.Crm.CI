@@ -7,8 +7,8 @@
     <ProjectGuid>{D05FCED2-45D8-467C-94DB-E3C06E9A42AD}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>UpdatePluginPackage</RootNamespace>
-    <AssemblyName>UpdatePluginPackage</AssemblyName>
+    <RootNamespace>Innofactor.Crm.CI.Cmdlets</RootNamespace>
+    <AssemblyName>Innofactor.Crm.CI</AssemblyName>
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -115,6 +115,7 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\XrmCmdletBase.cs">
