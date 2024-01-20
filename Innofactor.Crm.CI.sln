@@ -116,6 +116,13 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Xrm.Utils.Core.Common", "mo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Innofactor.Crm.CI.UpdatePluginPackage", "Cmdlets\UpdatePluginPackage\Innofactor.Crm.CI.UpdatePluginPackage.csproj", "{D05FCED2-45D8-467C-94DB-E3C06E9A42AD}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UpdatePackage", "UpdatePackage", "{7EF836D0-1FC2-4372-97B2-CEF2C2EF6C3E}"
+	ProjectSection(SolutionItems) = preProject
+		Extension\Implementation\UpdatePackage\icon.png = Extension\Implementation\UpdatePackage\icon.png
+		Extension\Implementation\UpdatePackage\script.ps1 = Extension\Implementation\UpdatePackage\script.ps1
+		Extension\Implementation\UpdatePackage\task.json = Extension\Implementation\UpdatePackage\task.json
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -175,6 +182,7 @@ Global
 		{5C10BFE2-AFAA-4B01-A570-B30EF41DE1F0} = {CAA30CCF-FF3D-420C-86CC-EAFCBC878654}
 		{A939CF3B-672A-4F68-8E6A-89EFE8C8CFBB} = {CAA30CCF-FF3D-420C-86CC-EAFCBC878654}
 		{D05FCED2-45D8-467C-94DB-E3C06E9A42AD} = {07B43341-393E-4B76-8410-C2068E8D5519}
+		{7EF836D0-1FC2-4372-97B2-CEF2C2EF6C3E} = {E8AF99D7-7E0B-4C33-99BD-35B5D03ED1FC}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {ED295346-E5B5-4006-855E-1100CEB0F456}

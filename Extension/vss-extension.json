@@ -159,6 +159,16 @@
       "properties": {
         "name": "implementation/WhoAmI"
       }
+    },
+    {
+      "id": "UpdatePackage",
+      "type": "ms.vss-distributed-task.task",
+      "targets": [
+        "ms.vss-distributed-task.tasks"
+      ],
+      "properties": {
+        "name": "implementation/UpdatePackage"
+      }
     }
   ]
 }
