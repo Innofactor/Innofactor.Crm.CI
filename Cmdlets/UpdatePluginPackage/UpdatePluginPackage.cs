@@ -1,16 +1,15 @@
-﻿using Innofactor.Crm.CI.Cmdlets;
-using Microsoft.Xrm.Sdk;
-using Microsoft.Xrm.Sdk.Query;
-using System;
-using System.IO;
-using System.IO.Packaging;
-using System.Linq;
-using System.Management.Automation;
-using System.Web.UI.WebControls;
-using System.Xml;
-
-namespace UpdatePluginPackage
+﻿namespace Innofactor.Crm.CI.Cmdlets
 {
+    using Microsoft.Xrm.Sdk;
+    using Microsoft.Xrm.Sdk.Query;
+    using System;
+    using System.IO;
+    using System.IO.Packaging;
+    using System.Linq;
+    using System.Management.Automation;
+    using System.Web.UI.WebControls;
+    using System.Xml;
+
     [Cmdlet(VerbsData.Update, "PluginPackage")]
     public class UpdatePluginPackage : XrmCmdletBase
     {
@@ -20,14 +19,14 @@ namespace UpdatePluginPackage
            Mandatory = true,
            Position = 0,
            HelpMessage = "Package Name of the nuget package in CRM. "
-       ), Alias("P", "p")]
+       ), Alias("PackageName", "p")]
         public string PackageName { get; set; }
 
         [Parameter(
             Mandatory = true,
             Position = 1,
             HelpMessage = "Path to the nuget package file containing the plugin"
-        ), Alias("Nupkg", "N")]
+        ), Alias("PackageFile", "PF")]
         public string PluginPackageFile { get; set; }
 
         [Parameter(
