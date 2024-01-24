@@ -19,8 +19,8 @@
            Mandatory = true,
            Position = 0,
            HelpMessage = "Package Name of the nuget package in CRM. "
-       ), Alias("PackageName", "p")]
-        public string PackageName { get; set; }
+       ), Alias("PackageName")]
+        public string PluginPackageName { get; set; }
 
         [Parameter(
             Mandatory = true,
@@ -50,19 +50,18 @@
         #endregion Protected Methods
 
         #region Private Methods
-
+        /// <summary>
+        /// Gets the plugin package
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
         private Entity GetPluginPackage()
         {
-            WriteObject($"Reading plugin package file {PluginPackageFile}");
-            if (!PackageName.EndsWith("_"))
-            {
-                PackageName += "_";
-                WriteObject($"PackageName did not end with underscore, adding it. PackageName is now {PackageName}");
-            }
+            WriteObject($"Getting plugin package {PluginPackageName} from Dataverse");
 
             var query = new QueryExpression("pluginpackage");
-            query.ColumnSet.AddColumns("name", "ismanaged");
-            query.Criteria.AddCondition("name", ConditionOperator.Equal, PackageName);
+            query.ColumnSet.AddColumns("name", "ismanaged", "version");
+            query.Criteria.AddCondition("name", ConditionOperator.Equal, PluginPackageName);
 
             var pluginPackage = Service.RetrieveMultiple(query).Entities.FirstOrDefault();
 
@@ -73,7 +72,7 @@
                 {
                     if (!UpdateManaged)
                     {
-                        throw new ArgumentOutOfRangeException("PackageName", PackageName, "Plugin package is managed in target CRM. Use parameter UpdateManaged to allow this.");
+                        throw new ArgumentOutOfRangeException("PluginPackageName", PluginPackageName, "Plugin package is managed in target CRM. Use parameter UpdateManaged to allow this.");
                     }
                     else
                     {
@@ -84,7 +83,7 @@
             }
             else
             {
-                throw new ArgumentOutOfRangeException("PackageName", PackageName, "Plugin package does not appear to be registered in CRM");
+                throw new ArgumentOutOfRangeException("PluginPackageName", PluginPackageName, "Plugin package does not appear to be registered in CRM/Dataverse");
             }
         }
 

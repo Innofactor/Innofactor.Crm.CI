@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("UpdatePluginPackage")]
+[assembly: AssemblyTitle("Innofactor.Crm.CI.UpdatePluginPackage")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Innofactor Plc")]
-[assembly: AssemblyProduct("UpdatePluginPackage")]
-[assembly: AssemblyCopyright("Copyright © Innofactor Plc 2024")]
+[assembly: AssemblyCompany("Innofactor AB")]
+[assembly: AssemblyProduct("Innofactor.Crm.CI.UpdatePluginPackage")]
+[assembly: AssemblyCopyright("Copyright © Innofactor AB 2024")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

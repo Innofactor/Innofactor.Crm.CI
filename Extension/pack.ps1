@@ -23,6 +23,7 @@ $TaskFolders = @(
 	"UpdateAssembly"
 	"UpdateWebResources"
 	"WhoAmI"
+	"UpdatePackage"
 )
 
 $DestinationFolders = @();
@@ -51,6 +52,7 @@ $CmdletFolders = @(
 	"UpdateCrmAssembly"
 	"UpdateCrmResouces"
 	"FindCrmUser"
+	"UpdatePackage"
 );
 
 $SourceFolders = @();

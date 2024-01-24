@@ -14,9 +14,9 @@
   "version": {
     "Major": "9",
     "Minor": "0",
-    "Patch": "6"
+    "Patch": "16"
   },
-  "minimumAgentVersion": "1.95.0",
+  "minimumAgentVersion": "3.1.0",
   "groups": [
     {
       "name": "advanced",
@@ -48,7 +48,7 @@
       "label": "Package",
       "defaultValue": "",
       "required": true,
-      "helpMarkDown": "File path of the Package file to update in target CRM. Package must be registered._"
+      "helpMarkDown": "File path of the Package file to update in target CRM. _Package must be registered already._"
     },
     {
       "name": "updateManaged",
