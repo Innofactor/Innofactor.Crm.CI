@@ -2,7 +2,7 @@
   "manifestVersion": 1,
   "id": "cinteros-devutils-ci-build-tasks",
   "name": "DevOps for Microsoft Dynamics 365",
-  "version": "9.0.76",
+  "version": "9.0.91",
   "publisher": "InnofactorSE",
   "targets": [
     {
@@ -158,6 +158,16 @@
       ],
       "properties": {
         "name": "implementation/WhoAmI"
+      }
+    },
+    {
+      "id": "UpdatePackage",
+      "type": "ms.vss-distributed-task.task",
+      "targets": [
+        "ms.vss-distributed-task.tasks"
+      ],
+      "properties": {
+        "name": "implementation/UpdatePackage"
       }
     }
   ]

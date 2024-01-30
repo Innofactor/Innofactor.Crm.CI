@@ -14,9 +14,15 @@
 [CmdletBinding()]
 param()
 
+# Getting input from UI
+$VersionType	= Get-VstsInput -Name versionType -Require
+$VersionFile	= Get-VstsInput -Name versionFile
+$VersionMatch	= Get-VstsInput -Name versionMatch -AsBool
+$WorkingDirectory = Get-VstsInput -Name workingDirectory 
+
 # If this script is not running on a build server, remind user to 
 # set environment variables so that this script can be debugged
-if(-not ($Env:BUILD_SOURCESDIRECTORY -and $Env:BUILD_BUILDNUMBER))
+if(-not ($Env:BUILD_SOURCESDIRECTORY -and $Env:BUILD_BUILDNUMBER -and $WorkingDirectory))
 {
     Write-Error "You must set the following environment variables"
     Write-Error "to test this script interactively."
@@ -24,21 +30,46 @@ if(-not ($Env:BUILD_SOURCESDIRECTORY -and $Env:BUILD_BUILDNUMBER))
     Write-Host '$Env:BUILD_SOURCESDIRECTORY = "C:\code\FabrikamTFVC\HelloWorld"'
     Write-Host '$Env:BUILD_BUILDNUMBER - For example, enter something like:'
     Write-Host '$Env:BUILD_BUILDNUMBER = "Build HelloWorld_0000.00.00.0"'
+    Write-Host '$WorkingDirectory - For example, enter something like:"/FabrikamGit/ProjectA"'
+    Write-Host 'Note: If $WorkingDirectory is not set, $Env:BUILD_SOURCESDIRECTORY will be used instead.'
     exit 1
 }
 
-# Make sure path to source code directory is available
-if (-not $Env:BUILD_SOURCESDIRECTORY)
+# Determine the working directory to use
+if ($WorkingDirectory) {
+    if(Test-Path $WorkingDirectory)
+    {
+        Write-Host "Working Directory set to $WorkingDirectory"
+        Set-Location $WorkingDirectory
+    }
+    else 
+    { 
+        Write-Host "Attempting to join-path for working directory"
+        $WorkingDirectory = Join-Path $Env:BUILD_SOURCESDIRECTORY $WorkingDirectory
+        if(Test-Path $WorkingDirectory)
+        {
+            Write-Host "Working Directory set to $WorkingDirectory"
+            Set-Location $WorkingDirectory
+        }
+        else
+        {
+			Write-Error "WorkingDirectory ($WorkingDirectory) does not exist. Reverting back to using ($Env:BUILD_SOURCESDIRECTORY)"
+			Set-Location $Env:BUILD_SOURCESDIRECTORY
+		}
+    }
+} 
+else 
 {
-    Write-Error ("BUILD_SOURCESDIRECTORY environment variable is missing.")
-    exit 1
+    if (-not $Env:BUILD_SOURCESDIRECTORY) {
+        Write-Error "BUILD_SOURCESDIRECTORY is not set. Set it as an environment variable. Or set WorkingDirectory variable"
+        exit 1
+    }
+
+    Write-Host "WorkingDirectory does not exist or is not specified. Setting location to default: $Env:BUILD_SOURCESDIRECTORY"
+    Set-Location $Env:BUILD_SOURCESDIRECTORY
 }
-elseif (-not (Test-Path $Env:BUILD_SOURCESDIRECTORY))
-{
-    Write-Error "BUILD_SOURCESDIRECTORY does not exist: $Env:BUILD_SOURCESDIRECTORY"
-    exit 1
-}
-Write-Verbose "BUILD_SOURCESDIRECTORY: $Env:BUILD_SOURCESDIRECTORY"
+
+Write-Host "Current working directory: $PWD"
 
 # Make sure there is a build number
 if (-not $Env:BUILD_BUILDNUMBER)
@@ -52,11 +83,6 @@ Write-Host "BUILD_BUILDNUMBER: $Env:BUILD_BUILDNUMBER"
 # Regular expression pattern to find the version in the build number 
 # and then apply it to the assemblies
 $VersionRegex = "\d+\.\d+\.\d+\.\d+"
-
-# Getting input from UI
-$VersionType	= Get-VstsInput -Name versionType -Require
-$VersionFile	= Get-VstsInput -Name versionFile
-$VersionMatch	= Get-VstsInput -Name versionMatch -AsBool
 
 # File with resulting version
 $VersionResult = Join-Path $Env:AGENT_BUILDDIRECTORY "version.txt"
@@ -142,21 +168,42 @@ if ($PrefixVersions -and ($Env:BUILD_SOURCEBRANCHNAME -eq $PrefixBranch))
 }
 
 # Apply the version to the assembly property files
-$files = gci $Env:BUILD_SOURCESDIRECTORY -recurse -include "*Properties*","My Project","*Version*" | 
-    ?{ $_.PSIsContainer } | 
-    foreach { gci -Path $_.FullName -Recurse -include *Info.cs }
-if($files)
-{
+$files = Get-ChildItem $PWD -Recurse -Include "*Properties*","My Project","*Version*" | 
+    Where-Object { $_.PSIsContainer } | 
+    ForEach-Object { Get-ChildItem -Path $_.FullName -Recurse -Include *Info.cs }
+
+if ($files) {
     Write-Host "Will apply $NewVersion to $($files.count) files."
 
     foreach ($file in $files) {
-        $filecontent = Get-Content($file)
+        $fileContent = Get-Content $file
         attrib $file -r
-        $filecontent -replace $VersionRegex, $NewVersion | Out-File $file
+        $fileContent -replace $VersionRegex, $NewVersion | Out-File $file
         Write-Host "$file - version applied"
     }
+} else {
+    Write-Warning "Found no files with version information such as info.cs, going to search for .csproj files."
 }
-else
-{
-    Write-Warning "Warning: Found no files."
+
+# Function to update version in .csproj file
+function Update-CsprojVersion($csprojPath, $newVersion) {
+    $xml = [xml](Get-Content $csprojPath)
+
+    $propertyGroup = $xml.Project.PropertyGroup | Where-Object { $_.AssemblyVersion -and $_.FileVersion }
+
+    if ($propertyGroup) {
+        $propertyGroup.AssemblyVersion = $newVersion.ToString()
+        $propertyGroup.FileVersion = $newVersion.ToString()
+        $xml.Save($csprojPath)
+        Write-Host "Updated version in $csprojPath"
+    } else {
+        Write-Warning "No version information found in $csprojPath"
+    }
+}
+
+# Get the .csproj file paths from the environment variable
+$csprojFiles = Get-ChildItem $PWD -Filter *.csproj
+
+foreach ($csprojFile in $csprojFiles) {
+    Update-CsprojVersion $csprojFile.FullName $NewVersion
 }

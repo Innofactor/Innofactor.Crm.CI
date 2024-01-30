@@ -1,0 +1,68 @@
+{
+  "id": "9a9257e6-1371-44a1-95c4-b2304b5396fb",
+  "name": "UpdatePackage",
+  "friendlyName": "Innofactor DevOps: Update Package",
+  "description": "Updates a package in target CRM organization.",
+  "author": "Innofactor Sweden",
+  "helpMarkDown": "",
+  "category": "Build",
+  "visibility": [
+    "Build",
+    "Release"
+  ],
+  "demands": [],
+  "version": {
+    "Major": "9",
+    "Minor": "0",
+    "Patch": "16"
+  },
+  "minimumAgentVersion": "3.1.0",
+  "groups": [
+    {
+      "name": "advanced",
+      "displayName": "Advanced",
+      "isExpanded": false
+    }
+  ],
+  "instanceNameFormat": "Update Plugin Package",
+  "inputs": [
+    {
+      "name": "crmConnectionString",
+      "type": "string",
+      "label": "CRM Connection String",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "For more information on format: https://msdn.microsoft.com/en-gb/library/mt608573.aspx"
+    },
+    {
+      "name": "packageName",
+      "type": "string",
+      "label": "Package Name",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "Name of the package to be updated in the target CRM. _Package must be registered already._"
+    },
+    {
+      "name": "packageFile",
+      "type": "filePath",
+      "label": "Package",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "File path of the Package file to update in target CRM. _Package must be registered already._"
+    },
+    {
+      "name": "updateManaged",
+      "type": "boolean",
+      "label": "Update Managed",
+      "defaultValue": "false",
+      "required": false,
+      "helpMarkDown": "Check this to allow update of assemblies that are managed in target CRM environment.",
+      "groupName": "advanced"
+    }
+  ],
+  "execution": {
+    "PowerShell3": {
+      "target": "script.ps1"
+    }
+  }
+}

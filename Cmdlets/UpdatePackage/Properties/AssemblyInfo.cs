@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Innofactor.Crm.CI.UpdateCrmAssembly")]
+[assembly: AssemblyTitle("Innofactor.Crm.CI.UpdatePluginPackage")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Innofactor.Crm.CI.UpdateCrmAssembly")]
+[assembly: AssemblyCompany("Innofactor AB")]
+[assembly: AssemblyProduct("Innofactor.Crm.CI.UpdatePluginPackage")]
 [assembly: AssemblyCopyright("Copyright © Innofactor AB 2024")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("5a43b8ff-de9f-4a30-857a-1619f51d8d6c")]
+[assembly: Guid("d05fced2-45d8-467c-94db-e3c06e9a42ad")]
 
 // Version information for an assembly consists of the following four values:
 //

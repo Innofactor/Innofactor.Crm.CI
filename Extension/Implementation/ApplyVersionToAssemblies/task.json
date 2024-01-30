@@ -12,11 +12,11 @@
   ],
   "demands": [],
   "version": {
-    "Major": "8",
-    "Minor": "3",
-    "Patch": "17"
+    "Major": "9",
+    "Minor": "0",
+    "Patch": "2"
   },
-  "minimumAgentVersion": "1.95.0",
+  "minimumAgentVersion": "3.0.0",
   "groups": [
     {
       "name": "advanced",
@@ -36,6 +36,14 @@
         "file": "Search for revision in build number and append it to pattern from file"
       },
       "helpMarkDown": "Select location where version pattern will be searched."
+    },
+    {
+      "name": "workingDirectory",
+      "type": "filePath",
+      "label": "Working Directory",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "Working directory to look for projects on which version number needs to be set. _If this is null, it will take the default build directory path_"
     },
     {
       "name": "versionFile",
