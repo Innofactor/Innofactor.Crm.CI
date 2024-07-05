@@ -13,7 +13,7 @@
   "version": {
     "Major": "8",
     "Minor": "2",
-    "Patch": "16"
+    "Patch": "15"
   },
   "minimumAgentVersion": "1.95.0",
   "instanceNameFormat": "Minify JavaScripts $(workingFolder)",

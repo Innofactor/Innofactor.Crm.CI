@@ -11,6 +11,7 @@
   "devDependencies": {
     "gulp": "^5.0.0",
     "gulp-cli": "^3.0.0",
+    "gulp-msbuild": "^0.10.0",
     "gulp-rename": "^2.0.0",
     "gulp-strip-debug": "^6.0.0",
     "gulp-terser": "^2.1.0",
