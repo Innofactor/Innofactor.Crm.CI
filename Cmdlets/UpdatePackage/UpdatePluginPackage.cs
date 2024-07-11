@@ -148,7 +148,10 @@
                 WriteVerbose("Adding Base64String to entity");
                 var updatePluginPackage = pluginPackage;
 
-                // Update version attribute
+                /*
+                 * Commented out as version is not updatable in Dataverse 
+                 * https://learn.microsoft.com/en-us/power-apps/developer/data-platform/build-and-package#dependent-assemblies
+                 * 
                 if (updatePluginPackage.Attributes.Contains("version"))
                 {
                     updatePluginPackage.Attributes["version"] = version;
@@ -157,6 +160,7 @@
                 {
                     updatePluginPackage.Attributes.Add("version", version);
                 }
+                */
 
                 // Update content attribute
                 if (updatePluginPackage.Attributes.Contains("content"))
